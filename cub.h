@@ -11,8 +11,9 @@
 # include <limits.h>
 # include <stdio.h>
 # include <stdlib.h>
-# include "mlx.h"
-# include <X11/keysym.h>
+# include <fcntl.h>
+// # include "mlx.h"
+// # include <X11/keysym.h>
 
 typedef struct data_s
 {
@@ -24,10 +25,11 @@ typedef struct data_s
 	char	*east;
 	char	*floor;
 
-}	t_data;
+	char	*read_buf;
+}	t_d;
 
 void	free_str(char *str);
-void	printe(char *str);
+void	ft_printe(char *str);
 
 void	*gnl_calloc(size_t nmemb, size_t size);
 char	*gnl_join_free(char *static_buf, char *buffer);
