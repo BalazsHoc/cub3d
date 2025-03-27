@@ -18,6 +18,7 @@
 typedef struct data_s
 {
 	char	**map;
+	char	**db_buf;
 
 	char	*north;
 	char	*south;

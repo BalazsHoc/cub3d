@@ -3,7 +3,7 @@ NAME = cub3D
 
 CC = cc
 CFLAGS = -Wall -Werror -Wextra -g
-MLXFLAGS = -lmlx -lXext -lX11 -lm
+# MLXFLAGS = -lmlx -lXext -lX11 -lm
 
 SRCS =	main.c get_next_line.c get_next_line_utils.c
 

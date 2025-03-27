@@ -22,12 +22,16 @@ void	free_map(char **map)
 {
 	int	i;
 
-	i = -1;
-	if (map != NULL)
+	i = 0;
+	if (!map)
+		return ;
+	while (map[i])
 	{
-		while (map[++i])
-			free_str(map[i]); 
+		free_str(map[i]);
+		i++;
 	}
+	free(map);
+	map = NULL;
 }
 
 void	free_str(char *str)
@@ -44,6 +48,7 @@ void	error_clean(t_d *data)
 	if (data)
 	{
 		free_map(data->map);
+		free_map(data->db_buf);
 		free_str(data->north);
 		free_str(data->south);
 		free_str(data->west);
@@ -60,6 +65,7 @@ void	exit_clean(t_d *data)
 	if (data)
 	{
 		free_map(data->map);
+		free_map(data->db_buf);
 		free_str(data->north);
 		free_str(data->south);
 		free_str(data->west);
@@ -67,6 +73,7 @@ void	exit_clean(t_d *data)
 		free_str(data->floor);
 		free_str(data->read_buf);
 		free(data);
+		data = NULL;
 	}
 	exit(0);
 }
@@ -74,6 +81,7 @@ void	exit_clean(t_d *data)
 void	init_data(t_d *data)
 {
 	data->map = NULL;
+	data->db_buf = NULL;
 	data->north = NULL;
 	data->south = NULL;
 	data->west = NULL;
@@ -95,7 +103,7 @@ void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
 	buffer = (void *)malloc(size * nmemb);
 	if (!buffer)
 		return (error_clean(data), NULL);
-	while (i < size)
+	while (++i < size)
 		buffer[i] = '\0';
 	return (buffer);
 }
@@ -141,6 +149,31 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (0);
 }
 
+// void	save_map(t_d *data, char *line)
+// {
+// 	// char	**buf;
+// 	int		i;
+
+// 	i = 0;
+// 	if (!data->north || !data->south || !data->west || !data->east || !data->floor)
+// 		return ;
+// 	if (!data->map)
+// 	{
+// 		data->map = ft_calloc(data, 1, sizeof(char *));
+// 		data->map[0] = NULL;
+// 	}
+// 	while (data->map[i])
+// 		i++;
+// 	data->db_buf = ft_calloc(data, i + 2, sizeof(char *));
+// 	i = -1;
+// 	while (data->map[++i])
+// 		data->db_buf[i] = ft_strdup(data, data->map[i]);
+// 	data->db_buf[i] = ft_strdup(data, line);
+// 	free_map(data->map);
+// 	data->map = data->db_buf;
+// 	data->db_buf = NULL;
+// }
+
 void	sort_data_utils(t_d *data, char *line, int i)
 {
 	if (!ft_strncmp("WE ", line + i, 2))
@@ -149,13 +182,13 @@ void	sort_data_utils(t_d *data, char *line, int i)
 			return (ft_printe("Multiple definition of 'WE'\n"), error_clean(data));
 		data->west = ft_strdup(data, data->read_buf);
 	}
-	if (!ft_strncmp("EA ", line + i, 2))
+	if (!ft_strncmp("EA ", line + i, 3))
 	{
 		if (data->east)
 			return (ft_printe("Multiple definition of 'EA'\n"), error_clean(data));
 		data->east = ft_strdup(data, data->read_buf);
 	}
-	if (!ft_strncmp("F ", line + i, 1))
+	if (!ft_strncmp("F ", line + i, 2))
 	{
 		if (data->floor)
 			return (ft_printe("Multiple definition of 'F'\n"), error_clean(data));
@@ -172,19 +205,20 @@ void	sort_data(t_d *data, char *line)
 		i++;
 	if (!line[i])
 		return ;
-	if (!ft_strncmp("NO ", line + i, 2))
+	if (!ft_strncmp("NO ", line + i, 3))
 	{
 		if (data->north)
 			return (ft_printe("Multiple definition of 'NO'\n"), error_clean(data));
 		data->north = ft_strdup(data, data->read_buf);
 	}
-	if (!ft_strncmp("SO ", line + i, 2))
+	if (!ft_strncmp("SO ", line + i, 3))
 	{
 		if (data->south)
 			return (ft_printe("Multiple definition of 'SO'\n"), error_clean(data));
 		data->south = ft_strdup(data, data->read_buf);
 	}
 	sort_data_utils(data, line, i);
+	// save_map(data, line);
 }
 
 void	reading_data(t_d *data, char **argv)
@@ -219,7 +253,7 @@ int	map_name(char *map_name)
 		i++;
 	i -= 4;
 	if (i <= 0)
-		return (1);
+		return (0);
 	if (!ft_strncmp(map_name + i, ".cub", 4))
 		return (1);
 	return (0);
