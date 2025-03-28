@@ -198,12 +198,21 @@ void	save_map(t_d *data, char *line)
 
 int	sort_data_u_2(t_d *data, char *line, int i)
 {
-	if (!ft_strncmp("C ", line + i, 2))
+	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
 	{
 		if (data->ceiling)
 			return (ft_printe("Error, multiple definition of 'F'\n"),
 				error_clean(data), 1);
 		data->ceiling = ft_strdup(data, data->read_buf);
+		// check_rgb(data, );
+		return (1);
+	}
+	if (!ft_strncmp("F ", line + i, 2) || !ft_strncmp("F\t", line + i, 2))
+	{
+		if (data->floor)
+			return (ft_printe("Error, multiple definition of 'F'\n"),
+				error_clean(data), 1);
+		data->floor = ft_strdup(data, data->read_buf);
 		return (1);
 	}
 	return (0);
@@ -211,7 +220,7 @@ int	sort_data_u_2(t_d *data, char *line, int i)
 
 int	sort_data_u(t_d *data, char *line, int i)
 {
-	if (!ft_strncmp("WE ", line + i, 2))
+	if (!ft_strncmp("WE ", line + i, 2) || !ft_strncmp("WE\t", line + i, 3))
 	{
 		if (data->west)
 			return (ft_printe("Error, multiple definition of 'WE'\n"),
@@ -219,20 +228,12 @@ int	sort_data_u(t_d *data, char *line, int i)
 		data->west = ft_strdup(data, data->read_buf);
 		return (1);
 	}
-	if (!ft_strncmp("EA ", line + i, 3))
+	if (!ft_strncmp("EA ", line + i, 3) || !ft_strncmp("EA\t", line + i, 3))
 	{
 		if (data->east)
 			return (ft_printe("Error, multiple definition of 'EA'\n"),
 				error_clean(data), 1);
 		data->east = ft_strdup(data, data->read_buf);
-		return (1);
-	}
-	if (!ft_strncmp("F ", line + i, 2))
-	{
-		if (data->floor)
-			return (ft_printe("Error, multiple definition of 'F'\n"),
-				error_clean(data), 1);
-		data->floor = ft_strdup(data, data->read_buf);
 		return (1);
 	}
 	return (0);
@@ -245,7 +246,7 @@ void	sort_data(t_d *data, char *line, int i)
 	if (!line[i] && (!data->map || !data->north || !data->south || !data->west
 		|| !data->east || !data->floor || !data->ceiling))
 		return ;
-	if (!ft_strncmp("NO ", line + i, 3))
+	if (!ft_strncmp("NO ", line + i, 3) || !ft_strncmp("NO\t", line + i, 3))
 	{
 		if (data->north)
 			return (ft_printe("Error, multiple definition of 'NO'\n"),
@@ -253,7 +254,7 @@ void	sort_data(t_d *data, char *line, int i)
 		data->north = ft_strdup(data, data->read_buf);
 		return ;
 	}
-	else if (!ft_strncmp("SO ", line + i, 3))
+	else if (!ft_strncmp("SO ", line + i, 3) || !ft_strncmp("SO\t", line + i, 3))
 	{
 		if (data->south)
 			return (ft_printe("Error, multiple definition of 'SO'\n"),
@@ -344,10 +345,11 @@ void	check_walls(t_d *data, int i, int j)
 				&& ((i == 0 || j == 0)
 				|| (!data->map[i - 1] || data->line[i - 1].length < j
 				|| data->map[i - 1][j] == 32 || data->map[i - 1][j] == '\n')
-				|| (!data->map[i + 1] || data->line[i + 1].length < j
-				|| data->map[i + 1][j] == 32) || (!data->map[i][j - 1]
-				|| data->map[i][j - 1] == 32) || (!data->map[i][j + 1]
-				|| data->map[i][j + 1] == 32 || data->map[i][j + 1] == '\n')))
+				|| (!data->map[i + 1] || data->line[i + 1].length <= j
+				|| data->map[i + 1][j] == 32 || data->map[i + 1][j] == '\n')
+				|| (!data->map[i][j - 1] || data->map[i][j - 1] == 32)
+				|| (!data->map[i][j + 1] || data->map[i][j + 1] == 32
+				|| data->map[i][j + 1] == '\n')))
 			return (ft_printe("Error, map must be surrounded by walls\n"),
 					error_clean(data));
 		}
