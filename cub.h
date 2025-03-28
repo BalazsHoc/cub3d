@@ -25,7 +25,6 @@ typedef struct line_s
 typedef struct data_s
 {
 	char			**map;
-	char			**db_buf;
 
 	char			*north;
 	char			*south;
@@ -34,8 +33,12 @@ typedef struct data_s
 	char			*floor;
 	char			*ceiling;
 
+	// char			*color1;
+	// char			*color2;
+	// char			*color3;
+	char			**colors;
+
 	char			*read_buf;
-	char			*gnl_buf;
 	struct line_s	*line;
 
 	int				width;
@@ -54,7 +57,7 @@ void	*gnl_calloc(size_t nmemb, size_t size);
 char	*gnl_join_free(char *static_buf, char *buffer);
 char	*gnl_join_buffer(char *line, char *buffer);
 char	*reading(int fd, char *static_buf);
-char	*get_next_line(int fd, t_d *data);
+char	*get_next_line(int fd);
 
 void	gnl_free(char **ptr);
 int		gnl_strlen(char *str);

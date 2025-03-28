@@ -91,14 +91,13 @@ char	*reading(int fd, char *static_buf)
 	return (static_buf);
 }
 
-char	*get_next_line(int fd, t_d *data)
+char	*get_next_line(int fd)
 {
 	static char	*buf;
 	char		*output;
 
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (gnl_free(&buf), NULL);
-	data->gnl_buf = buf;
 	buf = reading(fd, buf);
 	if (!buf)
 		return (NULL);

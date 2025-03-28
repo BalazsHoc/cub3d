@@ -33,7 +33,7 @@ void	free_map(char **map)
 	int	i;
 
 	i = 0;
-	if (!map)
+	if (!map || !map[i])
 		return ;
 	while (map[i])
 	{
@@ -58,18 +58,16 @@ void	error_clean(t_d *data)
 	if (data)
 	{
 		free_map(data->map);
-		free_map(data->db_buf);
 		free_str(data->north);
 		free_str(data->south);
 		free_str(data->west);
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->ceiling);
+		free_map(data->colors);
 		free_str(data->read_buf);
-		free_str(data->gnl_buf);
+		get_next_line(-1);
 		free_str((char *)data->line);
-		// free_str(data->window);
-		// free_str(data->mlx_ptr);
 		if (data->window)
 			mlx_destroy_window(data->mlx_ptr, data->window);
 		if (data->mlx_ptr)
@@ -85,18 +83,16 @@ void	exit_clean(t_d *data)
 	if (data)
 	{
 		free_map(data->map);
-		free_map(data->db_buf);
 		free_str(data->north);
 		free_str(data->south);
 		free_str(data->west);
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->ceiling);
+		free_map(data->colors);
 		free_str(data->read_buf);
-		free_str(data->gnl_buf);
+		get_next_line(-1);
 		free_str((char *)data->line);
-		// free_str(data->window);
-		// free_str(data->mlx_ptr);
 		if (data->window)
 			mlx_destroy_window(data->mlx_ptr, data->window);
 		if (data->mlx_ptr)
@@ -112,15 +108,14 @@ void	init_data(t_d *data)
 {
 	data->line = NULL;
 	data->map = NULL;
-	data->db_buf = NULL;
 	data->north = NULL;
 	data->south = NULL;
 	data->west = NULL;
 	data->east = NULL;
 	data->floor = NULL;
 	data->ceiling = NULL;
+	data->colors = NULL;
 	data->read_buf = NULL;
-	data->gnl_buf = NULL;
 	data->width = 0;
 	data->heigth = 0;
 	data->window = NULL;
@@ -139,10 +134,80 @@ void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
 		return (error_clean(data), NULL);
 	buffer = (void *)malloc(size * nmemb);
 	if (!buffer)
-		return (error_clean(data), NULL);
+		return (ft_printe("Error, malloc fail\n"), error_clean(data), NULL);
 	while (++i < size)
 		buffer[i] = '\0';
 	return (buffer);
+}
+
+size_t	ft_digit_count(long int n)
+{
+	size_t	digits;
+
+	if (n < 0)
+	{
+		digits = 1;
+		n *= -1;
+	}
+	else
+		digits = 0;
+	if (n == 0)
+		digits = 1;
+	while (n > 0)
+	{
+		n = n / 10;
+		digits++;
+	}
+	return (digits);
+}
+
+char	*ft_itoa(long n, t_d *data)
+{
+	char		*result;
+	size_t		digits;
+	long long	num;
+
+	num = n;
+	digits = ft_digit_count(num);
+	if (n < 0)
+		num *= -1;
+	result = ft_calloc(data, (digits + 1), sizeof(char));
+	while (digits--)
+	{
+		*(result + digits) = (num % 10) + 48;
+		num = num / 10;
+	}
+	if (n < 0)
+		*(result + 0) = '-';
+	return (result);
+}
+
+long long	ft_atoi(const char *nptr)
+{
+	int			i;
+	int			sign;
+	long long	result;
+
+	i = 0;
+	sign = 1;
+	result = 0;
+	if (nptr[0] == '\0')
+		return (0);
+	while (nptr[i] == ' ' || nptr[i] == '\f' || nptr[i] == '\n'
+		|| nptr[i] == '\r' || nptr[i] == '\t' || nptr[i] == '\v')
+		i++;
+	if (nptr[i] == '-' || nptr[i] == '+')
+	{
+		if (nptr[i] == '-')
+			sign *= -1;
+		i++;
+	}
+	while (nptr[i] >= '0' && nptr[i] <= '9')
+	{
+		result = result * 10 + (nptr[i] - '0');
+		i++;
+	}
+	return (sign * result);
 }
 
 char	*ft_strdup(t_d *data, const char *s)
@@ -212,6 +277,67 @@ void	save_map(t_d *data, char *line)
 	data->map = buf;
 }
 
+void	ft_strncpy(char *dest, char *src, int size)
+{
+	int	i;
+
+	i = -1;
+	if (!src || !*src)
+		return ;
+	while (++i < size)
+		dest[i] = src[i];
+}
+
+void	split_num(t_d *data, char *color)
+{
+	int	i;
+	int	loop;
+	int	start;
+	int	end;
+
+	i = 0;
+	loop = 3;
+	start = 0;
+	end = 0;
+	data->colors = ft_calloc(data, sizeof(char *), 4);
+	data->colors[loop] = NULL;
+	while (loop--)
+	{
+		while (color[start] && (color[start] < 48 || color[start] > 57))
+			start++;
+		while (color[start + end] && color[start + end] >= 48 && color[start + end] <= 57)
+			end++;
+		printf("end %d + 1\n", end);
+		data->colors[i] = ft_calloc(data, sizeof(char), end + 1);
+		ft_strncpy(data->colors[i], color, end - start);
+		start += end;
+		end = 0;
+		i++;
+	}
+}
+
+void	check_rgb(t_d *data, char *color)
+{
+	int	i;
+	int	stk;
+
+	i = 0;
+	stk = 0;
+	while (color[i])
+	{
+		while (color[i] && (color[i] < 48 || color[i] > 57))
+			i++;
+		while (color[i] && color[i] >= 48 && color[i] <= 57)
+			i++;
+		stk++;
+	}
+	stk--;
+	if (stk != 3)
+		return (ft_printe("Error, wrong color format\n"),
+			error_clean(data));
+	split_num(data, color);
+}
+
 int	sort_data_u_2(t_d *data, char *line, int i)
 {
 	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
@@ -220,7 +346,7 @@ int	sort_data_u_2(t_d *data, char *line, int i)
 			return (ft_printe("Error, multiple definition of 'F'\n"),
 				error_clean(data), 1);
 		data->ceiling = ft_strdup(data, data->read_buf);
-		// check_rgb(data, );
+		check_rgb(data, data->ceiling);
 		return (1);
 	}
 	if (!ft_strncmp("F ", line + i, 2) || !ft_strncmp("F\t", line + i, 2))
@@ -313,7 +439,7 @@ void	reading_data(t_d *data, char **argv)
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
 		return (ft_printe("Error, map can not be open\n"), error_clean(data));
-	data->read_buf = get_next_line(fd, data);
+	data->read_buf = get_next_line(fd);
 	if (!data->read_buf)
 		return (error_clean(data));
 	while (data->read_buf)
@@ -321,7 +447,7 @@ void	reading_data(t_d *data, char **argv)
 		// printf("%s\n", data->read_buf);
 		sort_data(data, data->read_buf, 0);
 		free_str(data->read_buf);
-		data->read_buf = get_next_line(fd, data);
+		data->read_buf = get_next_line(fd);
 	}
 	if (!data->north || !data->south || !data->west || !data->east
 			|| !data->floor || !data->ceiling || !data->map || !data->map[0]
@@ -426,7 +552,7 @@ int	handle_keyboard(int key, t_d *data)
 	return (0);
 }
 
-void	do_window(t_d *data)
+void	displaying(t_d *data)
 {
 	data->mlx_ptr = mlx_init();
 	if (!data->mlx_ptr)
@@ -452,6 +578,6 @@ int	main(int argc, char **argv)
 	reading_data(data, argv);
 	print_map(data);
 	check_map(data, 0, -1, -1);
-	do_window(data);
+	displaying(data);
 	return (exit_clean(data), 0);
 }
