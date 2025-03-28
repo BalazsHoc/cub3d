@@ -68,6 +68,13 @@ void	error_clean(t_d *data)
 		free_str(data->read_buf);
 		free_str(data->gnl_buf);
 		free_str((char *)data->line);
+		// free_str(data->window);
+		// free_str(data->mlx_ptr);
+		if (data->window)
+			mlx_destroy_window(data->mlx_ptr, data->window);
+		if (data->mlx_ptr)
+			mlx_destroy_display(data->mlx_ptr);
+		free_str(data->mlx_ptr);
 		free(data);
 	}
 	exit(1);
@@ -88,6 +95,13 @@ void	exit_clean(t_d *data)
 		free_str(data->read_buf);
 		free_str(data->gnl_buf);
 		free_str((char *)data->line);
+		// free_str(data->window);
+		// free_str(data->mlx_ptr);
+		if (data->window)
+			mlx_destroy_window(data->mlx_ptr, data->window);
+		if (data->mlx_ptr)
+			mlx_destroy_display(data->mlx_ptr);
+		free_str(data->mlx_ptr);
 		free(data);
 		data = NULL;
 	}
@@ -109,6 +123,8 @@ void	init_data(t_d *data)
 	data->gnl_buf = NULL;
 	data->width = 0;
 	data->heigth = 0;
+	data->window = NULL;
+	data->mlx_ptr = NULL;
 }
 
 void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
@@ -379,7 +395,46 @@ void	check_map(t_d *data, int pos, int i, int j)
 		}
 		j = -1;
 	}
+	if (data->heigth > 15 || data->width > 15)
+		return (ft_printe("Error, map is too big\n"),
+					error_clean(data));
 	check_walls(data, -1, -1);
+}
+
+int	handle_click_x(t_d *data)
+{
+	write(1, "You quit the game\n", 18);
+	return (exit_clean(data), 0);
+}
+
+int	handle_keyboard(int key, t_d *data)
+{
+	if (key == XK_Escape)
+	{
+		write(1, "You quit the game\n", 18);
+		exit_clean(data);
+	}
+	(void)data;
+	// if (key == XK_w)
+	// 	moving_w(data);
+	// if (key == XK_a)
+	// 	moving_a(data);
+	// if (key == XK_s)
+	// 	moving_s(data);
+	// if (key == XK_d)
+	// 	moving_d(data);
+	return (0);
+}
+
+void	do_window(t_d *data)
+{
+	data->mlx_ptr = mlx_init();
+	if (!data->mlx_ptr)
+		error_clean(data);
+	data->window = mlx_new_window(data->mlx_ptr, 1600, 900, "cub3D");
+	mlx_hook(data->window, 17, 0, handle_click_x, data);
+	mlx_key_hook(data->window, handle_keyboard, data);
+	mlx_loop(data->mlx_ptr);
 }
 
 int	main(int argc, char **argv)
@@ -397,5 +452,6 @@ int	main(int argc, char **argv)
 	reading_data(data, argv);
 	print_map(data);
 	check_map(data, 0, -1, -1);
+	do_window(data);
 	return (exit_clean(data), 0);
 }

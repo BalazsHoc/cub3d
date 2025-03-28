@@ -12,8 +12,9 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <fcntl.h>
+# include <X11/keysym.h>
 // # include "mlx.h"
-// # include <X11/keysym.h>
+# include "minilibx-linux/mlx.h"
 
 typedef struct line_s
 {
@@ -39,6 +40,9 @@ typedef struct data_s
 
 	int				width;
 	int				heigth;
+
+	void			*window;
+	void			*mlx_ptr;
 	
 }	t_d;
 
