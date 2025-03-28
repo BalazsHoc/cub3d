@@ -46,6 +46,7 @@ void	free_map(char **map)
 
 void	free_str(char *str)
 {
+	
 	if (str)
 	{
 		free(str);
@@ -64,6 +65,7 @@ void	error_clean(t_d *data)
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->ceiling);
+		// free_str(data->buf);
 		free_map(data->colors);
 		free_str(data->read_buf);
 		get_next_line(-1);
@@ -89,6 +91,7 @@ void	exit_clean(t_d *data)
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->ceiling);
+		// free_str(data->buf);
 		free_map(data->colors);
 		free_str(data->read_buf);
 		get_next_line(-1);
@@ -115,6 +118,7 @@ void	init_data(t_d *data)
 	data->floor = NULL;
 	data->ceiling = NULL;
 	data->colors = NULL;
+	data->buf = NULL;
 	data->read_buf = NULL;
 	data->width = 0;
 	data->heigth = 0;
@@ -140,75 +144,75 @@ void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
 	return (buffer);
 }
 
-size_t	ft_digit_count(long int n)
-{
-	size_t	digits;
+// size_t	ft_digit_count(long int n)
+// {
+// 	size_t	digits;
 
-	if (n < 0)
-	{
-		digits = 1;
-		n *= -1;
-	}
-	else
-		digits = 0;
-	if (n == 0)
-		digits = 1;
-	while (n > 0)
-	{
-		n = n / 10;
-		digits++;
-	}
-	return (digits);
-}
+// 	if (n < 0)
+// 	{
+// 		digits = 1;
+// 		n *= -1;
+// 	}
+// 	else
+// 		digits = 0;
+// 	if (n == 0)
+// 		digits = 1;
+// 	while (n > 0)
+// 	{
+// 		n = n / 10;
+// 		digits++;
+// 	}
+// 	return (digits);
+// }
 
-char	*ft_itoa(long n, t_d *data)
-{
-	char		*result;
-	size_t		digits;
-	long long	num;
+// char	*ft_itoa(long n, t_d *data)
+// {
+// 	char		*result;
+// 	size_t		digits;
+// 	long long	num;
 
-	num = n;
-	digits = ft_digit_count(num);
-	if (n < 0)
-		num *= -1;
-	result = ft_calloc(data, (digits + 1), sizeof(char));
-	while (digits--)
-	{
-		*(result + digits) = (num % 10) + 48;
-		num = num / 10;
-	}
-	if (n < 0)
-		*(result + 0) = '-';
-	return (result);
-}
+// 	num = n;
+// 	digits = ft_digit_count(num);
+// 	if (n < 0)
+// 		num *= -1;
+// 	result = ft_calloc(data, sizeof(char), (digits + 1));
+// 	while (digits--)
+// 	{
+// 		*(result + digits) = (num % 10) + 48;
+// 		num = num / 10;
+// 	}
+// 	if (n < 0)
+// 		*(result + 0) = '-';
+// 	return (result);
+// }
 
-long long	ft_atoi(const char *nptr)
-{
-	int			i;
-	int			sign;
-	long long	result;
+// long long	ft_atoi(const char *nptr)
+// {
+// 	int			i;
+// 	int			sign;
+// 	long long	result;
 
-	i = 0;
-	sign = 1;
-	result = 0;
-	if (nptr[0] == '\0')
-		return (0);
-	while (nptr[i] == ' ' || nptr[i] == '\f' || nptr[i] == '\n'
-		|| nptr[i] == '\r' || nptr[i] == '\t' || nptr[i] == '\v')
-		i++;
-	if (nptr[i] == '-' || nptr[i] == '+')
-	{
-		if (nptr[i] == '-')
-			sign *= -1;
-		i++;
-	}
-	while (nptr[i] >= '0' && nptr[i] <= '9')
-	{
-		result = result * 10 + (nptr[i] - '0');
-		i++;
-	}
-	return (sign * result);
-}
+// 	i = 0;
+// 	sign = 1;
+// 	result = 0;
+// 	if (nptr[0] == '\0')
+// 		return (0);
+// 	while (nptr[i] == ' ' || nptr[i] == '\f' || nptr[i] == '\n'
+// 		|| nptr[i] == '\r' || nptr[i] == '\t' || nptr[i] == '\v')
+// 		i++;
+// 	if (nptr[i] == '-' || nptr[i] == '+')
+// 	{
+// 		if (nptr[i] == '-')
+// 			sign *= -1;
+// 		i++;
+// 	}
+// 	while (nptr[i] >= '0' && nptr[i] <= '9')
+// 	{
+// 		result = result * 10 + (nptr[i] - '0');
+// 		i++;
+// 	}
+// 	return (sign * result);
+// }
 
 char	*ft_strdup(t_d *data, const char *s)
 {
@@ -277,44 +281,62 @@ void	save_map(t_d *data, char *line)
 	data->map = buf;
 }
 
-void	ft_strncpy(char *dest, char *src, int size)
+char	*ft_substr(t_d *data, char const *s, unsigned int start, size_t len)
 {
-	int	i;
-
-	i = -1;
-	if (!src || !*src)
-		return ;
-	while (++i < size)
-		dest[i] = src[i];
-}
-
-void	split_num(t_d *data, char *color)
-{
-	int	i;
-	int	loop;
-	int	start;
-	int	end;
+	unsigned int	i;
+	char			*sub;
 
 	i = 0;
-	loop = 3;
-	start = 0;
-	end = 0;
-	data->colors = ft_calloc(data, sizeof(char *), 4);
-	data->colors[loop] = NULL;
-	while (loop--)
+	if (!(s))
+		return (0);
+	sub = ft_calloc(data, sizeof(char), (len + 1));
+	while (i < len)
 	{
-		while (color[start] && (color[start] < 48 || color[start] > 57))
-			start++;
-		while (color[start + end] && color[start + end] >= 48 && color[start + end] <= 57)
-			end++;
-		printf("end %d + 1\n", end);
-		data->colors[i] = ft_calloc(data, sizeof(char), end + 1);
-		ft_strncpy(data->colors[i], color, end - start);
-		start += end;
-		end = 0;
+		sub[i] = s[start];
 		i++;
+		start++;
 	}
+	// sub[i] = '\0';
+	return (sub);
 }
+
+// void	split_num(t_d *data, char *col)
+// {
+// 	int	i;
+// 	int	loop;
+// 	int	start;
+// 	int	end;
+
+// 	i = 0;
+// 	loop = 3;
+// 	start = 0;
+// 	end = 0;
+// 	printf("color: |%s|\n", col);
+// 	data->colors = ft_calloc(data, sizeof(char *), 4);
+// 	data->colors[3] = NULL;
+// 	while (loop--)
+// 	{
+// 		while (col[start] && (col[start] < 48 || col[start] > 57))
+// 			start++;
+// 		printf("color + start: |%s|", col + start);
+// 		while ((col[start + end] && col[start + end] >= 48 && col[start + end] <= 57))
+// 			end++;
+// 		// printf("color + start: |%s|\n\n\n", col + start);
+// 		printf("start: %d | end %d + 1\n", start, end);
+// 		data->colors[i] = ft_substr(data, col, start, end);
+// 		data->buf = ft_itoa(atoi(col), data);
+// 		printf("colors[%d]: |%s|\n", i, data->colors[i]);
+// 		printf("data->buf: |%s|\n", data->buf);
+// 		// ft_atoi(data->buf);
+// 		if (ft_atoi(data->colors[i]) != ft_atoi(data->buf))
+// 			return (ft_printe("Error, wrong RGB number\n"), error_clean(data));
+// 		free_str(data->buf);
+// 		start += end;
+// 		end = 0;
+// 		i++;
+// 	}
+
+// }
 
 void	check_rgb(t_d *data, char *color)
 {
@@ -335,7 +357,7 @@ void	check_rgb(t_d *data, char *color)
 	if (stk != 3)
 		return (ft_printe("Error, wrong color format\n"),
 			error_clean(data));
-	split_num(data, color);
+	// split_num(data, color);
 }
 
 int	sort_data_u_2(t_d *data, char *line, int i)

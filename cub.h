@@ -33,6 +33,8 @@ typedef struct data_s
 	char			*floor;
 	char			*ceiling;
 
+	char			*buf;
+
 	// char			*color1;
 	// char			*color2;
 	// char			*color3;
