@@ -64,6 +64,7 @@ void	error_clean(t_d *data)
 		free_str(data->west);
 		free_str(data->east);
 		free_str(data->floor);
+		free_str(data->ceiling);
 		free_str(data->read_buf);
 		free_str(data->gnl_buf);
 		free(data);
@@ -82,6 +83,7 @@ void	exit_clean(t_d *data)
 		free_str(data->west);
 		free_str(data->east);
 		free_str(data->floor);
+		free_str(data->ceiling);
 		free_str(data->read_buf);
 		free_str(data->gnl_buf);
 		free(data);
@@ -99,6 +101,7 @@ void	init_data(t_d *data)
 	data->west = NULL;
 	data->east = NULL;
 	data->floor = NULL;
+	data->ceiling = NULL;
 	data->read_buf = NULL;
 	data->gnl_buf = NULL;
 }
@@ -168,7 +171,8 @@ void	save_map(t_d *data, char *line)
 	int		i;
 
 	i = 0;
-	if (!data->north || !data->south || !data->west || !data->east || !data->floor)
+	if (!data->north || !data->south || !data->west || !data->east
+		|| !data->floor || !data->ceiling)
 		return ;
 	if (!data->map)
 	{
@@ -187,56 +191,72 @@ void	save_map(t_d *data, char *line)
 	data->map = buf;
 }
 
-int	sort_data_utils(t_d *data, char *line, int i)
+int	sort_data_u_2(t_d *data, char *line, int i)
+{
+	if (!ft_strncmp("C ", line + i, 2))
+	{
+		if (data->ceiling)
+			return (ft_printe("Error, multiple definition of 'F'\n"),
+				error_clean(data), 1);
+		data->ceiling = ft_strdup(data, data->read_buf);
+		return (1);
+	}
+	return (0);
+}
+
+int	sort_data_u(t_d *data, char *line, int i)
 {
 	if (!ft_strncmp("WE ", line + i, 2))
 	{
 		if (data->west)
-			return (ft_printe("Multiple definition of 'WE'\n"), error_clean(data), 1);
+			return (ft_printe("Error, multiple definition of 'WE'\n"),
+				error_clean(data), 1);
 		data->west = ft_strdup(data, data->read_buf);
 		return (1);
 	}
 	if (!ft_strncmp("EA ", line + i, 3))
 	{
 		if (data->east)
-			return (ft_printe("Multiple definition of 'EA'\n"), error_clean(data), 1);
+			return (ft_printe("Error, multiple definition of 'EA'\n"),
+				error_clean(data), 1);
 		data->east = ft_strdup(data, data->read_buf);
 		return (1);
 	}
 	if (!ft_strncmp("F ", line + i, 2))
 	{
 		if (data->floor)
-			return (ft_printe("Multiple definition of 'F'\n"), error_clean(data), 1);
+			return (ft_printe("Error, multiple definition of 'F'\n"),
+				error_clean(data), 1);
 		data->floor = ft_strdup(data, data->read_buf);
 		return (1);
 	}
 	return (0);
 }
 
-void	sort_data(t_d *data, char *line)
+void	sort_data(t_d *data, char *line, int i)
 {
-	int	i;
-
-	i = 0;
 	while (line[i] && ((line[i] >= 7 && line[i] <= 13) || line[i] == 32))
 		i++;
-	if (!line[i] && (!data->map || !data->north || !data->south || !data->west || !data->east || !data->floor))
+	if (!line[i] && (!data->map || !data->north || !data->south || !data->west
+		|| !data->east || !data->floor || !data->ceiling))
 		return ;
 	if (!ft_strncmp("NO ", line + i, 3))
 	{
 		if (data->north)
-			return (ft_printe("Multiple definition of 'NO'\n"), error_clean(data));
+			return (ft_printe("Error, multiple definition of 'NO'\n"),
+				error_clean(data));
 		data->north = ft_strdup(data, data->read_buf);
 		return ;
 	}
-	if (!ft_strncmp("SO ", line + i, 3))
+	else if (!ft_strncmp("SO ", line + i, 3))
 	{
 		if (data->south)
-			return (ft_printe("Multiple definition of 'SO'\n"), error_clean(data));
+			return (ft_printe("Error, multiple definition of 'SO'\n"),
+				error_clean(data));
 		data->south = ft_strdup(data, data->read_buf);
 		return ;
 	}
-	if (!sort_data_utils(data, line, i))
+	else if (!sort_data_u(data, line, i) && !sort_data_u_2(data, line, i))
 		save_map(data, line);
 }
 
@@ -246,21 +266,22 @@ void	reading_data(t_d *data, char **argv)
 
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
-		return (ft_printe("Map can not be open\n"), error_clean(data));
+		return (ft_printe("Error, map can not be open\n"), error_clean(data));
 	data->read_buf = get_next_line(fd, data);
 	if (!data->read_buf)
 		return (error_clean(data));
 	while (data->read_buf)
 	{
 		// printf("%s\n", data->read_buf);
-		sort_data(data, data->read_buf);
+		sort_data(data, data->read_buf, 0);
 		free_str(data->read_buf);
 		data->read_buf = get_next_line(fd, data);
 	}
 	if (!data->north || !data->south || !data->west || !data->east
-		|| !data->floor || !data->map || !data->map[0] || !data->map[0][0])
-		return (ft_printe("poor declaration of the map\n"), error_clean(data));
-	
+			|| !data->floor || !data->ceiling || !data->map || !data->map[0]
+			|| !data->map[0][0])
+		return (ft_printe("Error, poor declaration of the map\n"),
+			error_clean(data));
 }
 
 
@@ -281,12 +302,23 @@ int	map_name(char *map_name)
 
 void	check_map(t_d *data)
 {
-	// int	i;
-	// int	j;
+	int	i;
+	int	j;
 
-	// i = 0;
-	// j = 0;
-	(void)data->map;
+	i = -1;
+	j = -1;
+	while (data->map[++i])
+	{
+		while (data->map[i][++j])
+		{
+			if (data->map[i][j] != 32 && data->map[i][j] != '1'
+				&& data->map[i][j] != '0' && data->map[i][j] != 'N'
+				&& data->map[i][j] != 'S' && data->map[i][j] != 'E'
+				&& data->map[i][j] != 'W')
+			return (ft_printe("Error, unexpected character\n"),
+					error_clean(data));
+		}
+	}
 }
 
 int	main(int argc, char **argv)

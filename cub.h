@@ -25,6 +25,7 @@ typedef struct data_s
 	char	*west;
 	char	*east;
 	char	*floor;
+	char	*ceiling;
 
 	char	*read_buf;
 	char	*gnl_buf;
