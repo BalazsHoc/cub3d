@@ -15,21 +15,30 @@
 // # include "mlx.h"
 // # include <X11/keysym.h>
 
+typedef struct line_s
+{
+	int		num;
+	int		length;
+}	t_line;
+
 typedef struct data_s
 {
-	char	**map;
-	char	**db_buf;
+	char			**map;
+	char			**db_buf;
 
-	char	*north;
-	char	*south;
-	char	*west;
-	char	*east;
-	char	*floor;
-	char	*ceiling;
+	char			*north;
+	char			*south;
+	char			*west;
+	char			*east;
+	char			*floor;
+	char			*ceiling;
 
-	char	*read_buf;
-	char	*gnl_buf;
+	char			*read_buf;
+	char			*gnl_buf;
+	struct line_s	*line;
+	
 }	t_d;
+
 
 void	free_str(char *str);
 void	ft_printe(char *str);

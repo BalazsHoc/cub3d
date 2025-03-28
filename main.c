@@ -67,6 +67,7 @@ void	error_clean(t_d *data)
 		free_str(data->ceiling);
 		free_str(data->read_buf);
 		free_str(data->gnl_buf);
+		free_str((char *)data->line);
 		free(data);
 	}
 	exit(1);
@@ -86,6 +87,7 @@ void	exit_clean(t_d *data)
 		free_str(data->ceiling);
 		free_str(data->read_buf);
 		free_str(data->gnl_buf);
+		free_str((char *)data->line);
 		free(data);
 		data = NULL;
 	}
@@ -94,6 +96,7 @@ void	exit_clean(t_d *data)
 
 void	init_data(t_d *data)
 {
+	data->line = NULL;
 	data->map = NULL;
 	data->db_buf = NULL;
 	data->north = NULL;
@@ -260,6 +263,26 @@ void	sort_data(t_d *data, char *line, int i)
 		save_map(data, line);
 }
 
+void	init_line_struct(t_d *data)
+{
+	int	i;
+	int	length;
+
+	i = 0;
+	while (data->map[i])
+		i++;
+	data->line = ft_calloc(data, sizeof(t_line), i);
+	i = -1;
+	while (data->map[++i])
+	{
+		length = 0;
+		data->line[i].num = i;
+		while (data->map[i][length])
+			length++;
+		data->line[i].length = length;
+	}
+}
+
 void	reading_data(t_d *data, char **argv)
 {
 	int	fd;
@@ -282,6 +305,7 @@ void	reading_data(t_d *data, char **argv)
 			|| !data->map[0][0])
 		return (ft_printe("Error, poor declaration of the map\n"),
 			error_clean(data));
+	init_line_struct(data);
 }
 
 
@@ -300,41 +324,69 @@ int	map_name(char *map_name)
 	return (0);
 }
 
-void	check_map(t_d *data)
-{
-	int	i;
-	int	j;
+// void	check_walls(t_d *data, int i, int j)
+// {
+// 	while (data->map[++i])
+// 	{
+// 		printf("\ni: %d\n", i);
+// 		while (data->map[i][++j])
+// 		{
+// 			printf("j: %d\n", j);
+// 			if ((data->map[i][j] == '0' || data->map[i][j] == 'N'
+// 				|| data->map[i][j] == 'S' || data->map[i][j] == 'E'
+// 				|| data->map[i][j] == 'W')
+// 				&& ((i == 0 || j == 0)
+// 				|| (!data->map[i - 1][j] || data->map[i - 1][j] == 32)
+// 				|| (!data->map[i + 1][j] || data->map[i + 1][j] == 32)
+// 				|| (!data->map[i][j - 1] || data->map[i][j - 1] == 32)
+// 				|| (!data->map[i][j + 1] || data->map[i][j + 1] == 32
+// 				|| data->map[i][j + 1] == '\n')))
+// 			return (ft_printe("Error, map must be surrounded by walls\n"),
+// 					error_clean(data));
+// 		}
+// 		j = -1;
+// 	}
+// }
 
-	i = -1;
-	j = -1;
+void	check_map(t_d *data, int pos, int i, int j)
+{
 	while (data->map[++i])
 	{
 		while (data->map[i][++j])
 		{
-			if (data->map[i][j] != 32 && data->map[i][j] != '1'
-				&& data->map[i][j] != '0' && data->map[i][j] != 'N'
-				&& data->map[i][j] != 'S' && data->map[i][j] != 'E'
-				&& data->map[i][j] != 'W')
+			if (!pos && (data->map[i][j] == 'N' || data->map[i][j] == 'S'
+				|| data->map[i][j] == 'E' || data->map[i][j] == 'W'))
+				pos = 1;
+			else if (pos && (data->map[i][j] == 'N' || data->map[i][j] == 'S'
+				|| data->map[i][j] == 'E' || data->map[i][j] == 'W'))
+				return (ft_printe("Error, multiple spawnpoint\n"),
+					error_clean(data));
+			if (data->map[i][j] != 32 && data->map[i][j] != '\n'
+				&& data->map[i][j] != '1' && data->map[i][j] != '0'
+				&& data->map[i][j] != 'N' && data->map[i][j] != 'S'
+				&& data->map[i][j] != 'E' && data->map[i][j] != 'W')
 			return (ft_printe("Error, unexpected character\n"),
 					error_clean(data));
 		}
+		j = -1;
 	}
+	// check_walls(data, -1, -1);
 }
 
 int	main(int argc, char **argv)
 {
-	t_d	*data;
+	t_d		*data;
 
 	if (argc != 2)
-		return(ft_printe("Map as input needed\n"), 1);
+		return(ft_printe("Error, map as input needed\n"), 1);
 	if (!map_name(argv[1]))
-		return(ft_printe("Map must be '.cub' format\n"), 1);
+		return(ft_printe("Error, map must be '.cub' format\n"), 1);
 	data = malloc(sizeof(t_d));
 	if (!data)
-		return (ft_printe("malloc fail\n"), 1);
+		return (ft_printe("Error, malloc fail\n"), 1);
 	init_data(data);
 	reading_data(data, argv);
 	print_map(data);
-	check_map(data);
+	check_map(data, 0, -1, -1);
 	return (exit_clean(data), 0);
 }
