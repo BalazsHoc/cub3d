@@ -107,6 +107,8 @@ void	init_data(t_d *data)
 	data->ceiling = NULL;
 	data->read_buf = NULL;
 	data->gnl_buf = NULL;
+	data->width = 0;
+	data->heigth = 0;
 }
 
 void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
@@ -271,6 +273,8 @@ void	init_line_struct(t_d *data)
 	i = 0;
 	while (data->map[i])
 		i++;
+	if (data->heigth < i)
+		data->heigth = i;
 	data->line = ft_calloc(data, sizeof(t_line), i);
 	i = -1;
 	while (data->map[++i])
@@ -280,6 +284,8 @@ void	init_line_struct(t_d *data)
 		while (data->map[i][length])
 			length++;
 		data->line[i].length = length;
+		if (data->width < length)
+			data->width = length;
 	}
 }
 
@@ -324,29 +330,30 @@ int	map_name(char *map_name)
 	return (0);
 }
 
-// void	check_walls(t_d *data, int i, int j)
-// {
-// 	while (data->map[++i])
-// 	{
-// 		printf("\ni: %d\n", i);
-// 		while (data->map[i][++j])
-// 		{
-// 			printf("j: %d\n", j);
-// 			if ((data->map[i][j] == '0' || data->map[i][j] == 'N'
-// 				|| data->map[i][j] == 'S' || data->map[i][j] == 'E'
-// 				|| data->map[i][j] == 'W')
-// 				&& ((i == 0 || j == 0)
-// 				|| (!data->map[i - 1][j] || data->map[i - 1][j] == 32)
-// 				|| (!data->map[i + 1][j] || data->map[i + 1][j] == 32)
-// 				|| (!data->map[i][j - 1] || data->map[i][j - 1] == 32)
-// 				|| (!data->map[i][j + 1] || data->map[i][j + 1] == 32
-// 				|| data->map[i][j + 1] == '\n')))
-// 			return (ft_printe("Error, map must be surrounded by walls\n"),
-// 					error_clean(data));
-// 		}
-// 		j = -1;
-// 	}
-// }
+void	check_walls(t_d *data, int i, int j)
+{
+	while (data->map[++i])
+	{
+		// printf("\ni: %d\n", i);
+		while (data->map[i][++j])
+		{
+			// printf("j: %d\n", j);
+			if ((data->map[i][j] == '0' || data->map[i][j] == 'N'
+				|| data->map[i][j] == 'S' || data->map[i][j] == 'E'
+				|| data->map[i][j] == 'W')
+				&& ((i == 0 || j == 0)
+				|| (!data->map[i - 1] || data->line[i - 1].length < j
+				|| data->map[i - 1][j] == 32 || data->map[i - 1][j] == '\n')
+				|| (!data->map[i + 1] || data->line[i + 1].length < j
+				|| data->map[i + 1][j] == 32) || (!data->map[i][j - 1]
+				|| data->map[i][j - 1] == 32) || (!data->map[i][j + 1]
+				|| data->map[i][j + 1] == 32 || data->map[i][j + 1] == '\n')))
+			return (ft_printe("Error, map must be surrounded by walls\n"),
+					error_clean(data));
+		}
+		j = -1;
+	}
+}
 
 void	check_map(t_d *data, int pos, int i, int j)
 {
@@ -370,7 +377,7 @@ void	check_map(t_d *data, int pos, int i, int j)
 		}
 		j = -1;
 	}
-	// check_walls(data, -1, -1);
+	check_walls(data, -1, -1);
 }
 
 int	main(int argc, char **argv)

@@ -36,6 +36,9 @@ typedef struct data_s
 	char			*read_buf;
 	char			*gnl_buf;
 	struct line_s	*line;
+
+	int				width;
+	int				heigth;
 	
 }	t_d;
 
