@@ -25,6 +25,7 @@ void	print_map(t_d *data)
 	i = -1;
 	while(data->map[++i])
 		printf("%s", data->map[i]);
+	printf("\n");
 }
 
 void	free_map(char **map)
@@ -64,6 +65,7 @@ void	error_clean(t_d *data)
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->read_buf);
+		free_str(data->gnl_buf);
 		free(data);
 	}
 	exit(1);
@@ -81,6 +83,7 @@ void	exit_clean(t_d *data)
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->read_buf);
+		free_str(data->gnl_buf);
 		free(data);
 		data = NULL;
 	}
@@ -97,6 +100,7 @@ void	init_data(t_d *data)
 	data->east = NULL;
 	data->floor = NULL;
 	data->read_buf = NULL;
+	data->gnl_buf = NULL;
 }
 
 void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
@@ -243,7 +247,7 @@ void	reading_data(t_d *data, char **argv)
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
 		return (ft_printe("Map can not be open\n"), error_clean(data));
-	data->read_buf = get_next_line(fd);
+	data->read_buf = get_next_line(fd, data);
 	if (!data->read_buf)
 		return (error_clean(data));
 	while (data->read_buf)
@@ -251,10 +255,11 @@ void	reading_data(t_d *data, char **argv)
 		// printf("%s\n", data->read_buf);
 		sort_data(data, data->read_buf);
 		free_str(data->read_buf);
-		data->read_buf = get_next_line(fd);
+		data->read_buf = get_next_line(fd, data);
 	}
-	if (!data->north || !data->south || !data->west || !data->east || !data->floor)
-		return (ft_printe("poor declaration of the map\n"));
+	if (!data->north || !data->south || !data->west || !data->east
+		|| !data->floor || !data->map || !data->map[0] || !data->map[0][0])
+		return (ft_printe("poor declaration of the map\n"), error_clean(data));
 	
 }
 
@@ -274,6 +279,16 @@ int	map_name(char *map_name)
 	return (0);
 }
 
+void	check_map(t_d *data)
+{
+	// int	i;
+	// int	j;
+
+	// i = 0;
+	// j = 0;
+	(void)data->map;
+}
+
 int	main(int argc, char **argv)
 {
 	t_d	*data;
@@ -288,5 +303,6 @@ int	main(int argc, char **argv)
 	init_data(data);
 	reading_data(data, argv);
 	print_map(data);
+	check_map(data);
 	return (exit_clean(data), 0);
 }

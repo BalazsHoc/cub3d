@@ -2,7 +2,7 @@
 # define CUB
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 12
+#  define BUFFER_SIZE 8
 # endif
 
 # include <unistd.h>
@@ -27,6 +27,7 @@ typedef struct data_s
 	char	*floor;
 
 	char	*read_buf;
+	char	*gnl_buf;
 }	t_d;
 
 void	free_str(char *str);
@@ -36,7 +37,7 @@ void	*gnl_calloc(size_t nmemb, size_t size);
 char	*gnl_join_free(char *static_buf, char *buffer);
 char	*gnl_join_buffer(char *line, char *buffer);
 char	*reading(int fd, char *static_buf);
-char	*get_next_line(int fd);
+char	*get_next_line(int fd, t_d *data);
 
 void	gnl_free(char **ptr);
 int		gnl_strlen(char *str);
