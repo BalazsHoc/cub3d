@@ -28,6 +28,18 @@ void	print_map(t_d *data)
 	printf("\n");
 }
 
+void	free_colors(t_d *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < 3)
+	{
+		free_str(data->colors[i]);
+		i++;
+	}
+}
+
 void	free_map(char **map)
 {
 	int	i;
@@ -65,8 +77,8 @@ void	error_clean(t_d *data)
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->ceiling);
-		// free_str(data->buf);
-		free_map(data->colors);
+		free_str(data->buf);
+		free_colors(data);
 		free_str(data->read_buf);
 		get_next_line(-1);
 		free_str((char *)data->line);
@@ -91,8 +103,8 @@ void	exit_clean(t_d *data)
 		free_str(data->east);
 		free_str(data->floor);
 		free_str(data->ceiling);
-		// free_str(data->buf);
-		free_map(data->colors);
+		free_str(data->buf);
+		free_colors(data);
 		free_str(data->read_buf);
 		get_next_line(-1);
 		free_str((char *)data->line);
@@ -117,8 +129,12 @@ void	init_data(t_d *data)
 	data->east = NULL;
 	data->floor = NULL;
 	data->ceiling = NULL;
-	data->colors = NULL;
+	data->colors[0] = NULL;
+	data->colors[1] = NULL;
+	data->colors[2] = NULL;
 	data->buf = NULL;
+	data->c = 0;
+	data->f = 0;
 	data->read_buf = NULL;
 	data->width = 0;
 	data->heigth = 0;
@@ -144,75 +160,75 @@ void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
 	return (buffer);
 }
 
-// size_t	ft_digit_count(long int n)
-// {
-// 	size_t	digits;
+int	ft_digit_count(int n)
+{
+	int	digits;
 
-// 	if (n < 0)
-// 	{
-// 		digits = 1;
-// 		n *= -1;
-// 	}
-// 	else
-// 		digits = 0;
-// 	if (n == 0)
-// 		digits = 1;
-// 	while (n > 0)
-// 	{
-// 		n = n / 10;
-// 		digits++;
-// 	}
-// 	return (digits);
-// }
+	if (n < 0)
+	{
+		digits = 1;
+		n *= -1;
+	}
+	else
+		digits = 0;
+	if (n == 0)
+		digits = 1;
+	while (n > 0)
+	{
+		n = n / 10;
+		digits++;
+	}
+	return (digits);
+}
 
-// char	*ft_itoa(long n, t_d *data)
-// {
-// 	char		*result;
-// 	size_t		digits;
-// 	long long	num;
+char	*ft_itoa(int n, t_d *data)
+{
+	char		*result;
+	int			digits;
+	int			num;
 
-// 	num = n;
-// 	digits = ft_digit_count(num);
-// 	if (n < 0)
-// 		num *= -1;
-// 	result = ft_calloc(data, sizeof(char), (digits + 1));
-// 	while (digits--)
-// 	{
-// 		*(result + digits) = (num % 10) + 48;
-// 		num = num / 10;
-// 	}
-// 	if (n < 0)
-// 		*(result + 0) = '-';
-// 	return (result);
-// }
+	num = n;
+	digits = ft_digit_count(num);
+	if (n < 0)
+		num *= -1;
+	result = ft_calloc(data, sizeof(char), (digits + 1));
+	while (digits--)
+	{
+		*(result + digits) = (num % 10) + 48;
+		num = num / 10;
+	}
+	if (n < 0)
+		*(result + 0) = '-';
+	return (result);
+}
 
-// long long	ft_atoi(const char *nptr)
-// {
-// 	int			i;
-// 	int			sign;
-// 	long long	result;
+long long	ft_atoi(const char *nptr)
+{
+	int			i;
+	int			sign;
+	long long	result;
 
-// 	i = 0;
-// 	sign = 1;
-// 	result = 0;
-// 	if (nptr[0] == '\0')
-// 		return (0);
-// 	while (nptr[i] == ' ' || nptr[i] == '\f' || nptr[i] == '\n'
-// 		|| nptr[i] == '\r' || nptr[i] == '\t' || nptr[i] == '\v')
-// 		i++;
-// 	if (nptr[i] == '-' || nptr[i] == '+')
-// 	{
-// 		if (nptr[i] == '-')
-// 			sign *= -1;
-// 		i++;
-// 	}
-// 	while (nptr[i] >= '0' && nptr[i] <= '9')
-// 	{
-// 		result = result * 10 + (nptr[i] - '0');
-// 		i++;
-// 	}
-// 	return (sign * result);
-// }
+	i = 0;
+	sign = 1;
+	result = 0;
+	if (!nptr || nptr[0] == '\0')
+		return (0);
+	while (nptr[i] == ' ' || nptr[i] == '\f' || nptr[i] == '\n'
+		|| nptr[i] == '\r' || nptr[i] == '\t' || nptr[i] == '\v')
+		i++;
+	if (nptr[i] == '-' || nptr[i] == '+')
+	{
+		if (nptr[i] == '-')
+			sign *= -1;
+		i++;
+	}
+	while (nptr[i] >= '0' && nptr[i] <= '9')
+	{
+		result = result * 10 + (nptr[i] - '0');
+		i++;
+	}
+	return (sign * result);
+}
 
 char	*ft_strdup(t_d *data, const char *s)
 {
@@ -296,68 +312,76 @@ char	*ft_substr(t_d *data, char const *s, unsigned int start, size_t len)
 		i++;
 		start++;
 	}
-	// sub[i] = '\0';
 	return (sub);
 }
 
-// void	split_num(t_d *data, char *col)
-// {
-// 	int	i;
-// 	int	loop;
-// 	int	start;
-// 	int	end;
+void	cut_num(t_d *data, char *color, int i, int loop)
+{
+	int	l;
 
-// 	i = 0;
-// 	loop = 3;
-// 	start = 0;
-// 	end = 0;
-// 	printf("color: |%s|\n", col);
-// 	data->colors = ft_calloc(data, sizeof(char *), 4);
-// 	data->colors[3] = NULL;
-// 	while (loop--)
-// 	{
-// 		while (col[start] && (col[start] < 48 || col[start] > 57))
-// 			start++;
-// 		printf("color + start: |%s|", col + start);
-// 		while ((col[start + end] && col[start + end] >= 48 && col[start + end] <= 57))
-// 			end++;
-// 		// printf("color + start: |%s|\n\n\n", col + start);
-// 		printf("start: %d | end %d + 1\n", start, end);
-// 		data->colors[i] = ft_substr(data, col, start, end);
-// 		data->buf = ft_itoa(atoi(col), data);
-// 		printf("colors[%d]: |%s|\n", i, data->colors[i]);
-// 		printf("data->buf: |%s|\n", data->buf);
-// 		// ft_atoi(data->buf);
-// 		if (ft_atoi(data->colors[i]) != ft_atoi(data->buf))
-// 			return (ft_printe("Error, wrong RGB number\n"), error_clean(data));
-// 		free_str(data->buf);
-// 		start += end;
-// 		end = 0;
-// 		i++;
-// 	}
+	l = 0;
+	if (!color[i] || color[i] < 48 || color[i] > 57)
+		return ;
+	while (color[i + l] && color[i + l] >= 48 && color[i + l] <= 57)
+		l++;
+	if (loop == 3 || l == 0)
+		return ;
+	data->colors[loop] = ft_substr(data, color, i, l);
+	data->buf = ft_itoa(ft_atoi(data->colors[loop]), data);
+	if (ft_atoi(data->colors[loop]) != ft_atoi(data->buf)
+		|| ft_atoi(data->colors[loop]) >= 256 || ft_atoi(data->colors[loop]) < 0)
+		return (ft_printe("Error, wrong RGB number\n"), error_clean(data));
+	free_str(data->buf);
+	data->buf = NULL;	//important idk why
+}
 
-// }
+int	to_rgb(t_d *data)
+{
+	int	r;
+	int	g;
+	int	b;
 
-void	check_rgb(t_d *data, char *color)
+	r = ft_atoi(data->colors[0]) * 256 * 256;
+	g = ft_atoi(data->colors[1]) * 256;
+	b = ft_atoi(data->colors[2]);
+	free_str(data->colors[0]);
+	data->colors[0] = NULL;
+	free_str(data->colors[1]);
+	data->colors[1] = NULL;
+	free_str(data->colors[2]);	// those are important idk why
+	data->colors[2] = NULL;
+	return (r + g + b);
+}
+
+void	check_rgb(t_d *data, char *color, int *to_store)
 {
 	int	i;
 	int	stk;
 
-	i = 0;
+	i = 1;
 	stk = 0;
-	while (color[i])
+	while (color[i] && color[i] != '\n')
 	{
-		while (color[i] && (color[i] < 48 || color[i] > 57))
+		while (color[i] && (color[i] == ','|| color[i] == 32
+			|| color[i] == '\t'))
 			i++;
-		while (color[i] && color[i] >= 48 && color[i] <= 57)
+		cut_num(data, color, i, stk);
+		while (color[i] && color[i] >= 48 && color[i] <= 57 && (color[i] != ','
+			|| color[i] != 32 || color[i] != '\t'))
 			i++;
+		if (color[i] && (color[i] != ',' && color[i] != 32 && color[i] != '\t'
+			&& color[i] != '\n'))
+			return (ft_printe("Error, wrong color format\n"),
+			error_clean(data));
 		stk++;
 	}
 	stk--;
 	if (stk != 3)
 		return (ft_printe("Error, wrong color format\n"),
 			error_clean(data));
-	// split_num(data, color);
+	*to_store = to_rgb(data);
+	// printf("data->c: %d\n", to_store);
+	// printf("Extracted RGB: %s, %s, %s\n", data->colors[0], data->colors[1], data->colors[2]);
 }
 
 int	sort_data_u_2(t_d *data, char *line, int i)
@@ -368,7 +392,7 @@ int	sort_data_u_2(t_d *data, char *line, int i)
 			return (ft_printe("Error, multiple definition of 'F'\n"),
 				error_clean(data), 1);
 		data->ceiling = ft_strdup(data, data->read_buf);
-		check_rgb(data, data->ceiling);
+		check_rgb(data, data->ceiling, &data->c);
 		return (1);
 	}
 	if (!ft_strncmp("F ", line + i, 2) || !ft_strncmp("F\t", line + i, 2))
@@ -377,6 +401,7 @@ int	sort_data_u_2(t_d *data, char *line, int i)
 			return (ft_printe("Error, multiple definition of 'F'\n"),
 				error_clean(data), 1);
 		data->floor = ft_strdup(data, data->read_buf);
+		check_rgb(data, data->floor, &data->f);
 		return (1);
 	}
 	return (0);
@@ -576,12 +601,22 @@ int	handle_keyboard(int key, t_d *data)
 
 void	displaying(t_d *data)
 {
+	int	i = -1;
+	int	j = -1;
 	data->mlx_ptr = mlx_init();
 	if (!data->mlx_ptr)
-		error_clean(data);
+		return (ft_printe("Error, mlx_init\n"), error_clean(data));
 	data->window = mlx_new_window(data->mlx_ptr, 1600, 900, "cub3D");
 	mlx_hook(data->window, 17, 0, handle_click_x, data);
 	mlx_key_hook(data->window, handle_keyboard, data);
+	printf("data->c: %d\n", data->c);
+	printf("data->f: %d\n", data->f);
+	while (++i <= 100)
+	{
+		while (++j <= 100)
+			mlx_pixel_put(data->mlx_ptr, data->window, i, j, data->c);
+		j = -1;
+	}
 	mlx_loop(data->mlx_ptr);
 }
 

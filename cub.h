@@ -35,16 +35,15 @@ typedef struct data_s
 
 	char			*buf;
 
-	// char			*color1;
-	// char			*color2;
-	// char			*color3;
-	char			**colors;
+	char			*colors[3];
 
 	char			*read_buf;
 	struct line_s	*line;
 
 	int				width;
 	int				heigth;
+	int				f;
+	int				c;
 
 	void			*window;
 	void			*mlx_ptr;
