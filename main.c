@@ -28,14 +28,14 @@ void	print_map(t_d *data)
 	printf("\n");
 }
 
-void	free_colors(t_d *data)
+void	free_colors(char **dbptr, int size)
 {
 	int	i;
 
 	i = 0;
-	while (i < 3)
+	while (i < size)
 	{
-		free_str(data->colors[i]);
+		free_str(dbptr[i]);
 		i++;
 	}
 }
@@ -66,6 +66,15 @@ void	free_str(char *str)
 	}
 }
 
+void	free_mlx(t_d *data)
+{
+	if (data->window)
+			mlx_destroy_window(data->mlx_ptr, data->window);
+		if (data->mlx_ptr)
+			mlx_destroy_display(data->mlx_ptr);
+		free_str(data->mlx_ptr);
+}
+
 void	error_clean(t_d *data)
 {
 	if (data)
@@ -78,16 +87,14 @@ void	error_clean(t_d *data)
 		free_str(data->floor);
 		free_str(data->ceiling);
 		free_str(data->buf);
-		free_colors(data);
+		free_colors(data->colors, 3);
+		free_colors(data->textures, 4);
 		free_str(data->read_buf);
 		get_next_line(-1);
 		free_str((char *)data->line);
-		if (data->window)
-			mlx_destroy_window(data->mlx_ptr, data->window);
-		if (data->mlx_ptr)
-			mlx_destroy_display(data->mlx_ptr);
-		free_str(data->mlx_ptr);
+		free_mlx(data);
 		free(data);
+		data = NULL;
 	}
 	exit(1);
 }
@@ -104,19 +111,28 @@ void	exit_clean(t_d *data)
 		free_str(data->floor);
 		free_str(data->ceiling);
 		free_str(data->buf);
-		free_colors(data);
+		free_colors(data->colors, 3);
+		free_colors(data->textures, 4);
 		free_str(data->read_buf);
 		get_next_line(-1);
 		free_str((char *)data->line);
-		if (data->window)
-			mlx_destroy_window(data->mlx_ptr, data->window);
-		if (data->mlx_ptr)
-			mlx_destroy_display(data->mlx_ptr);
-		free_str(data->mlx_ptr);
+		free_mlx(data);
 		free(data);
 		data = NULL;
 	}
 	exit(0);
+}
+
+void	init_dblptr(char **dbptr, int size)
+{
+	int	i;
+
+	i = 0;
+	while (i < size)
+	{
+		dbptr[i] = NULL;
+		i++;
+	}
 }
 
 void	init_data(t_d *data)
@@ -129,9 +145,8 @@ void	init_data(t_d *data)
 	data->east = NULL;
 	data->floor = NULL;
 	data->ceiling = NULL;
-	data->colors[0] = NULL;
-	data->colors[1] = NULL;
-	data->colors[2] = NULL;
+	init_dblptr(data->colors, 3);
+	init_dblptr(data->textures, 4);
 	data->buf = NULL;
 	data->c = 0;
 	data->f = 0;
@@ -329,7 +344,8 @@ void	cut_num(t_d *data, char *color, int i, int loop)
 	data->colors[loop] = ft_substr(data, color, i, l);
 	data->buf = ft_itoa(ft_atoi(data->colors[loop]), data);
 	if (ft_atoi(data->colors[loop]) != ft_atoi(data->buf)
-		|| ft_atoi(data->colors[loop]) >= 256 || ft_atoi(data->colors[loop]) < 0)
+		|| ft_atoi(data->colors[loop]) >= 256
+		|| ft_atoi(data->colors[loop]) < 0)
 		return (ft_printe("Error, wrong RGB number\n"), error_clean(data));
 	free_str(data->buf);
 	data->buf = NULL;	//important idk why
@@ -380,8 +396,6 @@ void	check_rgb(t_d *data, char *color, int *to_store)
 		return (ft_printe("Error, wrong color format\n"),
 			error_clean(data));
 	*to_store = to_rgb(data);
-	// printf("data->c: %d\n", to_store);
-	// printf("Extracted RGB: %s, %s, %s\n", data->colors[0], data->colors[1], data->colors[2]);
 }
 
 int	sort_data_u_2(t_d *data, char *line, int i)
@@ -393,6 +407,8 @@ int	sort_data_u_2(t_d *data, char *line, int i)
 				error_clean(data), 1);
 		data->ceiling = ft_strdup(data, data->read_buf);
 		check_rgb(data, data->ceiling, &data->c);
+		// free_str(data->ceiling);
+		// data->ceiling = mlx_new_image();
 		return (1);
 	}
 	if (!ft_strncmp("F ", line + i, 2) || !ft_strncmp("F\t", line + i, 2))
@@ -443,7 +459,8 @@ void	sort_data(t_d *data, char *line, int i)
 		data->north = ft_strdup(data, data->read_buf);
 		return ;
 	}
-	else if (!ft_strncmp("SO ", line + i, 3) || !ft_strncmp("SO\t", line + i, 3))
+	else if (!ft_strncmp("SO ", line + i, 3)
+		|| !ft_strncmp("SO\t", line + i, 3))
 	{
 		if (data->south)
 			return (ft_printe("Error, multiple definition of 'SO'\n"),
@@ -524,15 +541,13 @@ void	check_walls(t_d *data, int i, int j)
 {
 	while (data->map[++i])
 	{
-		// printf("\ni: %d\n", i);
 		while (data->map[i][++j])
 		{
-			// printf("j: %d\n", j);
 			if ((data->map[i][j] == '0' || data->map[i][j] == 'N'
 				|| data->map[i][j] == 'S' || data->map[i][j] == 'E'
 				|| data->map[i][j] == 'W')
-				&& ((i == 0 || j == 0)
-				|| (!data->map[i - 1] || data->line[i - 1].length < j
+				&& (i == 0 || j == 0
+				|| (!data->map[i - 1] || data->line[i - 1].length <= j
 				|| data->map[i - 1][j] == 32 || data->map[i - 1][j] == '\n')
 				|| (!data->map[i + 1] || data->line[i + 1].length <= j
 				|| data->map[i + 1][j] == 32 || data->map[i + 1][j] == '\n')
@@ -568,7 +583,7 @@ void	check_map(t_d *data, int pos, int i, int j)
 		}
 		j = -1;
 	}
-	if (data->heigth > 15 || data->width > 15)
+	if (data->heigth > 15 || data->width > 16)
 		return (ft_printe("Error, map is too big\n"),
 					error_clean(data));
 	check_walls(data, -1, -1);
@@ -601,8 +616,8 @@ int	handle_keyboard(int key, t_d *data)
 
 void	displaying(t_d *data)
 {
-	int	i = -1;
-	int	j = -1;
+	// int	i = -1;
+	// int	j = -1;
 	data->mlx_ptr = mlx_init();
 	if (!data->mlx_ptr)
 		return (ft_printe("Error, mlx_init\n"), error_clean(data));
@@ -611,12 +626,13 @@ void	displaying(t_d *data)
 	mlx_key_hook(data->window, handle_keyboard, data);
 	printf("data->c: %d\n", data->c);
 	printf("data->f: %d\n", data->f);
-	while (++i <= 100)
-	{
-		while (++j <= 100)
-			mlx_pixel_put(data->mlx_ptr, data->window, i, j, data->c);
-		j = -1;
-	}
+	// mlx_my_pixel_put();
+	// while (++i <= 100)
+	// {
+	// 	while (++j <= 100)
+	// 		mlx_pixel_put(data->mlx_ptr, data->window, i, j, data->c);
+	// 	j = -1;
+	// }
 	mlx_loop(data->mlx_ptr);
 }
 

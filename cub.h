@@ -36,6 +36,7 @@ typedef struct data_s
 	char			*buf;
 
 	char			*colors[3];
+	char			*textures[4];
 
 	char			*read_buf;
 	struct line_s	*line;
@@ -67,4 +68,4 @@ char	*gnl_strcpy(char *str);
 char	*gnl_fromnl(char *str);
 
 
-#endif
+# endif
