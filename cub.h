@@ -3,6 +3,14 @@
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 8
+
+# define WIDTH 1280
+# define HEIGHT 720
+
+# define W 119
+# define A 97
+# define S 115
+# define D 100
 # endif
 
 # include <unistd.h>
@@ -11,6 +19,7 @@
 # include <limits.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <stdbool.h>
 # include <fcntl.h>
 # include <X11/keysym.h>
 // # include "mlx.h"
@@ -21,6 +30,16 @@ typedef struct line_s
 	int		num;
 	int		length;
 }	t_line;
+
+typedef struct player_s
+{
+	float			x;
+	float			y;
+	bool			up;
+	bool			down;
+	bool			left;
+	bool			right;
+}	t_player;
 
 typedef struct data_s
 {
@@ -48,8 +67,18 @@ typedef struct data_s
 
 	void			*window;
 	void			*mlx_ptr;
+	void			*img;
+
+	char			*addr;
+
+	int				bpp;
+	int				size_line;
+	int				endian;
+
+	struct player_s	*player;
 	
-}	t_d;
+}	t_data;
+
 
 
 void	free_str(char *str);

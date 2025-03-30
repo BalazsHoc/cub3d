@@ -18,13 +18,13 @@ void	ft_printe(char *str)
 		write(2, str++, 1);
 }
 
-void	print_map(t_d *data)
+void	print_map(t_data *d)
 {
 	int	i;
 
 	i = -1;
-	while(data->map[++i])
-		printf("%s", data->map[i]);
+	while(d->map[++i])
+		printf("%s", d->map[i]);
 	printf("\n");
 }
 
@@ -66,59 +66,77 @@ void	free_str(char *str)
 	}
 }
 
-void	free_mlx(t_d *data)
+void	free_mlx(t_data *d)
 {
-	if (data->window)
-			mlx_destroy_window(data->mlx_ptr, data->window);
-		if (data->mlx_ptr)
-			mlx_destroy_display(data->mlx_ptr);
-		free_str(data->mlx_ptr);
+	if (d->img)
+		mlx_destroy_image(d->mlx_ptr, d->img);
+	d->img = NULL;
+	if (d->window)
+		mlx_destroy_window(d->mlx_ptr, d->window);
+	d->window = NULL;
+	if (d->mlx_ptr)
+	{
+		mlx_destroy_display(d->mlx_ptr);
+		free(d->mlx_ptr);
+		d->mlx_ptr = NULL;
+	}
 }
 
-void	error_clean(t_d *data)
+void	free_player(t_data *d)
 {
-	if (data)
+	if (d->player)
 	{
-		free_map(data->map);
-		free_str(data->north);
-		free_str(data->south);
-		free_str(data->west);
-		free_str(data->east);
-		free_str(data->floor);
-		free_str(data->ceiling);
-		free_str(data->buf);
-		free_colors(data->colors, 3);
-		free_colors(data->textures, 4);
-		free_str(data->read_buf);
+		free(d->player);
+		d->player = NULL;
+	}
+}
+
+void	error_clean(t_data *d)
+{
+	if (d)
+	{
+		free_map(d->map);
+		free_str(d->north);
+		free_str(d->south);
+		free_str(d->west);
+		free_str(d->east);
+		free_str(d->floor);
+		free_str(d->ceiling);
+		free_str(d->buf);
+		free_colors(d->colors, 3);
+		free_colors(d->textures, 4);
+		free_str(d->read_buf);
 		get_next_line(-1);
-		free_str((char *)data->line);
-		free_mlx(data);
-		free(data);
-		data = NULL;
+		free_str((char *)d->line);
+		free_mlx(d);
+		free_player(d);
+		free(d);
+		d = NULL;
 	}
 	exit(1);
 }
 
-void	exit_clean(t_d *data)
+void	exit_clean(t_data *d)
 {
-	if (data)
+	if (d)
 	{
-		free_map(data->map);
-		free_str(data->north);
-		free_str(data->south);
-		free_str(data->west);
-		free_str(data->east);
-		free_str(data->floor);
-		free_str(data->ceiling);
-		free_str(data->buf);
-		free_colors(data->colors, 3);
-		free_colors(data->textures, 4);
-		free_str(data->read_buf);
+		free_map(d->map);
+		free_str(d->north);
+		free_str(d->south);
+		free_str(d->west);
+		free_str(d->east);
+		free_str(d->floor);
+		free_str(d->ceiling);
+		free_str(d->buf);
+		free_colors(d->colors, 3);
+		free_colors(d->textures, 4);
+		free_str(d->read_buf);
 		get_next_line(-1);
-		free_str((char *)data->line);
-		free_mlx(data);
-		free(data);
-		data = NULL;
+		free_str((char *)d->line);
+		free_mlx(d);
+		free_player(d);
+		free(d);
+		d = NULL;
 	}
 	exit(0);
 }
@@ -135,47 +153,62 @@ void	init_dblptr(char **dbptr, int size)
 	}
 }
 
-void	init_data(t_d *data)
+void	init_data(t_data *d)
 {
-	data->line = NULL;
-	data->map = NULL;
-	data->north = NULL;
-	data->south = NULL;
-	data->west = NULL;
-	data->east = NULL;
-	data->floor = NULL;
-	data->ceiling = NULL;
-	init_dblptr(data->colors, 3);
-	init_dblptr(data->textures, 4);
-	data->buf = NULL;
-	data->c = 0;
-	data->f = 0;
-	data->read_buf = NULL;
-	data->width = 0;
-	data->heigth = 0;
-	data->window = NULL;
-	data->mlx_ptr = NULL;
+	d->line = NULL;
+	d->map = NULL;
+	d->north = NULL;
+	d->south = NULL;
+	d->west = NULL;
+	d->east = NULL;
+	d->floor = NULL;
+	d->ceiling = NULL;
+	init_dblptr(d->colors, 3);
+	init_dblptr(d->textures, 4);
+	d->buf = NULL;
+	d->c = 0;
+	d->f = 0;
+	d->read_buf = NULL;
+	d->width = 0;
+	d->heigth = 0;
+	d->window = NULL;
+	d->mlx_ptr = NULL;
+	d->addr = NULL;
+	d->img = NULL;
+	d->player = NULL;
 }
 
-void	*ft_calloc(t_d *data, size_t nmemb, size_t size)
+void	init_player(t_data *d)
+{
+	d->player->x = WIDTH / 2;
+	d->player->y = HEIGHT / 2;
+	d->player->up = false;
+	d->player->down = false;
+	d->player->left = false;
+	d->player->right = false;
+	printf("player->x: %f\n", d->player->x);
+	printf("player->y: %f\n", d->player->y);
+}
+
+void	*ft_calloc(t_data *d, size_t nmemb, size_t size)
 {
 	char	*buffer;
 	size_t	i;
 
 	i = -1;
 	if (!nmemb || !size)
-		return (error_clean(data), NULL);
+		return (error_clean(d), NULL);
 	if (size > SIZE_MAX / nmemb)
-		return (error_clean(data), NULL);
+		return (error_clean(d), NULL);
 	buffer = (void *)malloc(size * nmemb);
 	if (!buffer)
-		return (ft_printe("Error, malloc fail\n"), error_clean(data), NULL);
+		return (ft_printe("Error, malloc fail\n"), error_clean(d), NULL);
 	while (++i < size)
 		buffer[i] = '\0';
 	return (buffer);
 }
 
-int	ft_digit_count(int n)
+int	ft_dataigit_count(int n)
 {
 	int	digits;
 
@@ -196,14 +229,14 @@ int	ft_digit_count(int n)
 	return (digits);
 }
 
-char	*ft_itoa(int n, t_d *data)
+char	*ft_itoa(int n, t_data *data)
 {
 	char		*result;
 	int			digits;
 	int			num;
 
 	num = n;
-	digits = ft_digit_count(num);
+	digits = ft_dataigit_count(num);
 	if (n < 0)
 		num *= -1;
 	result = ft_calloc(data, sizeof(char), (digits + 1));
@@ -245,7 +278,7 @@ long long	ft_atoi(const char *nptr)
 	return (sign * result);
 }
 
-char	*ft_strdup(t_d *data, const char *s)
+char	*ft_strdup(t_data *d, const char *s)
 {
 	size_t	i;
 	size_t	j;
@@ -257,7 +290,7 @@ char	*ft_strdup(t_d *data, const char *s)
 		return (NULL);
 	while (s[j] != '\0')
 		j++;
-	ptr = ft_calloc(data, sizeof(char), (j + 1));
+	ptr = ft_calloc(d, sizeof(char), (j + 1));
 	while (i < j)
 	{
 		ptr[i] = s[i];
@@ -286,33 +319,33 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (0);
 }
 
-void	save_map(t_d *data, char *line)
+void	save_map(t_data *d, char *line)
 {
 	char	**buf;
 	int		i;
 
 	i = 0;
-	if (!data->north || !data->south || !data->west || !data->east
-		|| !data->floor || !data->ceiling)
+	if (!d->north || !d->south || !d->west || !d->east
+		|| !d->floor || !d->ceiling)
 		return ;
-	if (!data->map)
+	if (!d->map)
 	{
-		data->map = ft_calloc(data, 2, sizeof(char *));
-		data->map[0] = NULL;
+		d->map = ft_calloc(d, 2, sizeof(char *));
+		d->map[0] = NULL;
 	}
-	while (data->map[i])
+	while (d->map[i])
 		i++;
-	buf = ft_calloc(data, i + 2, sizeof(char *));
+	buf = ft_calloc(d, i + 2, sizeof(char *));
 	i = -1;
-	while (data->map[++i] != NULL)
-		buf[i] = data->map[i];
-	buf[i] = ft_strdup(data, line);
+	while (d->map[++i] != NULL)
+		buf[i] = d->map[i];
+	buf[i] = ft_strdup(d, line);
 	buf[i + 1] = NULL;
-	free(data->map);
-	data->map = buf;
+	free(d->map);
+	d->map = buf;
 }
 
-char	*ft_substr(t_d *data, char const *s, unsigned int start, size_t len)
+char	*ft_substr(t_data *data, char const *s, unsigned int start, size_t len)
 {
 	unsigned int	i;
 	char			*sub;
@@ -330,7 +363,7 @@ char	*ft_substr(t_d *data, char const *s, unsigned int start, size_t len)
 	return (sub);
 }
 
-void	cut_num(t_d *data, char *color, int i, int loop)
+void	cut_num(t_data *d, char *color, int i, int loop)
 {
 	int	l;
 
@@ -341,35 +374,35 @@ void	cut_num(t_d *data, char *color, int i, int loop)
 		l++;
 	if (loop == 3 || l == 0)
 		return ;
-	data->colors[loop] = ft_substr(data, color, i, l);
-	data->buf = ft_itoa(ft_atoi(data->colors[loop]), data);
-	if (ft_atoi(data->colors[loop]) != ft_atoi(data->buf)
-		|| ft_atoi(data->colors[loop]) >= 256
-		|| ft_atoi(data->colors[loop]) < 0)
-		return (ft_printe("Error, wrong RGB number\n"), error_clean(data));
-	free_str(data->buf);
-	data->buf = NULL;	//important idk why
+	d->colors[loop] = ft_substr(d, color, i, l);
+	d->buf = ft_itoa(ft_atoi(d->colors[loop]), d);
+	if (ft_atoi(d->colors[loop]) != ft_atoi(d->buf)
+		|| ft_atoi(d->colors[loop]) >= 256
+		|| ft_atoi(d->colors[loop]) < 0)
+		return (ft_printe("Error, wrong RGB number\n"), error_clean(d));
+	free_str(d->buf);
+	d->buf = NULL;	//important idk why
 }
 
-int	to_rgb(t_d *data)
+int	to_rgb(t_data *d)
 {
 	int	r;
 	int	g;
 	int	b;
 
-	r = ft_atoi(data->colors[0]) * 256 * 256;
-	g = ft_atoi(data->colors[1]) * 256;
-	b = ft_atoi(data->colors[2]);
-	free_str(data->colors[0]);
-	data->colors[0] = NULL;
-	free_str(data->colors[1]);
-	data->colors[1] = NULL;
-	free_str(data->colors[2]);	// those are important idk why
-	data->colors[2] = NULL;
+	r = ft_atoi(d->colors[0]) * 256 * 256;
+	g = ft_atoi(d->colors[1]) * 256;
+	b = ft_atoi(d->colors[2]);
+	free_str(d->colors[0]);
+	d->colors[0] = NULL;
+	free_str(d->colors[1]);
+	d->colors[1] = NULL;
+	free_str(d->colors[2]);	// those are important idk why
+	d->colors[2] = NULL;
 	return (r + g + b);
 }
 
-void	check_rgb(t_d *data, char *color, int *to_store)
+void	check_rgb(t_data *data, char *color, int *to_store)
 {
 	int	i;
 	int	stk;
@@ -398,127 +431,124 @@ void	check_rgb(t_d *data, char *color, int *to_store)
 	*to_store = to_rgb(data);
 }
 
-int	sort_data_u_2(t_d *data, char *line, int i)
+int	sort_dataata_u_2(t_data *d, char *line, int i)
 {
 	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
 	{
-		if (data->ceiling)
+		if (d->ceiling)
 			return (ft_printe("Error, multiple definition of 'F'\n"),
-				error_clean(data), 1);
-		data->ceiling = ft_strdup(data, data->read_buf);
-		check_rgb(data, data->ceiling, &data->c);
-		// free_str(data->ceiling);
-		// data->ceiling = mlx_new_image();
+				error_clean(d), 1);
+		d->ceiling = ft_strdup(d, d->read_buf);
+		check_rgb(d, d->ceiling, &d->c);
 		return (1);
 	}
 	if (!ft_strncmp("F ", line + i, 2) || !ft_strncmp("F\t", line + i, 2))
 	{
-		if (data->floor)
+		if (d->floor)
 			return (ft_printe("Error, multiple definition of 'F'\n"),
-				error_clean(data), 1);
-		data->floor = ft_strdup(data, data->read_buf);
-		check_rgb(data, data->floor, &data->f);
+				error_clean(d), 1);
+		d->floor = ft_strdup(d, d->read_buf);
+		check_rgb(d, d->floor, &d->f);
 		return (1);
 	}
 	return (0);
 }
 
-int	sort_data_u(t_d *data, char *line, int i)
+int	sort_dataata_u(t_data *d, char *line, int i)
 {
 	if (!ft_strncmp("WE ", line + i, 2) || !ft_strncmp("WE\t", line + i, 3))
 	{
-		if (data->west)
+		if (d->west)
 			return (ft_printe("Error, multiple definition of 'WE'\n"),
-				error_clean(data), 1);
-		data->west = ft_strdup(data, data->read_buf);
+				error_clean(d), 1);
+		d->west = ft_strdup(d, d->read_buf);
 		return (1);
 	}
 	if (!ft_strncmp("EA ", line + i, 3) || !ft_strncmp("EA\t", line + i, 3))
 	{
-		if (data->east)
+		if (d->east)
 			return (ft_printe("Error, multiple definition of 'EA'\n"),
-				error_clean(data), 1);
-		data->east = ft_strdup(data, data->read_buf);
+				error_clean(d), 1);
+		d->east = ft_strdup(d, d->read_buf);
 		return (1);
 	}
 	return (0);
 }
 
-void	sort_data(t_d *data, char *line, int i)
+void	sort_dataata(t_data *d, char *line, int i)
 {
 	while (line[i] && ((line[i] >= 7 && line[i] <= 13) || line[i] == 32))
 		i++;
-	if (!line[i] && (!data->map || !data->north || !data->south || !data->west
-		|| !data->east || !data->floor || !data->ceiling))
+	if (!line[i] && (!d->map || !d->north || !d->south || !d->west
+		|| !d->east || !d->floor || !d->ceiling))
 		return ;
 	if (!ft_strncmp("NO ", line + i, 3) || !ft_strncmp("NO\t", line + i, 3))
 	{
-		if (data->north)
+		if (d->north)
 			return (ft_printe("Error, multiple definition of 'NO'\n"),
-				error_clean(data));
-		data->north = ft_strdup(data, data->read_buf);
+				error_clean(d));
+		d->north = ft_strdup(d, d->read_buf);
 		return ;
 	}
 	else if (!ft_strncmp("SO ", line + i, 3)
 		|| !ft_strncmp("SO\t", line + i, 3))
 	{
-		if (data->south)
+		if (d->south)
 			return (ft_printe("Error, multiple definition of 'SO'\n"),
-				error_clean(data));
-		data->south = ft_strdup(data, data->read_buf);
+				error_clean(d));
+		d->south = ft_strdup(d, d->read_buf);
 		return ;
 	}
-	else if (!sort_data_u(data, line, i) && !sort_data_u_2(data, line, i))
-		save_map(data, line);
+	else if (!sort_dataata_u(d, line, i) && !sort_dataata_u_2(d, line, i))
+		save_map(d, line);
 }
 
-void	init_line_struct(t_d *data)
+void	init_line_struct(t_data *d)
 {
 	int	i;
 	int	length;
 
 	i = 0;
-	while (data->map[i])
+	while (d->map[i])
 		i++;
-	if (data->heigth < i)
-		data->heigth = i;
-	data->line = ft_calloc(data, sizeof(t_line), i);
+	if (d->heigth < i)
+		d->heigth = i;
+	d->line = ft_calloc(d, sizeof(t_line), i);
 	i = -1;
-	while (data->map[++i])
+	while (d->map[++i])
 	{
 		length = 0;
-		data->line[i].num = i;
-		while (data->map[i][length])
+		d->line[i].num = i;
+		while (d->map[i][length])
 			length++;
-		data->line[i].length = length;
-		if (data->width < length)
-			data->width = length;
+		d->line[i].length = length;
+		if (d->width < length)
+			d->width = length;
 	}
 }
 
-void	reading_data(t_d *data, char **argv)
+void	reading_data(t_data *d, char **argv)
 {
 	int	fd;
 
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
-		return (ft_printe("Error, map can not be open\n"), error_clean(data));
-	data->read_buf = get_next_line(fd);
-	if (!data->read_buf)
-		return (error_clean(data));
-	while (data->read_buf)
+		return (ft_printe("Error, map can not be open\n"), error_clean(d));
+	d->read_buf = get_next_line(fd);
+	if (!d->read_buf)
+		return (error_clean(d));
+	while (d->read_buf)
 	{
-		// printf("%s\n", data->read_buf);
-		sort_data(data, data->read_buf, 0);
-		free_str(data->read_buf);
-		data->read_buf = get_next_line(fd);
+		sort_dataata(d, d->read_buf, 0);
+		free_str(d->read_buf);
+		d->read_buf = get_next_line(fd);
 	}
-	if (!data->north || !data->south || !data->west || !data->east
-			|| !data->floor || !data->ceiling || !data->map || !data->map[0]
-			|| !data->map[0][0])
+	if (!d->north || !d->south || !d->west || !d->east
+			|| !d->floor || !d->ceiling || !d->map || !d->map[0]
+			|| !d->map[0][0])
 		return (ft_printe("Error, poor declaration of the map\n"),
-			error_clean(data));
-	init_line_struct(data);
+			error_clean(d));
+	init_line_struct(d);
 }
 
 
@@ -537,72 +567,72 @@ int	map_name(char *map_name)
 	return (0);
 }
 
-void	check_walls(t_d *data, int i, int j)
+void	check_walls(t_data *d, int i, int j)
 {
-	while (data->map[++i])
+	while (d->map[++i])
 	{
-		while (data->map[i][++j])
+		while (d->map[i][++j])
 		{
-			if ((data->map[i][j] == '0' || data->map[i][j] == 'N'
-				|| data->map[i][j] == 'S' || data->map[i][j] == 'E'
-				|| data->map[i][j] == 'W')
+			if ((d->map[i][j] == '0' || d->map[i][j] == 'N'
+				|| d->map[i][j] == 'S' || d->map[i][j] == 'E'
+				|| d->map[i][j] == 'W')
 				&& (i == 0 || j == 0
-				|| (!data->map[i - 1] || data->line[i - 1].length <= j
-				|| data->map[i - 1][j] == 32 || data->map[i - 1][j] == '\n')
-				|| (!data->map[i + 1] || data->line[i + 1].length <= j
-				|| data->map[i + 1][j] == 32 || data->map[i + 1][j] == '\n')
-				|| (!data->map[i][j - 1] || data->map[i][j - 1] == 32)
-				|| (!data->map[i][j + 1] || data->map[i][j + 1] == 32
-				|| data->map[i][j + 1] == '\n')))
+				|| (!d->map[i - 1] || d->line[i - 1].length <= j
+				|| d->map[i - 1][j] == 32 || d->map[i - 1][j] == '\n')
+				|| (!d->map[i + 1] || d->line[i + 1].length <= j
+				|| d->map[i + 1][j] == 32 || d->map[i + 1][j] == '\n')
+				|| (!d->map[i][j - 1] || d->map[i][j - 1] == 32)
+				|| (!d->map[i][j + 1] || d->map[i][j + 1] == 32
+				|| d->map[i][j + 1] == '\n')))
 			return (ft_printe("Error, map must be surrounded by walls\n"),
-					error_clean(data));
+					error_clean(d));
 		}
 		j = -1;
 	}
 }
 
-void	check_map(t_d *data, int pos, int i, int j)
+void	check_map(t_data *d, int pos, int i, int j)
 {
-	while (data->map[++i])
+	while (d->map[++i])
 	{
-		while (data->map[i][++j])
+		while (d->map[i][++j])
 		{
-			if (!pos && (data->map[i][j] == 'N' || data->map[i][j] == 'S'
-				|| data->map[i][j] == 'E' || data->map[i][j] == 'W'))
+			if (!pos && (d->map[i][j] == 'N' || d->map[i][j] == 'S'
+				|| d->map[i][j] == 'E' || d->map[i][j] == 'W'))
 				pos = 1;
-			else if (pos && (data->map[i][j] == 'N' || data->map[i][j] == 'S'
-				|| data->map[i][j] == 'E' || data->map[i][j] == 'W'))
+			else if (pos && (d->map[i][j] == 'N' || d->map[i][j] == 'S'
+				|| d->map[i][j] == 'E' || d->map[i][j] == 'W'))
 				return (ft_printe("Error, multiple spawnpoint\n"),
-					error_clean(data));
-			if (data->map[i][j] != 32 && data->map[i][j] != '\n'
-				&& data->map[i][j] != '1' && data->map[i][j] != '0'
-				&& data->map[i][j] != 'N' && data->map[i][j] != 'S'
-				&& data->map[i][j] != 'E' && data->map[i][j] != 'W')
+					error_clean(d));
+			if (d->map[i][j] != 32 && d->map[i][j] != '\n'
+				&& d->map[i][j] != '1' && d->map[i][j] != '0'
+				&& d->map[i][j] != 'N' && d->map[i][j] != 'S'
+				&& d->map[i][j] != 'E' && d->map[i][j] != 'W')
 			return (ft_printe("Error, unexpected character\n"),
-					error_clean(data));
+					error_clean(d));
 		}
 		j = -1;
 	}
-	if (data->heigth > 15 || data->width > 16)
+	if (d->heigth > 15 || d->width > 16)
 		return (ft_printe("Error, map is too big\n"),
-					error_clean(data));
-	check_walls(data, -1, -1);
+					error_clean(d));
+	check_walls(d, -1, -1);
 }
 
-int	handle_click_x(t_d *data)
+int	handle_click_x(t_data *d)
 {
 	write(1, "You quit the game\n", 18);
-	return (exit_clean(data), 0);
+	return (exit_clean(d), 0);
 }
 
-int	handle_keyboard(int key, t_d *data)
+int	key_press(int key, t_data *d)
 {
 	if (key == XK_Escape)
 	{
 		write(1, "You quit the game\n", 18);
-		exit_clean(data);
+		exit_clean(d);
 	}
-	(void)data;
+	(void)d;
 	// if (key == XK_w)
 	// 	moving_w(data);
 	// if (key == XK_a)
@@ -614,43 +644,103 @@ int	handle_keyboard(int key, t_d *data)
 	return (0);
 }
 
-void	displaying(t_d *data)
+void	put_pixel(t_data *d, int x, int y, int color)
+{
+	int	index;
+	if (x > WIDTH || y > HEIGHT || x < 0 || y < 0)
+		return ;
+	index = y * d->size_line + x * d->bpp / 8;
+	// (void)d;
+	// (void)color;
+	d->addr[index] = color & 0xFF;
+	d->addr[index + 1] = (color >> 8) & 0xFF;
+	d->addr[index + 2] = (color >> 16) & 0xFF;
+}
+
+void	draw_player(t_data *d, int x, int y, int size, int color)
+{
+	int	i;
+
+	i = -1;
+	while (++i < size)
+		put_pixel(d, x + i, y, color);
+	i = -1;
+	while (++i < size)
+		put_pixel(d, x, y + i, color);
+	i = -1;
+	while (++i < size)
+		put_pixel(d, x + i, y + size, color);
+	i = -1;
+	while (++i < size)
+		put_pixel(d, x + size, y + i, color);
+	
+}
+
+void	displaying(t_data *d)
 {
 	// int	i = -1;
 	// int	j = -1;
-	data->mlx_ptr = mlx_init();
-	if (!data->mlx_ptr)
-		return (ft_printe("Error, mlx_init\n"), error_clean(data));
-	data->window = mlx_new_window(data->mlx_ptr, 1600, 900, "cub3D");
-	mlx_hook(data->window, 17, 0, handle_click_x, data);
-	mlx_key_hook(data->window, handle_keyboard, data);
-	printf("data->c: %d\n", data->c);
-	printf("data->f: %d\n", data->f);
+	d->mlx_ptr = mlx_init();
+	if (!d->mlx_ptr)
+		return (ft_printe("Error, mlx_init\n"), error_clean(d));
+	d->window = mlx_new_window(d->mlx_ptr, WIDTH, HEIGHT, "cub3D");
+	if (!d->window)
+		return (ft_printe("Error, mlx_new_window\n"), error_clean(d));
+	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
+	if (!d->img)
+		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
+	// d->addr = mlx_get_data_addr(d->mlx_ptr, &d->bpp, &d->size_line, &d->endian);
+	// if (!d->addr)
+	// 	return (ft_printe("Error, mlx_get_data_addr\n"), error_clean(d));
+	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->img, 0, 0);
+	
+	mlx_hook(d->window, 17, 0, handle_click_x, d);
+	mlx_key_hook(d->window, key_press, d);
+
+	// draw_player(d, d->player->x, d->player->y, 10, d->c);
+
+
+
+
+
+	printf("d->c: %d\n", d->c);
+	printf("d->f: %d\n", d->f);
+	// d->buf = mlx_new_image(d->mlx_ptr,0, 0);
+	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->buf, 0, 0);
 	// mlx_my_pixel_put();
 	// while (++i <= 100)
 	// {
 	// 	while (++j <= 100)
-	// 		mlx_pixel_put(data->mlx_ptr, data->window, i, j, data->c);
+	// 		mlx_pixel_put(d->mlx_ptr, d->window, i, j, d->c);
 	// 	j = -1;
 	// }
-	mlx_loop(data->mlx_ptr);
+	mlx_loop(d->mlx_ptr);
 }
 
 int	main(int argc, char **argv)
 {
-	t_d		*data;
-
+	t_data		*d;
+	t_player	*p;
+	
+	p = NULL;
 	if (argc != 2)
 		return(ft_printe("Error, map as input needed\n"), 1);
 	if (!map_name(argv[1]))
 		return(ft_printe("Error, map must be '.cub' format\n"), 1);
-	data = malloc(sizeof(t_d));
-	if (!data)
+	d = malloc(sizeof(t_data));
+	if (!d)
 		return (ft_printe("Error, malloc fail\n"), 1);
-	init_data(data);
-	reading_data(data, argv);
-	print_map(data);
-	check_map(data, 0, -1, -1);
-	displaying(data);
-	return (exit_clean(data), 0);
+	init_data(d);
+	p = malloc(sizeof(t_player));
+	if (!p)
+		return (ft_printe("Error, malloc fail\n"), error_clean(d), 1);
+	d->player = p;
+	init_player(d);
+	reading_data(d, argv);
+	print_map(d);
+	check_map(d, 0, -1, -1);
+
+
+	displaying(d);
+	return (exit_clean(d), 0);
 }
