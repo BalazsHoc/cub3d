@@ -720,17 +720,17 @@ void	move_player(t_data *d)
 	// 	d->player->x -= SPEED;
 	// if (d->player->right == true && valid_move(d, d->player->x + SPEED, d->player->y))
 	// 	d->player->x += SPEED;
-	if (d->player->up == true) //&& d->map[y_on_map(d, d->player->y - SPEED)][d->player->x] != '1'
+	if (d->player->up == true && d->map[y_on_map(d, d->player->y - SPEED)][x_on_map(d, d->player->x)] != '1')
 		d->player->y -= SPEED;
-	if (d->player->down == true)
+	if (d->player->down == true && d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x)] != '1')
 		d->player->y += SPEED;
-	if (d->player->left == true)
+	if (d->player->left == true && d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - SPEED - SIZE)] != '1')
 		d->player->x -= SPEED;
-	if (d->player->right == true)
+	if (d->player->right == true && d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
 		d->player->x += SPEED;
 	// x * BLOCK + (BLOCK / 2)
 	// printf("[(int)d->player->x]: %d\n", (int)d->player->x);
-	printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y - SPEED)][x_on_map(d, d->player->x)]);
+	printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - 1)]);
 	printf("X: %d | Y: %d\n", x_on_map(d, d->player->x), y_on_map(d, d->player->y));
 	printf("MOVE: %f\n", (d->player->x - (BLOCK / 2)) / BLOCK);
 }
