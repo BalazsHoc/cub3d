@@ -7,6 +7,8 @@
 # define WIDTH 1280
 # define HEIGHT 720
 
+# define SPEED 5
+
 # define W 119
 # define A 97
 # define S 115
