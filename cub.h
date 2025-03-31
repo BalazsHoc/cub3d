@@ -10,6 +10,7 @@
 # define SPEED 5
 
 # define SIZE 5
+# define BLOCK 6
 
 # define W 119
 # define A 97

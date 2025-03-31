@@ -644,7 +644,7 @@ int	handle_click_x(t_data *d)
 // 	if (key == D)
 // 		d->player->right = true;
 // 	move_player(d);
-// 	draw_player(d, d->player->x, d->player->y, 10, d->c);
+// 	draw_square(d, d->player->x, d->player->y, 10, d->c);
 // 	return (0);
 // }
 
@@ -681,7 +681,7 @@ void	put_pixel(t_data *d, int x, int y, int color)
 	// d->addr[index + 2] = (color >> 16) & 0xFF;
 }
 
-void	draw_player(t_data *d, int x, int y, int size, int color)
+void	draw_square(t_data *d, int x, int y, int size, int color)
 {
 	int	i;
 
@@ -702,6 +702,14 @@ void	draw_player(t_data *d, int x, int y, int size, int color)
 
 void	move_player(t_data *d)
 {
+	// if (d->player->up == true && valid_move(d, d->player->x, d->player->y - SPEED))
+	// 	d->player->y -= SPEED;
+	// if (d->player->down == true && valid_move(d, d->player->x, d->player->y + SPEED))
+	// 	d->player->y += SPEED;
+	// if (d->player->left == true && valid_move(d, d->player->x - SPEED, d->player->y))
+	// 	d->player->x -= SPEED;
+	// if (d->player->right == true && valid_move(d, d->player->x + SPEED, d->player->y))
+	// 	d->player->x += SPEED;
 	if (d->player->up == true)
 		d->player->y -= SPEED;
 	if (d->player->down == true)
@@ -715,7 +723,7 @@ void	move_player(t_data *d)
 int	draw_loop(t_data *d)
 {
 	move_player(d);
-	draw_player(d, d->player->x, d->player->y, 10, d->c);
+	draw_square(d, d->player->x, d->player->y, 10, d->c);
 	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->img, 0, 0);
 	return (1);
 }
@@ -736,9 +744,9 @@ int	key_press(int key, t_data *d)
 		d->player->down = true;
 	if (key == D)
 		d->player->right = true;
-	draw_player(d, d->player->x, d->player->y, 5, 0); // deleting perpouse
+	draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
 	move_player(d);
-	draw_player(d, d->player->x, d->player->y, 5, d->f);
+	draw_square(d, d->player->x, d->player->y, 5, d->f);
 	return (0);
 }
 
@@ -783,23 +791,66 @@ void	find_player(t_data *d)
 		j = 0;
 		i++;
 	}
+	printf("map_x: %d\n", d->player->map_x);
+	printf("map_y: %d\n", d->player->map_y);
 }
 
-void	flood_fill(t_data *d, int x, int y)
+void	flood_fill_down(t_data *d, int x, int y)
+{
+	if (y < 0 || x < 0 || !d->map[y] || d->line[y].length < x || !d->map[y][x] || d->map[y][x] == 'n'
+		|| d->map[y][x] == 's' || d->map[y][x] == 'e'
+		|| d->map[y][x] == 'w' || d->map[y][x] == 'o'
+		|| d->map[y][x] == 'l' || d->map[y][x] == '\t')
+		return ;
+	if (d->map[y][x] == '1')
+		draw_square(d, d->player->x + (x * BLOCK * BLOCK - (BLOCK * BLOCK) - BLOCK), d->player->y + (y * (BLOCK * BLOCK) - (BLOCK * BLOCK) - BLOCK), BLOCK * 5, d->c);
+	if (d->map[y][x] == 'N')
+		d->map[y][x] = 'n';
+	if (d->map[y][x] == 'S')
+		d->map[y][x] = 's';
+	if (d->map[y][x] == 'E')
+		d->map[y][x] = 'e';
+	if (d->map[y][x] == 'W')
+		d->map[y][x] = 'w';
+	if (d->map[y][x] == '0')
+		d->map[y][x] = 'o';
+	if (d->map[y][x] == '1')
+		d->map[y][x] = 'l';
+	if (d->map[y][x] == '\n')
+		d->map[y][x] = '\t';
+	flood_fill_down(d, x + 1, y);
+	flood_fill_down(d, x - 1, y);
+	flood_fill_down(d, x, y + 1);
+	flood_fill_down(d, x, y - 1);
+}
+
+void	map_set_back(t_data *d, int x, int y)
 {
 	if (y < 0 || x < 0 || !d->map[y] || !d->map[y][x] || (y > 0
 		&& d->line[y - 1].length < x) || (d->map[y + 1]
 		&& d->line[y + 1].length < x) || d->map[y][x] == 'N'
 		|| d->map[y][x] == 'S' || d->map[y][x] == 'E'
-		|| d->map[y][x] == 'W')
+		|| d->map[y][x] == 'W' || d->map[y][x] == '0'
+		|| d->map[y][x] == '1' || d->map[y][x] == '\n')
 		return ;
-	if (d->map[y][x] == '1')
-		draw_player(d, d->player->map_x + (x * SIZE), d->player->map_y + (y * SIZE), SIZE, d->c);
-	d->map[y][x] = 'N';
-	flood_fill(d, x + 1, y);
-	flood_fill(d, x - 1, y);
-	flood_fill(d, x, y + 1);
-	flood_fill(d, x, y - 1);
+	if (d->map[y][x] == 'n')
+		d->map[y][x] = 'N';
+	if (d->map[y][x] == 's')
+		d->map[y][x] = 'S';
+	if (d->map[y][x] == 'e')
+		d->map[y][x] = 'E';
+	if (d->map[y][x] == 'w')
+		d->map[y][x] = 'W';
+	if (d->map[y][x] == 'o')
+		d->map[y][x] = '0';
+	if (d->map[y][x] == 'l')
+		d->map[y][x] = '1';
+	if (d->map[y][x] == '\t')
+		d->map[y][x] = '\n';
+	flood_fill_down(d, x + 1, y);
+	flood_fill_down(d, x - 1, y);
+	flood_fill_down(d, x, y + 1);
+	flood_fill_down(d, x, y - 1);
 }
 
 void	draw_map(t_data *d)
@@ -810,8 +861,8 @@ void	draw_map(t_data *d)
 	i = 0;
 	j = 0;
 	find_player(d);
-	flood_fill(d, d->player->map_x + 1, d->player->map_y);
-	
+	flood_fill_down(d, d->player->map_x, d->player->map_y);
+	map_set_back(d, d->player->map_x, d->player->map_y);
 }
 
 void	displaying(t_data *d)
@@ -825,19 +876,19 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
-	draw_player(d, d->player->x, d->player->y, SIZE, d->f);
-	draw_map(d);
+	draw_square(d, d->player->x, d->player->y, SIZE, d->f);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
+	draw_map(d);
+	
 
 
 
 
-
-	printf("d->c: %d\n", d->c);
-	printf("d->f: %d\n", d->f);
+	// printf("d->c: %d\n", d->c);
+	// printf("d->f: %d\n", d->f);
 	mlx_loop(d->mlx_ptr);
 }
 
