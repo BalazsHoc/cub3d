@@ -9,6 +9,8 @@
 
 # define SPEED 5
 
+# define SIZE 5
+
 # define W 119
 # define A 97
 # define S 115
@@ -41,6 +43,9 @@ typedef struct player_s
 	bool			down;
 	bool			left;
 	bool			right;
+
+	int				map_x;
+	int				map_y;
 }	t_player;
 
 typedef struct data_s

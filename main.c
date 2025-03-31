@@ -186,6 +186,8 @@ void	init_player(t_data *d)
 	d->player->down = false;
 	d->player->left = false;
 	d->player->right = false;
+	d->player->map_x = 0;
+	d->player->map_y = 0;
 	printf("player->x: %f\n", d->player->x);
 	printf("player->y: %f\n", d->player->y);
 }
@@ -734,6 +736,7 @@ int	key_press(int key, t_data *d)
 		d->player->down = true;
 	if (key == D)
 		d->player->right = true;
+	draw_player(d, d->player->x, d->player->y, 5, 0); // deleting perpouse
 	move_player(d);
 	draw_player(d, d->player->x, d->player->y, 5, d->f);
 	return (0);
@@ -758,6 +761,59 @@ int	key_release(int key, t_data *d)
 	return (0);
 }
 
+void	find_player(t_data *d)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (d->map[i])
+	{
+		while (d->map[i][j])
+		{
+			if (d->map[i][j] == 'N' || d->map[i][j] == 'S'
+				|| d->map[i][j] == 'E' || d->map[i][j] == 'W')
+			{
+				d->player->map_x = j;
+				d->player->map_y = i;
+			}
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+}
+
+void	flood_fill(t_data *d, int x, int y)
+{
+	if (y < 0 || x < 0 || !d->map[y] || !d->map[y][x] || (y > 0
+		&& d->line[y - 1].length < x) || (d->map[y + 1]
+		&& d->line[y + 1].length < x) || d->map[y][x] == 'N'
+		|| d->map[y][x] == 'S' || d->map[y][x] == 'E'
+		|| d->map[y][x] == 'W')
+		return ;
+	if (d->map[y][x] == '1')
+		draw_player(d, d->player->map_x + (x * SIZE), d->player->map_y + (y * SIZE), SIZE, d->c);
+	d->map[y][x] = 'N';
+	flood_fill(d, x + 1, y);
+	flood_fill(d, x - 1, y);
+	flood_fill(d, x, y + 1);
+	flood_fill(d, x, y - 1);
+}
+
+void	draw_map(t_data *d)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	find_player(d);
+	flood_fill(d, d->player->map_x + 1, d->player->map_y);
+	
+}
+
 void	displaying(t_data *d)
 {
 	d->mlx_ptr = mlx_init();
@@ -769,7 +825,8 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
-	draw_player(d, d->player->x, d->player->y, 5, d->f);
+	draw_player(d, d->player->x, d->player->y, SIZE, d->f);
+	draw_map(d);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
