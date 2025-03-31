@@ -180,8 +180,8 @@ void	init_data(t_data *d)
 
 void	init_player(t_data *d)
 {
-	d->player->x = WIDTH / 2;
-	d->player->y = HEIGHT / 2;
+	d->player->x = 0;
+	d->player->y = 0;
 	d->player->up = false;
 	d->player->down = false;
 	d->player->left = false;
@@ -627,6 +627,16 @@ int	handle_click_x(t_data *d)
 	return (exit_clean(d), 0);
 }
 
+int	x_on_map(t_data *d, float pixel)
+{
+	return ((pixel - d->player->map_x) / BLOCK);
+}
+
+int	y_on_map(t_data *d, float pixel)
+{
+	return ((pixel - d->player->map_y) / BLOCK);
+}
+
 // int	key_press(int key, t_data *d)
 // {
 // 	if (key == XK_Escape)
@@ -670,7 +680,7 @@ int	handle_click_x(t_data *d)
 void	put_pixel(t_data *d, int x, int y, int color)
 {
 	// int	index;
-	if (x > WIDTH || y > HEIGHT || x < 0 || y < 0)
+	if (x >= WIDTH || y >= HEIGHT || x <= 0 || y <= 0)
 		return ;
 	mlx_pixel_put(d->mlx_ptr, d->window, x, y, color);
 	// index = y * d->size_line + x * d->bpp / 8;
@@ -710,7 +720,7 @@ void	move_player(t_data *d)
 	// 	d->player->x -= SPEED;
 	// if (d->player->right == true && valid_move(d, d->player->x + SPEED, d->player->y))
 	// 	d->player->x += SPEED;
-	if (d->player->up == true)
+	if (d->player->up == true) //&& d->map[y_on_map(d, d->player->y - SPEED)][d->player->x] != '1'
 		d->player->y -= SPEED;
 	if (d->player->down == true)
 		d->player->y += SPEED;
@@ -718,6 +728,11 @@ void	move_player(t_data *d)
 		d->player->x -= SPEED;
 	if (d->player->right == true)
 		d->player->x += SPEED;
+	// x * BLOCK + (BLOCK / 2)
+	// printf("[(int)d->player->x]: %d\n", (int)d->player->x);
+	printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y - SPEED)][x_on_map(d, d->player->x)]);
+	printf("X: %d | Y: %d\n", x_on_map(d, d->player->x), y_on_map(d, d->player->y));
+	printf("MOVE: %f\n", (d->player->x - (BLOCK / 2)) / BLOCK);
 }
 
 int	draw_loop(t_data *d)
@@ -735,14 +750,13 @@ int	key_press(int key, t_data *d)
 		write(1, "You quit the game\n", 18);
 		exit_clean(d);
 	}
-	(void)d;
-	if (key == W)
+	if (key == W && d->player->y > 0)
 		d->player->up = true;
-	if (key == A)
+	if (key == A && d->player->x > 0)
 		d->player->left = true;
-	if (key == S)
+	if (key == S && d->player->y < HEIGHT)
 		d->player->down = true;
-	if (key == D)
+	if (key == D && d->player->x < WIDTH)
 		d->player->right = true;
 	draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
 	move_player(d);
@@ -757,14 +771,13 @@ int	key_release(int key, t_data *d)
 		write(1, "You quit the game\n", 18);
 		exit_clean(d);
 	}
-	(void)d;
-	if (key == W)
+	if (key == W || d->player->y < 0)
 		d->player->up = false;
-	if (key == A)
+	if (key == A || d->player->x < 0)
 		d->player->left = false;
-	if (key == S)
+	if (key == S || d->player->y >= HEIGHT)
 		d->player->down = false;
-	if (key == D)
+	if (key == D || d->player->x >= WIDTH)
 		d->player->right = false;
 	return (0);
 }
@@ -785,14 +798,14 @@ void	find_player(t_data *d)
 			{
 				d->player->map_x = j;
 				d->player->map_y = i;
+				d->player->x = j * BLOCK + (BLOCK / 2);
+				d->player->y = i * BLOCK + (BLOCK / 2);
 			}
 			j++;
 		}
 		j = 0;
 		i++;
 	}
-	printf("map_x: %d\n", d->player->map_x);
-	printf("map_y: %d\n", d->player->map_y);
 }
 
 void	flood_fill_down(t_data *d, int x, int y)
@@ -800,10 +813,14 @@ void	flood_fill_down(t_data *d, int x, int y)
 	if (y < 0 || x < 0 || !d->map[y] || d->line[y].length < x || !d->map[y][x] || d->map[y][x] == 'n'
 		|| d->map[y][x] == 's' || d->map[y][x] == 'e'
 		|| d->map[y][x] == 'w' || d->map[y][x] == 'o'
-		|| d->map[y][x] == 'l' || d->map[y][x] == '\t')
+		|| d->map[y][x] == '2' || d->map[y][x] == '\n' || d->map[y][x] == 32)
 		return ;
 	if (d->map[y][x] == '1')
-		draw_square(d, d->player->x + (x * BLOCK * BLOCK - (BLOCK * BLOCK) - BLOCK), d->player->y + (y * (BLOCK * BLOCK) - (BLOCK * BLOCK) - BLOCK), BLOCK * 5, d->c);
+	{
+		draw_square(d, ((x * BLOCK) + d->player->map_x), ((y * BLOCK) + d->player->map_y), BLOCK, d->c);
+		return ;
+	}
+	// draw_square(d, (d->player->map_x * BLOCK + (d->player->map_x + x * BLOCK)), (d->player->map_y * BLOCK + (d->player->map_y + y * BLOCK)), BLOCK, d->c);
 	if (d->map[y][x] == 'N')
 		d->map[y][x] = 'n';
 	if (d->map[y][x] == 'S')
@@ -814,10 +831,10 @@ void	flood_fill_down(t_data *d, int x, int y)
 		d->map[y][x] = 'w';
 	if (d->map[y][x] == '0')
 		d->map[y][x] = 'o';
-	if (d->map[y][x] == '1')
-		d->map[y][x] = 'l';
-	if (d->map[y][x] == '\n')
-		d->map[y][x] = '\t';
+	// if (d->map[y][x] == '1')
+	// 	d->map[y][x] = '2';
+	// if (d->map[y][x] == '\n')
+	// 	d->map[y][x] = '\t';
 	flood_fill_down(d, x + 1, y);
 	flood_fill_down(d, x - 1, y);
 	flood_fill_down(d, x, y + 1);
@@ -831,7 +848,7 @@ void	map_set_back(t_data *d, int x, int y)
 		&& d->line[y + 1].length < x) || d->map[y][x] == 'N'
 		|| d->map[y][x] == 'S' || d->map[y][x] == 'E'
 		|| d->map[y][x] == 'W' || d->map[y][x] == '0'
-		|| d->map[y][x] == '1' || d->map[y][x] == '\n')
+		|| d->map[y][x] == '1' || d->map[y][x] == '\n' || d->map[y][x] == 32)
 		return ;
 	if (d->map[y][x] == 'n')
 		d->map[y][x] = 'N';
@@ -843,14 +860,14 @@ void	map_set_back(t_data *d, int x, int y)
 		d->map[y][x] = 'W';
 	if (d->map[y][x] == 'o')
 		d->map[y][x] = '0';
-	if (d->map[y][x] == 'l')
+	if (d->map[y][x] == '2')
 		d->map[y][x] = '1';
 	if (d->map[y][x] == '\t')
 		d->map[y][x] = '\n';
-	flood_fill_down(d, x + 1, y);
-	flood_fill_down(d, x - 1, y);
-	flood_fill_down(d, x, y + 1);
-	flood_fill_down(d, x, y - 1);
+	map_set_back(d, x + 1, y);
+	map_set_back(d, x - 1, y);
+	map_set_back(d, x, y + 1);
+	map_set_back(d, x, y - 1);
 }
 
 void	draw_map(t_data *d)
@@ -863,6 +880,7 @@ void	draw_map(t_data *d)
 	find_player(d);
 	flood_fill_down(d, d->player->map_x, d->player->map_y);
 	map_set_back(d, d->player->map_x, d->player->map_y);
+	print_map(d);
 }
 
 void	displaying(t_data *d)
@@ -876,12 +894,13 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
+	find_player(d);
 	draw_square(d, d->player->x, d->player->y, SIZE, d->f);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
-	mlx_hook(d->window, 3, 1L << 1, key_release, d);
 	draw_map(d);
+	mlx_hook(d->window, 3, 1L << 1, key_release, d);
 	
 
 
@@ -917,5 +936,6 @@ int	main(int argc, char **argv)
 
 
 	displaying(d);
+
 	return (exit_clean(d), 0);
 }
