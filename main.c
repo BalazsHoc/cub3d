@@ -691,29 +691,57 @@ void	delete_ray(t_data *d)
 	}
 }
 
+// void	draw_ray(t_data *d, int color)
+// {
+// 	float	x;
+// 	float	y;
+// 	float	step_size;
+
+// 	x = d->player->x;
+// 	y = d->player->y;
+// 	step_size = 1.0; // Small steps for precision
+// 	while (1)
+// 	{
+// 		// Stop if we hit a wall
+// 		if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
+// 			break;
+
+// 		// Draw the current point
+// 		put_pixel(d, x, y, color);
+
+// 		// Move in the direction of the angle
+// 		x += cos(d->player->angle) * step_size;
+// 		y += sin(d->player->angle) * step_size;
+// 	}
+// }
+
 void	draw_ray(t_data *d, int color)
 {
-	float	x;
-	float	y;
-	float	step_size;
+    float ray_x = d->player->x;
+    float ray_y = d->player->y;
+    float ray_angle = d->player->angle;
 
-	x = d->player->x;
-	y = d->player->y;
-	step_size = 1.0; // Small steps for precision
-	while (1)
-	{
-		// Stop if we hit a wall
-		if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
-			break;
+    float delta_x = cos(ray_angle);
+    float delta_y = sin(ray_angle);
 
-		// Draw the current point
-		put_pixel(d, x, y, color);
+    float step_size = 1.0;
+    int map_x, map_y;
 
-		// Move in the direction of the angle
-		x += cos(d->player->angle) * step_size;
-		y += sin(d->player->angle) * step_size;
-	}
+    while (1)
+    {
+        map_x = (int)(ray_x / BLOCK);
+        map_y = (int)(ray_y / BLOCK);
+
+        if (d->map[map_y][map_x] == '1')  // Wall hit
+            break;
+
+        put_pixel(d, ray_x, ray_y, color);
+
+        ray_x += delta_x * step_size;
+        ray_y += delta_y * step_size;
+    }
 }
+
 
 void	move_player(t_data *d)
 {
