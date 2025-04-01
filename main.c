@@ -712,24 +712,16 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 
 void	move_player(t_data *d)
 {
-	// if (d->player->up == true && valid_move(d, d->player->x, d->player->y - SPEED))
-	// 	d->player->y -= SPEED;
-	// if (d->player->down == true && valid_move(d, d->player->x, d->player->y + SPEED))
-	// 	d->player->y += SPEED;
-	// if (d->player->left == true && valid_move(d, d->player->x - SPEED, d->player->y))
-	// 	d->player->x -= SPEED;
-	// if (d->player->right == true && valid_move(d, d->player->x + SPEED, d->player->y))
-	// 	d->player->x += SPEED;
-	if (d->player->up == true && d->map[y_on_map(d, d->player->y - SPEED)][x_on_map(d, d->player->x)] != '1')
+
+	if (d->player->up == true && ((d->map[y_on_map(d, d->player->y - (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x + SIZE)] != '1')&& (d->map[y_on_map(d, d->player->y - (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x - SIZE)] != '1')))
 		d->player->y -= SPEED;
-	if (d->player->down == true && d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x)] != '1')
+	if (d->player->down == true && d->map[y_on_map(d, d->player->y + (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x - (SIZE / 2))] != '1' && d->map[y_on_map(d, d->player->y + (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x + (SIZE))] != '1')
 		d->player->y += SPEED;
-	if (d->player->left == true && d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - SPEED - SIZE)] != '1')
+	if (d->player->left == true && d->map[y_on_map(d, d->player->y + (SIZE / 2))][x_on_map(d, d->player->x - SPEED - (SIZE / 2))] != '1' && d->map[y_on_map(d, d->player->y - (SIZE / 2))][x_on_map(d, d->player->x - SPEED -(SIZE / 2))] != '1')
 		d->player->x -= SPEED;
-	if (d->player->right == true && d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
+	if (d->player->right == true && d->map[y_on_map(d, d->player->y + (SIZE / 2))][x_on_map(d, d->player->x + SPEED + SIZE)] != '1' && d->map[y_on_map(d, d->player->y - (SIZE / 2))][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
 		d->player->x += SPEED;
 	// x * BLOCK + (BLOCK / 2)
-	// printf("[(int)d->player->x]: %d\n", (int)d->player->x);
 	printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - 1)]);
 	printf("X: %d | Y: %d\n", x_on_map(d, d->player->x), y_on_map(d, d->player->y));
 	printf("MOVE: %f\n", (d->player->x - (BLOCK / 2)) / BLOCK);
@@ -872,11 +864,11 @@ void	map_set_back(t_data *d, int x, int y)
 
 void	draw_map(t_data *d)
 {
-	int	i;
-	int	j;
+	// int	i;
+	// int	j;
 
-	i = 0;
-	j = 0;
+	// i = 0;
+	// j = 0;
 	find_player(d);
 	flood_fill_down(d, d->player->map_x, d->player->map_y);
 	map_set_back(d, d->player->map_x, d->player->map_y);
