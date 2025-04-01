@@ -9,9 +9,10 @@
 
 
 # define SIZE 5
-# define BLOCK 50
+# define BLOCK 60
 
-# define SPEED 0.0025
+# define SPEED 0.15
+# define SENSITIVITY 0.005
 
 # define W 119
 # define A 97
@@ -49,6 +50,8 @@ typedef struct player_s
 
 	int				map_x;
 	int				map_y;
+
+	double			angle;
 }	t_player;
 
 typedef struct data_s
@@ -79,11 +82,11 @@ typedef struct data_s
 	void			*mlx_ptr;
 	void			*img;
 
-	char			*addr;
+	// char			*addr;
 
-	int				bpp;
-	int				size_line;
-	int				endian;
+	// int				bpp;
+	// int				size_line;
+	// int				endian;
 
 	double			pi;
 
@@ -107,6 +110,8 @@ int		gnl_strlen(char *str);
 int		gnl_newline(char *str);
 char	*gnl_strcpy(char *str);
 char	*gnl_fromnl(char *str);
+
+void	draw_map(t_data *d);
 
 
 # endif

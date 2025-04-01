@@ -173,7 +173,7 @@ void	init_data(t_data *d)
 	d->heigth = 0;
 	d->window = NULL;
 	d->mlx_ptr = NULL;
-	d->addr = NULL;
+	// d->addr = NULL;
 	d->img = NULL;
 	d->player = NULL;
 	d->pi = acos(-1.0);
@@ -189,8 +189,7 @@ void	init_player(t_data *d)
 	d->player->right = false;
 	d->player->map_x = 0;
 	d->player->map_y = 0;
-	printf("player->x: %f\n", d->player->x);
-	printf("player->y: %f\n", d->player->y);
+	d->player->angle = 0;
 }
 
 void	*ft_calloc(t_data *d, size_t nmemb, size_t size)
@@ -570,51 +569,51 @@ int	map_name(char *map_name)
 	return (0);
 }
 
-void	check_walls(t_data *d, int i, int j)
+void	check_walls(t_data *d, int y, int x)
 {
-	while (d->map[++i])
+	while (d->map[++y])
 	{
-		while (d->map[i][++j])
+		while (d->map[y][++x])
 		{
-			if ((d->map[i][j] == '0' || d->map[i][j] == 'N'
-				|| d->map[i][j] == 'S' || d->map[i][j] == 'E'
-				|| d->map[i][j] == 'W')
-				&& (i == 0 || j == 0
-				|| (!d->map[i - 1] || d->line[i - 1].length <= j
-				|| d->map[i - 1][j] == 32 || d->map[i - 1][j] == '\n')
-				|| (!d->map[i + 1] || d->line[i + 1].length <= j
-				|| d->map[i + 1][j] == 32 || d->map[i + 1][j] == '\n')
-				|| (!d->map[i][j - 1] || d->map[i][j - 1] == 32)
-				|| (!d->map[i][j + 1] || d->map[i][j + 1] == 32
-				|| d->map[i][j + 1] == '\n')))
+			if ((d->map[y][x] == '0' || d->map[y][x] == 'N'
+				|| d->map[y][x] == 'S' || d->map[y][x] == 'E'
+				|| d->map[y][x] == 'W')
+				&& (y == 0 || x == 0
+				|| (!d->map[y - 1] || d->line[y - 1].length <= x
+				|| d->map[y - 1][x] == 32 || d->map[y - 1][x] == '\n')
+				|| (!d->map[y + 1] || d->line[y + 1].length <= x
+				|| d->map[y + 1][x] == 32 || d->map[y + 1][x] == '\n')
+				|| (!d->map[y][x - 1] || d->map[y][x - 1] == 32)
+				|| (!d->map[y][x + 1] || d->map[y][x + 1] == 32
+				|| d->map[y][x + 1] == '\n')))
 			return (ft_printe("Error, map must be surrounded by walls\n"),
 					error_clean(d));
 		}
-		j = -1;
+		x = -1;
 	}
 }
 
-void	check_map(t_data *d, int pos, int i, int j)
+void	check_map(t_data *d, int pos, int x, int y)
 {
-	while (d->map[++i])
+	while (d->map[++y])
 	{
-		while (d->map[i][++j])
+		while (d->map[y][++x])
 		{
-			if (!pos && (d->map[i][j] == 'N' || d->map[i][j] == 'S'
-				|| d->map[i][j] == 'E' || d->map[i][j] == 'W'))
+			if (!pos && (d->map[y][x] == 'N' || d->map[y][x] == 'S'
+				|| d->map[y][x] == 'E' || d->map[y][x] == 'W'))
 				pos = 1;
-			else if (pos && (d->map[i][j] == 'N' || d->map[i][j] == 'S'
-				|| d->map[i][j] == 'E' || d->map[i][j] == 'W'))
+			else if (pos && (d->map[y][x] == 'N' || d->map[y][x] == 'S'
+				|| d->map[y][x] == 'E' || d->map[y][x] == 'W'))
 				return (ft_printe("Error, multiple spawnpoint\n"),
 					error_clean(d));
-			if (d->map[i][j] != 32 && d->map[i][j] != '\n'
-				&& d->map[i][j] != '1' && d->map[i][j] != '0'
-				&& d->map[i][j] != 'N' && d->map[i][j] != 'S'
-				&& d->map[i][j] != 'E' && d->map[i][j] != 'W')
+			if (d->map[y][x] != 32 && d->map[y][x] != '\n'
+				&& d->map[y][x] != '1' && d->map[y][x] != '0'
+				&& d->map[y][x] != 'N' && d->map[y][x] != 'S'
+				&& d->map[y][x] != 'E' && d->map[y][x] != 'W')
 			return (ft_printe("Error, unexpected character\n"),
 					error_clean(d));
 		}
-		j = -1;
+		x = -1;
 	}
 	if (d->heigth > 15 || d->width > 16)
 		return (ft_printe("Error, map is too big\n"),
@@ -672,6 +671,62 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 	
 }
 
+void	delete_ray(t_data *d)
+{
+	int		map_x;
+	int		map_y;
+	float	x;
+	float	y;
+	float	step_size;
+
+	map_x = 0;
+	map_y = 0;
+	x = d->player->x;
+	y = d->player->y;
+	step_size = 1.0;
+	while (1) //d->map[map_y][map_x] != '1'
+	{
+		map_x = (x / BLOCK);
+		map_y = (y / BLOCK);
+		if (d->map[map_y][map_x] == '1')
+			break;
+		put_pixel(d, x, y, 0);
+		x += cos(d->player->angle) * step_size;
+		y += sin(d->player->angle) * step_size;
+	}
+}
+
+void	draw_ray(t_data *d, int color)
+{
+	int		map_x;
+	int		map_y;
+	float	x;
+	float	y;
+	float	step_size;
+
+	map_x = 0; // Convert pixel to map index
+	map_y = 0;
+	x = d->player->x;
+	y = d->player->y;
+	step_size = 1.0; // Small steps for precision
+	while (1) //d->map[map_y][map_x] != '1'
+	{
+		map_x = (x / BLOCK); // Convert pixel to map index
+		map_y = (y / BLOCK);
+
+		// Stop if we hit a wall
+		if (d->map[map_y][map_x] == '1')
+			break;
+
+		// Draw the current point
+		put_pixel(d, x, y, color);
+
+		// Move in the direction of the angle
+		x += cos(d->player->angle) * step_size;
+		y += sin(d->player->angle) * step_size;
+	}
+}
+
 void	move_player(t_data *d)
 {
 	if (d->player->up == true
@@ -686,16 +741,18 @@ void	move_player(t_data *d)
 		d->player->x -= SPEED;
 	if (d->player->right == true && d->map[y_on_map(d, d->player->y + SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1' && d->map[y_on_map(d, d->player->y - SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
 		d->player->x += SPEED;
+	// printf("d->player->x: %f | d->player->y: %f\n", d->player->x, d->player->y);
 }
 
-int	draw_loop(t_data *d)
+int	draw_player(t_data *d)
 {
-
 	if (d->player->up == true || d->player->down == true || d->player->left == true || d->player->right == true)
 	{
+		delete_ray(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
 		move_player(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
+		draw_ray(d, d->c);
 	}
 	return (1);
 }
@@ -736,29 +793,45 @@ int	key_release(int key, t_data *d)
 	return (0);
 }
 
+void	set_angle(t_data *d, int x, int y)
+{
+	if (d->map[y][x] == 'N')
+		d->player->angle = (3 * d->pi) / 2;
+	if (d->map[y][x] == 'S')
+		d->player->angle = d->pi / 2;
+	if (d->map[y][x] == 'E')
+		d->player->angle = 0;
+	if (d->map[y][x] == 'W')
+		d->player->angle = d->pi;
+	printf("map[y][x]: %c\n", d->map[y][x]);
+	printf("angle: %f\n", d->player->angle);
+	
+}
+
 void	find_player(t_data *d)
 {
-	int	i;
-	int	j;
+	int	y;
+	int	x;
 
-	i = 0;
-	j = 0;
-	while (d->map[i])
+	y = 0;
+	x = 0;
+	while (d->map[y])
 	{
-		while (d->map[i][j])
+		while (d->map[y][x])
 		{
-			if (d->map[i][j] == 'N' || d->map[i][j] == 'S'
-				|| d->map[i][j] == 'E' || d->map[i][j] == 'W')
+			if (d->map[y][x] == 'N' || d->map[y][x] == 'S'
+				|| d->map[y][x] == 'E' || d->map[y][x] == 'W')
 			{
-				d->player->map_x = j;
-				d->player->map_y = i;
-				d->player->x = j * BLOCK + (BLOCK / 2);
-				d->player->y = i * BLOCK + (BLOCK / 2);
+				set_angle(d, x, y);
+				d->player->map_x = x;
+				d->player->map_y = y;
+				d->player->x = x * BLOCK + (BLOCK / 2);
+				d->player->y = y * BLOCK + (BLOCK / 2);
 			}
-			j++;
+			x++;
 		}
-		j = 0;
-		i++;
+		x = 0;
+		y++;
 	}
 }
 
@@ -827,6 +900,30 @@ void	draw_map(t_data *d)
 	print_map(d);
 }
 
+// void	mouse_move(t_data *d, int x, int y)
+// {
+//     static int last_x = WIDTH / 2; // Center of the screen
+
+
+//     int delta_x = x - last_x;
+//     if (delta_x != 0) 
+//     {
+//         d->player->angle += delta_x * SENSITIVITY;
+//         if (d->player->angle > 2 * d->pi)
+//             d->player->angle -= 2 * d->pi;
+//         if (d->player->angle < 0)
+//             d->player->angle += 2 * d->pi;
+
+//         // Update direction vector
+//         d->player->dir_x = cos(d->player->angle);
+//         d->player->dir_y = sin(d->player->angle);
+
+//         last_x = x; // Update last_x position
+//     }
+
+//     return (0);
+// }
+
 void	displaying(t_data *d)
 {
 	d->mlx_ptr = mlx_init();
@@ -847,11 +944,14 @@ void	displaying(t_data *d)
 	find_player(d);
 	draw_square(d, d->player->x, d->player->y, SIZE, d->f);
 	draw_map(d);
+	// draw_ray(d, 255);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
-	mlx_loop_hook(d->mlx_ptr, draw_loop, d);
+	// mlx_hook(d->window, 6, 1L << 6, mouse_move, d);
+
+	mlx_loop_hook(d->mlx_ptr, draw_player, d);
 	
 	mlx_loop(d->mlx_ptr);
 }
