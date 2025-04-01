@@ -11,7 +11,7 @@
 # define SIZE 5
 # define BLOCK 50
 
-# define SPEED 0.01
+# define SPEED 0.0025
 
 # define W 119
 # define A 97

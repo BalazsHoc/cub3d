@@ -674,11 +674,10 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 
 void	move_player(t_data *d)
 {
-
 	if (d->player->up == true
 		&& ((d->map[y_on_map(d, d->player->y - SPEED - SIZE)][x_on_map(d, d->player->x + SIZE)] != '1')
 		&& (d->map[y_on_map(d, d->player->y - SPEED - SIZE)][x_on_map(d, d->player->x - SIZE)] != '1')))
-		d->player->y -= SPEED; //this
+		d->player->y -= SPEED;
 	if (d->player->down == true
 		&& d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x - SIZE)] != '1'
 		&& d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x + SIZE)] != '1')
@@ -687,13 +686,6 @@ void	move_player(t_data *d)
 		d->player->x -= SPEED;
 	if (d->player->right == true && d->map[y_on_map(d, d->player->y + SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1' && d->map[y_on_map(d, d->player->y - SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
 		d->player->x += SPEED;
-
-
-	// x * BLOCK + (BLOCK / 2)
-	// printf("x: %f | y: %f\n", d->player->x, d->player->y);
-	// printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - 1)]);
-	// printf("X: %d | Y: %d\n", x_on_map(d, d->player->x), y_on_map(d, d->player->y));
-	// printf("MOVE: %f\n", (d->player->x - (BLOCK / 2)) / BLOCK);
 }
 
 int	draw_loop(t_data *d)
@@ -702,15 +694,9 @@ int	draw_loop(t_data *d)
 	if (d->player->up == true || d->player->down == true || d->player->left == true || d->player->right == true)
 	{
 		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
-		printf("x: %f | y: %f\n", d->player->x, d->player->y);
 		move_player(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
 	}
-
-
-	// move_player(d);
-	// draw_square(d, d->player->x, d->player->y, 10, d->c);
-	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->img, 0, 0);
 	return (1);
 }
 
@@ -729,9 +715,6 @@ int	key_press(int key, t_data *d)
 		d->player->down = true;
 	if (key == D && d->player->x < WIDTH)
 		d->player->right = true;
-	// draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
-	// move_player(d);
-	// draw_square(d, d->player->x, d->player->y, 5, d->f);
 	return (0);
 }
 
@@ -869,19 +852,7 @@ void	displaying(t_data *d)
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
 	mlx_loop_hook(d->mlx_ptr, draw_loop, d);
-	// draw_loop(d);
 	
-	
-
-	// if (d->player->up == true || d->player->down == true || d->player->left == true || d->player->right == true)
-	// {
-	// 	draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
-	// 	move_player(d);
-	// 	draw_square(d, d->player->x, d->player->y, 5, d->f);
-	// }
-
-	// printf("d->c: %d\n", d->c);
-	// printf("d->f: %d\n", d->f);
 	mlx_loop(d->mlx_ptr);
 }
 
