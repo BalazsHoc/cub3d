@@ -176,6 +176,7 @@ void	init_data(t_data *d)
 	d->addr = NULL;
 	d->img = NULL;
 	d->player = NULL;
+	d->pi = acos(-1.0);
 }
 
 void	init_player(t_data *d)
@@ -637,46 +638,6 @@ int	y_on_map(t_data *d, float pixel)
 	return ((pixel - d->player->map_y) / BLOCK);
 }
 
-// int	key_press(int key, t_data *d)
-// {
-// 	if (key == XK_Escape)
-// 	{
-// 		write(1, "You quit the game\n", 18);
-// 		exit_clean(d);
-// 	}
-// 	(void)d;
-// 	if (key == W)
-// 		d->player->up = true;
-// 	if (key == A)
-// 		d->player->left = true;
-// 	if (key == S)
-// 		d->player->down = true;
-// 	if (key == D)
-// 		d->player->right = true;
-// 	move_player(d);
-// 	draw_square(d, d->player->x, d->player->y, 10, d->c);
-// 	return (0);
-// }
-
-// int	key_release(int key, t_data *d)
-// {
-// 	if (key == XK_Escape)
-// 	{
-// 		write(1, "You quit the game\n", 18);
-// 		exit_clean(d);
-// 	}
-// 	(void)d;
-// 	if (key == W)
-// 		d->player->up = false;
-// 	if (key == A)
-// 		d->player->left = false;
-// 	if (key == S)
-// 		d->player->down = false;
-// 	if (key == D)
-// 		d->player->right = false;
-// 	return (0);
-// }
-
 void	put_pixel(t_data *d, int x, int y, int color)
 {
 	// int	index;
@@ -684,11 +645,12 @@ void	put_pixel(t_data *d, int x, int y, int color)
 		return ;
 	mlx_pixel_put(d->mlx_ptr, d->window, x, y, color);
 	// index = y * d->size_line + x * d->bpp / 8;
-	// // (void)d;
-	// // (void)color;
+	// (void)d;
+	// (void)color;
 	// d->addr[index] = color & 0xFF;
 	// d->addr[index + 1] = (color >> 8) & 0xFF;
 	// d->addr[index + 2] = (color >> 16) & 0xFF;
+
 }
 
 void	draw_square(t_data *d, int x, int y, int size, int color)
@@ -705,7 +667,7 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 	while (++i < size)
 		put_pixel(d, x + i, y + size, color);
 	i = -1;
-	while (++i < size)
+	while (++i <= size)
 		put_pixel(d, x + size, y + i, color);
 	
 }
@@ -713,24 +675,41 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 void	move_player(t_data *d)
 {
 
-	if (d->player->up == true && ((d->map[y_on_map(d, d->player->y - (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x + SIZE)] != '1')&& (d->map[y_on_map(d, d->player->y - (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x - SIZE)] != '1')))
-		d->player->y -= SPEED;
-	if (d->player->down == true && d->map[y_on_map(d, d->player->y + (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x - (SIZE / 2))] != '1' && d->map[y_on_map(d, d->player->y + (SPEED + (SIZE / 2)))][x_on_map(d, d->player->x + (SIZE))] != '1')
+	if (d->player->up == true
+		&& ((d->map[y_on_map(d, d->player->y - SPEED - SIZE)][x_on_map(d, d->player->x + SIZE)] != '1')
+		&& (d->map[y_on_map(d, d->player->y - SPEED - SIZE)][x_on_map(d, d->player->x - SIZE)] != '1')))
+		d->player->y -= SPEED; //this
+	if (d->player->down == true
+		&& d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x - SIZE)] != '1'
+		&& d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x + SIZE)] != '1')
 		d->player->y += SPEED;
-	if (d->player->left == true && d->map[y_on_map(d, d->player->y + (SIZE / 2))][x_on_map(d, d->player->x - SPEED - (SIZE / 2))] != '1' && d->map[y_on_map(d, d->player->y - (SIZE / 2))][x_on_map(d, d->player->x - SPEED -(SIZE / 2))] != '1')
+	if (d->player->left == true && d->map[y_on_map(d, d->player->y + SIZE)][x_on_map(d, d->player->x - SPEED - SIZE)] != '1' && d->map[y_on_map(d, d->player->y - SIZE)][x_on_map(d, d->player->x - SPEED - SIZE)] != '1')
 		d->player->x -= SPEED;
-	if (d->player->right == true && d->map[y_on_map(d, d->player->y + (SIZE / 2))][x_on_map(d, d->player->x + SPEED + SIZE)] != '1' && d->map[y_on_map(d, d->player->y - (SIZE / 2))][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
+	if (d->player->right == true && d->map[y_on_map(d, d->player->y + SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1' && d->map[y_on_map(d, d->player->y - SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
 		d->player->x += SPEED;
+
+
 	// x * BLOCK + (BLOCK / 2)
-	printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - 1)]);
-	printf("X: %d | Y: %d\n", x_on_map(d, d->player->x), y_on_map(d, d->player->y));
-	printf("MOVE: %f\n", (d->player->x - (BLOCK / 2)) / BLOCK);
+	// printf("x: %f | y: %f\n", d->player->x, d->player->y);
+	// printf("map[][]: %c\n", d->map[y_on_map(d, d->player->y)][x_on_map(d, d->player->x - 1)]);
+	// printf("X: %d | Y: %d\n", x_on_map(d, d->player->x), y_on_map(d, d->player->y));
+	// printf("MOVE: %f\n", (d->player->x - (BLOCK / 2)) / BLOCK);
 }
 
 int	draw_loop(t_data *d)
 {
-	move_player(d);
-	draw_square(d, d->player->x, d->player->y, 10, d->c);
+
+	if (d->player->up == true || d->player->down == true || d->player->left == true || d->player->right == true)
+	{
+		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
+		printf("x: %f | y: %f\n", d->player->x, d->player->y);
+		move_player(d);
+		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
+	}
+
+
+	// move_player(d);
+	// draw_square(d, d->player->x, d->player->y, 10, d->c);
 	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->img, 0, 0);
 	return (1);
 }
@@ -750,9 +729,9 @@ int	key_press(int key, t_data *d)
 		d->player->down = true;
 	if (key == D && d->player->x < WIDTH)
 		d->player->right = true;
-	draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
-	move_player(d);
-	draw_square(d, d->player->x, d->player->y, 5, d->f);
+	// draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
+	// move_player(d);
+	// draw_square(d, d->player->x, d->player->y, 5, d->f);
 	return (0);
 }
 
@@ -812,7 +791,6 @@ void	flood_fill_down(t_data *d, int x, int y)
 		draw_square(d, ((x * BLOCK) + d->player->map_x), ((y * BLOCK) + d->player->map_y), BLOCK, d->c);
 		return ;
 	}
-	// draw_square(d, (d->player->map_x * BLOCK + (d->player->map_x + x * BLOCK)), (d->player->map_y * BLOCK + (d->player->map_y + y * BLOCK)), BLOCK, d->c);
 	if (d->map[y][x] == 'N')
 		d->map[y][x] = 'n';
 	if (d->map[y][x] == 'S')
@@ -823,10 +801,6 @@ void	flood_fill_down(t_data *d, int x, int y)
 		d->map[y][x] = 'w';
 	if (d->map[y][x] == '0')
 		d->map[y][x] = 'o';
-	// if (d->map[y][x] == '1')
-	// 	d->map[y][x] = '2';
-	// if (d->map[y][x] == '\n')
-	// 	d->map[y][x] = '\t';
 	flood_fill_down(d, x + 1, y);
 	flood_fill_down(d, x - 1, y);
 	flood_fill_down(d, x, y + 1);
@@ -864,11 +838,6 @@ void	map_set_back(t_data *d, int x, int y)
 
 void	draw_map(t_data *d)
 {
-	// int	i;
-	// int	j;
-
-	// i = 0;
-	// j = 0;
 	find_player(d);
 	flood_fill_down(d, d->player->map_x, d->player->map_y);
 	map_set_back(d, d->player->map_x, d->player->map_y);
@@ -886,17 +855,30 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
+	// d->addr = mlx_get_data_addr(d->mlx_ptr, &d->bpp, &d->size_line, &d->endian);
+	// if (!d->addr)
+	// 	return (ft_printe("Error, mlx_get_data_addr\n"), error_clean(d));
+	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->img, 0, 0); //new
+
+
 	find_player(d);
 	draw_square(d, d->player->x, d->player->y, SIZE, d->f);
+	draw_map(d);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
-	draw_map(d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
+	mlx_loop_hook(d->mlx_ptr, draw_loop, d);
+	// draw_loop(d);
+	
 	
 
-
-
+	// if (d->player->up == true || d->player->down == true || d->player->left == true || d->player->right == true)
+	// {
+	// 	draw_square(d, d->player->x, d->player->y, 5, 0); // deleting porpouse
+	// 	move_player(d);
+	// 	draw_square(d, d->player->x, d->player->y, 5, d->f);
+	// }
 
 	// printf("d->c: %d\n", d->c);
 	// printf("d->f: %d\n", d->f);
@@ -923,9 +905,9 @@ int	main(int argc, char **argv)
 	d->player = p;
 	init_player(d);
 	reading_data(d, argv);
-	print_map(d);
+	// print_map(d);
 	check_map(d, 0, -1, -1);
-
+	printf("pi: %f\n", d->pi);
 
 	displaying(d);
 

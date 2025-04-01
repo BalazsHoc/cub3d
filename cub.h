@@ -7,10 +7,11 @@
 # define WIDTH 1280
 # define HEIGHT 720
 
-# define SPEED 5
 
 # define SIZE 5
 # define BLOCK 50
+
+# define SPEED 0.01
 
 # define W 119
 # define A 97
@@ -27,6 +28,7 @@
 # include <stdbool.h>
 # include <fcntl.h>
 # include <X11/keysym.h>
+# include <math.h>
 // # include "mlx.h"
 # include "minilibx-linux/mlx.h"
 
@@ -82,6 +84,8 @@ typedef struct data_s
 	int				bpp;
 	int				size_line;
 	int				endian;
+
+	double			pi;
 
 	struct player_s	*player;
 	
