@@ -673,22 +673,57 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 
 void	delete_ray(t_data *d)
 {
-	float	x;
-	float	y;
-	float	step_size;
+	// float	x;
+	// float	y;
+	// float	step_size;
 
-	x = d->player->x;
-	y = d->player->y;
-	step_size = 1.0;
-	while (1)
-	{
-		// printf("(int)((x + (SIZE / 2)) / BLOCK): %d\n", (int)((x + (SIZE / 2)) / BLOCK));
-		if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
-			break;
-		put_pixel(d, x, y, 0);
-		x += cos(d->player->angle) * step_size;
-		y += sin(d->player->angle) * step_size;
-	}
+	// x = d->player->x;
+	// y = d->player->y;
+	// step_size = 1.0;
+	// while (1)
+	// {
+	// 	// printf("(int)((x + (SIZE / 2)) / BLOCK): %d\n", (int)((x + (SIZE / 2)) / BLOCK));
+	// 	if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
+	// 		break;
+	// 	put_pixel(d, x, y, 0);
+	// 	x += cos(d->player->angle) * step_size;
+	// 	y += sin(d->player->angle) * step_size;
+	// }
+	int	i = 0;
+	float ray_angle;
+    float ray_x, ray_y;
+    float delta_x, delta_y;
+    float step_size = 1.0;
+    int map_x, map_y;
+    float angle_step = (d->pi / 3) / RAYSPRAD; // 60° spread divided into steps
+
+    // Start raycasting from player's angle - 30° (left side of FOV)
+    ray_angle = d->player->angle - (d->pi / 6);
+
+    while (i++ < RAYSPRAD)
+    {
+        ray_x = d->player->x;
+        ray_y = d->player->y;
+        delta_x = cos(ray_angle);
+        delta_y = sin(ray_angle);
+
+        while (1)
+        {
+            map_x = (int)(ray_x / BLOCK);
+            map_y = (int)(ray_y / BLOCK);
+
+            if (d->map[map_y][map_x] == '1')  // Stop when hitting a wall
+                break;
+
+            put_pixel(d, ray_x, ray_y, 0); // Draw pixel at ray position
+
+            ray_x += delta_x * step_size;
+            ray_y += delta_y * step_size;
+        }
+
+        ray_angle += angle_step; // Move to next ray
+    }
+
 }
 
 // void	draw_ray(t_data *d, int color)
@@ -717,28 +752,63 @@ void	delete_ray(t_data *d)
 
 void	draw_ray(t_data *d, int color)
 {
-    float ray_x = d->player->x;
-    float ray_y = d->player->y;
-    float ray_angle = d->player->angle;
+    // float ray_x = d->player->x;
+    // float ray_y = d->player->y;
+    // float ray_angle = d->player->angle;
 
-    float delta_x = cos(ray_angle);
-    float delta_y = sin(ray_angle);
+    // float delta_x = cos(ray_angle);
+    // float delta_y = sin(ray_angle);
 
+    // float step_size = 1.0;
+    // int map_x, map_y;
+
+    // while (1)
+    // {
+    //     map_x = (int)(ray_x / BLOCK);
+    //     map_y = (int)(ray_y / BLOCK);
+
+    //     if (d->map[map_y][map_x] == '1')  // Wall hit
+    //         break;
+
+    //     put_pixel(d, ray_x, ray_y, color);
+
+    //     ray_x += delta_x * step_size;
+    //     ray_y += delta_y * step_size;
+    // }
+
+	int	i = 0;
+	float ray_angle;
+    float ray_x, ray_y;
+    float delta_x, delta_y;
     float step_size = 1.0;
     int map_x, map_y;
+    float angle_step = (d->pi / 3) / RAYSPRAD; // 60° spread divided into steps
 
-    while (1)
+    // Start raycasting from player's angle - 30° (left side of FOV)
+    ray_angle = d->player->angle - (d->pi / 6);
+
+    while (i++ < RAYSPRAD)
     {
-        map_x = (int)(ray_x / BLOCK);
-        map_y = (int)(ray_y / BLOCK);
+        ray_x = d->player->x;
+        ray_y = d->player->y;
+        delta_x = cos(ray_angle);
+        delta_y = sin(ray_angle);
 
-        if (d->map[map_y][map_x] == '1')  // Wall hit
-            break;
+        while (1)
+        {
+            map_x = (int)(ray_x / BLOCK);
+            map_y = (int)(ray_y / BLOCK);
 
-        put_pixel(d, ray_x, ray_y, color);
+            if (d->map[map_y][map_x] == '1')  // Stop when hitting a wall
+                break;
 
-        ray_x += delta_x * step_size;
-        ray_y += delta_y * step_size;
+            put_pixel(d, ray_x, ray_y, color); // Draw pixel at ray position
+
+            ray_x += delta_x * step_size;
+            ray_y += delta_y * step_size;
+        }
+
+        ray_angle += angle_step; // Move to next ray
     }
 }
 

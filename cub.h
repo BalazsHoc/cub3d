@@ -14,6 +14,8 @@
 # define SPEED 0.15
 # define SENSITIVITY 0.005
 
+# define RAYSPRAD 50
+
 # define W 119
 # define A 97
 # define S 115
