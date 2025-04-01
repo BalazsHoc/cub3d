@@ -673,22 +673,17 @@ void	draw_square(t_data *d, int x, int y, int size, int color)
 
 void	delete_ray(t_data *d)
 {
-	int		map_x;
-	int		map_y;
 	float	x;
 	float	y;
 	float	step_size;
 
-	map_x = 0;
-	map_y = 0;
 	x = d->player->x;
 	y = d->player->y;
 	step_size = 1.0;
-	while (1) //d->map[map_y][map_x] != '1'
+	while (1)
 	{
-		map_x = (x / BLOCK);
-		map_y = (y / BLOCK);
-		if (d->map[map_y][map_x] == '1')
+		// printf("(int)((x + (SIZE / 2)) / BLOCK): %d\n", (int)((x + (SIZE / 2)) / BLOCK));
+		if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
 			break;
 		put_pixel(d, x, y, 0);
 		x += cos(d->player->angle) * step_size;
@@ -698,24 +693,17 @@ void	delete_ray(t_data *d)
 
 void	draw_ray(t_data *d, int color)
 {
-	int		map_x;
-	int		map_y;
 	float	x;
 	float	y;
 	float	step_size;
 
-	map_x = 0; // Convert pixel to map index
-	map_y = 0;
 	x = d->player->x;
 	y = d->player->y;
 	step_size = 1.0; // Small steps for precision
-	while (1) //d->map[map_y][map_x] != '1'
+	while (1)
 	{
-		map_x = (x / BLOCK); // Convert pixel to map index
-		map_y = (y / BLOCK);
-
 		// Stop if we hit a wall
-		if (d->map[map_y][map_x] == '1')
+		if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
 			break;
 
 		// Draw the current point

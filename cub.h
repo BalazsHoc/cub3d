@@ -8,7 +8,7 @@
 # define HEIGHT 720
 
 
-# define SIZE 5
+# define SIZE 10
 # define BLOCK 60
 
 # define SPEED 0.15
