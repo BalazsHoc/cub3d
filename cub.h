@@ -12,6 +12,7 @@
 # define BLOCK 60
 
 # define SPEED 0.15
+# define R_SPEED 0.15
 # define SENSITIVITY 0.005
 
 # define RAYSPRAD 50
@@ -20,6 +21,10 @@
 # define A 97
 # define S 115
 # define D 100
+
+# define LEFT 65361
+# define RIGHT 65363
+
 # endif
 
 # include <unistd.h>
@@ -49,6 +54,8 @@ typedef struct player_s
 	bool			down;
 	bool			left;
 	bool			right;
+	bool			t_left;
+	bool			t_right;
 
 	int				map_x;
 	int				map_y;

@@ -173,7 +173,6 @@ void	init_data(t_data *d)
 	d->heigth = 0;
 	d->window = NULL;
 	d->mlx_ptr = NULL;
-	// d->addr = NULL;
 	d->img = NULL;
 	d->player = NULL;
 	d->pi = acos(-1.0);
@@ -187,6 +186,8 @@ void	init_player(t_data *d)
 	d->player->down = false;
 	d->player->left = false;
 	d->player->right = false;
+	d->player->t_left = false;
+	d->player->t_right = false;
 	d->player->map_x = 0;
 	d->player->map_y = 0;
 	d->player->angle = 0;
@@ -627,218 +628,87 @@ int	handle_click_x(t_data *d)
 	return (exit_clean(d), 0);
 }
 
-int	x_on_map(t_data *d, float pixel)
-{
-	return ((pixel - d->player->map_x) / BLOCK);
-}
-
-int	y_on_map(t_data *d, float pixel)
-{
-	return ((pixel - d->player->map_y) / BLOCK);
-}
-
 void	put_pixel(t_data *d, int x, int y, int color)
 {
-	// int	index;
 	if (x >= WIDTH || y >= HEIGHT || x <= 0 || y <= 0)
 		return ;
 	mlx_pixel_put(d->mlx_ptr, d->window, x, y, color);
-	// index = y * d->size_line + x * d->bpp / 8;
-	// (void)d;
-	// (void)color;
-	// d->addr[index] = color & 0xFF;
-	// d->addr[index + 1] = (color >> 8) & 0xFF;
-	// d->addr[index + 2] = (color >> 16) & 0xFF;
-
 }
 
-void	draw_square(t_data *d, int x, int y, int size, int color)
+void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 {
 	int	i;
 
 	i = -1;
 	while (++i < size)
-		put_pixel(d, x + i, y, color);
+		put_pixel(d, pixel_x + i, pixel_y, color);
 	i = -1;
 	while (++i < size)
-		put_pixel(d, x, y + i, color);
+		put_pixel(d, pixel_x, pixel_y + i, color);
 	i = -1;
 	while (++i < size)
-		put_pixel(d, x + i, y + size, color);
+		put_pixel(d, pixel_x + i, pixel_y + size, color);
 	i = -1;
 	while (++i <= size)
-		put_pixel(d, x + size, y + i, color);
+		put_pixel(d, pixel_x + size, pixel_y + i, color);
 	
 }
 
-void	delete_ray(t_data *d)
+int	is_wall(t_data *d, float new_x, float new_y)
 {
-	// float	x;
-	// float	y;
-	// float	step_size;
-
-	// x = d->player->x;
-	// y = d->player->y;
-	// step_size = 1.0;
-	// while (1)
-	// {
-	// 	// printf("(int)((x + (SIZE / 2)) / BLOCK): %d\n", (int)((x + (SIZE / 2)) / BLOCK));
-	// 	if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
-	// 		break;
-	// 	put_pixel(d, x, y, 0);
-	// 	x += cos(d->player->angle) * step_size;
-	// 	y += sin(d->player->angle) * step_size;
-	// }
-	int	i = 0;
-	float ray_angle;
-    float ray_x, ray_y;
-    float delta_x, delta_y;
-    float step_size = 1.0;
-    int map_x, map_y;
-    float angle_step = (d->pi / 3) / RAYSPRAD; // 60° spread divided into steps
-
-    // Start raycasting from player's angle - 30° (left side of FOV)
-    ray_angle = d->player->angle - (d->pi / 6);
-
-    while (i++ < RAYSPRAD)
-    {
-        ray_x = d->player->x;
-        ray_y = d->player->y;
-        delta_x = cos(ray_angle);
-        delta_y = sin(ray_angle);
-
-        while (1)
-        {
-            map_x = (int)(ray_x / BLOCK);
-            map_y = (int)(ray_y / BLOCK);
-
-            if (d->map[map_y][map_x] == '1')  // Stop when hitting a wall
-                break;
-
-            put_pixel(d, ray_x, ray_y, 0); // Draw pixel at ray position
-
-            ray_x += delta_x * step_size;
-            ray_y += delta_y * step_size;
-        }
-
-        ray_angle += angle_step; // Move to next ray
-    }
-
+	if (d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == '1')
+		return (1);
+	return (0);
 }
 
-// void	draw_ray(t_data *d, int color)
-// {
-// 	float	x;
-// 	float	y;
-// 	float	step_size;
-
-// 	x = d->player->x;
-// 	y = d->player->y;
-// 	step_size = 1.0; // Small steps for precision
-// 	while (1)
-// 	{
-// 		// Stop if we hit a wall
-// 		if (d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y - (SIZE / 2)) / BLOCK)][(int)((x - (SIZE / 2)) / BLOCK)] == '1' || d->map[(int)((y + (SIZE / 2)) / BLOCK)][(int)((x + (SIZE / 2)) / BLOCK)] == '1')
-// 			break;
-
-// 		// Draw the current point
-// 		put_pixel(d, x, y, color);
-
-// 		// Move in the direction of the angle
-// 		x += cos(d->player->angle) * step_size;
-// 		y += sin(d->player->angle) * step_size;
-// 	}
-// }
-
-void	draw_ray(t_data *d, int color)
+void	rotate_player(t_data *d)
 {
-    // float ray_x = d->player->x;
-    // float ray_y = d->player->y;
-    // float ray_angle = d->player->angle;
-
-    // float delta_x = cos(ray_angle);
-    // float delta_y = sin(ray_angle);
-
-    // float step_size = 1.0;
-    // int map_x, map_y;
-
-    // while (1)
-    // {
-    //     map_x = (int)(ray_x / BLOCK);
-    //     map_y = (int)(ray_y / BLOCK);
-
-    //     if (d->map[map_y][map_x] == '1')  // Wall hit
-    //         break;
-
-    //     put_pixel(d, ray_x, ray_y, color);
-
-    //     ray_x += delta_x * step_size;
-    //     ray_y += delta_y * step_size;
-    // }
-
-	int	i = 0;
-	float ray_angle;
-    float ray_x, ray_y;
-    float delta_x, delta_y;
-    float step_size = 1.0;
-    int map_x, map_y;
-    float angle_step = (d->pi / 3) / RAYSPRAD; // 60° spread divided into steps
-
-    // Start raycasting from player's angle - 30° (left side of FOV)
-    ray_angle = d->player->angle - (d->pi / 6);
-
-    while (i++ < RAYSPRAD)
-    {
-        ray_x = d->player->x;
-        ray_y = d->player->y;
-        delta_x = cos(ray_angle);
-        delta_y = sin(ray_angle);
-
-        while (1)
-        {
-            map_x = (int)(ray_x / BLOCK);
-            map_y = (int)(ray_y / BLOCK);
-
-            if (d->map[map_y][map_x] == '1')  // Stop when hitting a wall
-                break;
-
-            put_pixel(d, ray_x, ray_y, color); // Draw pixel at ray position
-
-            ray_x += delta_x * step_size;
-            ray_y += delta_y * step_size;
-        }
-
-        ray_angle += angle_step; // Move to next ray
-    }
+	if (d->player->t_left)
+		d->player->angle -= R_SPEED;
+	if (d->player->t_right)
+		d->player->angle += R_SPEED;
+	if (d->player->angle < 0)
+		d->player->angle = 2 * d->pi;
+	if (d->player->angle > 2 * d->pi)
+		d->player->angle = 0;
 }
 
-
-void	move_player(t_data *d)
+void	move_player_coor(t_data *d)
 {
-	if (d->player->up == true
-		&& ((d->map[y_on_map(d, d->player->y - SPEED - SIZE)][x_on_map(d, d->player->x + SIZE)] != '1')
-		&& (d->map[y_on_map(d, d->player->y - SPEED - SIZE)][x_on_map(d, d->player->x - SIZE)] != '1')))
-		d->player->y -= SPEED;
-	if (d->player->down == true
-		&& d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x - SIZE)] != '1'
-		&& d->map[y_on_map(d, d->player->y + SPEED + SIZE)][x_on_map(d, d->player->x + SIZE)] != '1')
-		d->player->y += SPEED;
-	if (d->player->left == true && d->map[y_on_map(d, d->player->y + SIZE)][x_on_map(d, d->player->x - SPEED - SIZE)] != '1' && d->map[y_on_map(d, d->player->y - SIZE)][x_on_map(d, d->player->x - SPEED - SIZE)] != '1')
-		d->player->x -= SPEED;
-	if (d->player->right == true && d->map[y_on_map(d, d->player->y + SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1' && d->map[y_on_map(d, d->player->y - SIZE)][x_on_map(d, d->player->x + SPEED + SIZE)] != '1')
-		d->player->x += SPEED;
-	// printf("d->player->x: %f | d->player->y: %f\n", d->player->x, d->player->y);
+	rotate_player(d);
+	if (d->player->up && !is_wall(d, d->player->x + (cos(d->player->angle) * SPEED), d->player->y + (sin(d->player->angle) * SPEED)))
+    {
+        d->player->x += cos(d->player->angle) * SPEED;
+        d->player->y += sin(d->player->angle) * SPEED;
+    }
+    if (d->player->down && !is_wall(d, d->player->x - (cos(d->player->angle) * SPEED), d->player->y - (sin(d->player->angle) * SPEED)))
+    {
+        d->player->x -= cos(d->player->angle) * SPEED;
+        d->player->y -= sin(d->player->angle) * SPEED;
+    }
+    if (d->player->left  && !is_wall(d, d->player->x + (sin(d->player->angle) * SPEED), d->player->y - (cos(d->player->angle) * SPEED)))
+    {
+        d->player->x += sin(d->player->angle) * SPEED;
+        d->player->y -= cos(d->player->angle) * SPEED;
+    }
+    if (d->player->right && !is_wall(d, d->player->x - (sin(d->player->angle) * SPEED), d->player->y + (cos(d->player->angle) * SPEED)))
+    {
+        d->player->x -= sin(d->player->angle) * SPEED;
+        d->player->y += cos(d->player->angle) * SPEED;
+    }
 }
 
 int	draw_player(t_data *d)
 {
-	if (d->player->up == true || d->player->down == true || d->player->left == true || d->player->right == true)
+	if (d->player->up == true || d->player->down == true
+		|| d->player->left == true || d->player->right == true
+		|| d->player->t_left == true || d->player->t_right == true)
 	{
-		delete_ray(d);
+
 		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
-		move_player(d);
+		move_player_coor(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
-		draw_ray(d, d->c);
+		draw_map(d);
 	}
 	return (1);
 }
@@ -850,14 +720,18 @@ int	key_press(int key, t_data *d)
 		write(1, "You quit the game\n", 18);
 		exit_clean(d);
 	}
-	if (key == W && d->player->y > 0)
+	if (key == W)
 		d->player->up = true;
-	if (key == A && d->player->x > 0)
+	if (key == A)
 		d->player->left = true;
-	if (key == S && d->player->y < HEIGHT)
+	if (key == S)
 		d->player->down = true;
-	if (key == D && d->player->x < WIDTH)
+	if (key == D)
 		d->player->right = true;
+	if (key == LEFT)
+		d->player->t_left = true;
+	if (key == RIGHT)
+		d->player->t_right = true;
 	return (0);
 }
 
@@ -868,14 +742,18 @@ int	key_release(int key, t_data *d)
 		write(1, "You quit the game\n", 18);
 		exit_clean(d);
 	}
-	if (key == W || d->player->y < 0)
+	if (key == W)
 		d->player->up = false;
-	if (key == A || d->player->x < 0)
+	if (key == A)
 		d->player->left = false;
-	if (key == S || d->player->y >= HEIGHT)
+	if (key == S)
 		d->player->down = false;
-	if (key == D || d->player->x >= WIDTH)
+	if (key == D)
 		d->player->right = false;
+	if (key == LEFT)
+		d->player->t_left = false;
+	if (key == RIGHT)
+		d->player->t_right = false;
 	return (0);
 }
 
@@ -913,6 +791,7 @@ void	find_player(t_data *d)
 				d->player->map_y = y;
 				d->player->x = x * BLOCK + (BLOCK / 2);
 				d->player->y = y * BLOCK + (BLOCK / 2);
+				d->map[y][x] = '0';
 			}
 			x++;
 		}
@@ -921,97 +800,45 @@ void	find_player(t_data *d)
 	}
 }
 
-void	flood_fill_down(t_data *d, int x, int y)
-{
-	if (y < 0 || x < 0 || !d->map[y] || d->line[y].length < x || !d->map[y][x] || d->map[y][x] == 'n'
-		|| d->map[y][x] == 's' || d->map[y][x] == 'e'
-		|| d->map[y][x] == 'w' || d->map[y][x] == 'o'
-		|| d->map[y][x] == '2' || d->map[y][x] == '\n' || d->map[y][x] == 32)
-		return ;
-	if (d->map[y][x] == '1')
-	{
-		draw_square(d, ((x * BLOCK) + d->player->map_x), ((y * BLOCK) + d->player->map_y), BLOCK, d->c);
-		return ;
-	}
-	if (d->map[y][x] == 'N')
-		d->map[y][x] = 'n';
-	if (d->map[y][x] == 'S')
-		d->map[y][x] = 's';
-	if (d->map[y][x] == 'E')
-		d->map[y][x] = 'e';
-	if (d->map[y][x] == 'W')
-		d->map[y][x] = 'w';
-	if (d->map[y][x] == '0')
-		d->map[y][x] = 'o';
-	flood_fill_down(d, x + 1, y);
-	flood_fill_down(d, x - 1, y);
-	flood_fill_down(d, x, y + 1);
-	flood_fill_down(d, x, y - 1);
-}
+// void	map_flood_fill(t_data *d, int x, int y)
+// {
+// 	map_flood_fill(d, x + 1, y);
+// 	map_flood_fill(d, x - 1, y);
+// 	map_flood_fill(d, x, y + 1);
+// 	map_flood_fill(d, x, y - 1);
+// }
 
-void	map_set_back(t_data *d, int x, int y)
-{
-	if (y < 0 || x < 0 || !d->map[y] || !d->map[y][x] || (y > 0
-		&& d->line[y - 1].length < x) || (d->map[y + 1]
-		&& d->line[y + 1].length < x) || d->map[y][x] == 'N'
-		|| d->map[y][x] == 'S' || d->map[y][x] == 'E'
-		|| d->map[y][x] == 'W' || d->map[y][x] == '0'
-		|| d->map[y][x] == '1' || d->map[y][x] == '\n' || d->map[y][x] == 32)
-		return ;
-	if (d->map[y][x] == 'n')
-		d->map[y][x] = 'N';
-	if (d->map[y][x] == 's')
-		d->map[y][x] = 'S';
-	if (d->map[y][x] == 'e')
-		d->map[y][x] = 'E';
-	if (d->map[y][x] == 'w')
-		d->map[y][x] = 'W';
-	if (d->map[y][x] == 'o')
-		d->map[y][x] = '0';
-	if (d->map[y][x] == '2')
-		d->map[y][x] = '1';
-	if (d->map[y][x] == '\t')
-		d->map[y][x] = '\n';
-	map_set_back(d, x + 1, y);
-	map_set_back(d, x - 1, y);
-	map_set_back(d, x, y + 1);
-	map_set_back(d, x, y - 1);
-}
+// void	map_set_back(t_data *d, int x, int y)
+// {
+// 	map_set_back(d, x + 1, y);
+// 	map_set_back(d, x - 1, y);
+// 	map_set_back(d, x, y + 1);
+// 	map_set_back(d, x, y - 1);
+// }
 
 void	draw_map(t_data *d)
 {
-	find_player(d);
-	flood_fill_down(d, d->player->map_x, d->player->map_y);
-	map_set_back(d, d->player->map_x, d->player->map_y);
-	print_map(d);
+	int	y;
+	int	x;
+
+	y = 0;
+	x = 0;
+	while (d->map[y])
+	{
+		while (d->map[y][x])
+		{
+			if (d->map[y][x] == '1')
+				draw_square(d, x * BLOCK, y * BLOCK, BLOCK, d->c);
+			x++;
+		}
+		x = 0;
+		y++;
+	}
 }
-
-// void	mouse_move(t_data *d, int x, int y)
-// {
-//     static int last_x = WIDTH / 2; // Center of the screen
-
-
-//     int delta_x = x - last_x;
-//     if (delta_x != 0) 
-//     {
-//         d->player->angle += delta_x * SENSITIVITY;
-//         if (d->player->angle > 2 * d->pi)
-//             d->player->angle -= 2 * d->pi;
-//         if (d->player->angle < 0)
-//             d->player->angle += 2 * d->pi;
-
-//         // Update direction vector
-//         d->player->dir_x = cos(d->player->angle);
-//         d->player->dir_y = sin(d->player->angle);
-
-//         last_x = x; // Update last_x position
-//     }
-
-//     return (0);
-// }
 
 void	displaying(t_data *d)
 {
+	find_player(d);
 	d->mlx_ptr = mlx_init();
 	if (!d->mlx_ptr)
 		return (ft_printe("Error, mlx_init\n"), error_clean(d));
@@ -1021,21 +848,21 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
-	// d->addr = mlx_get_data_addr(d->mlx_ptr, &d->bpp, &d->size_line, &d->endian);
-	// if (!d->addr)
-	// 	return (ft_printe("Error, mlx_get_data_addr\n"), error_clean(d));
-	// mlx_put_image_to_window(d->mlx_ptr, d->window, d->img, 0, 0); //new
 
-
-	find_player(d);
-	draw_square(d, d->player->x, d->player->y, SIZE, d->f);
+	draw_square(d, d->player->x, d->player->y, SIZE, d->f); // for player
 	draw_map(d);
-	// draw_ray(d, 255);
+	
+	printf("here\n");
+	printf("d->player->map_x: %d\n", d->player->map_x);
+	printf("d->player->map_y: %d\n\n", d->player->map_y);
+	printf("d->player->x: %f\n", d->player->x);
+	printf("d->player->y: %f\n\n", d->player->y);
+	printf("d->map[map_y][map_x]: %c\n", d->map[d->player->map_y][d->player->map_x]);
+	
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
-	// mlx_hook(d->window, 6, 1L << 6, mouse_move, d);
 
 	mlx_loop_hook(d->mlx_ptr, draw_player, d);
 	
