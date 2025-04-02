@@ -8,14 +8,14 @@
 # define HEIGHT 720
 
 
-# define SIZE 10
+# define SIZE 20
 # define BLOCK 60
 
-# define SPEED 1//0.05
-# define R_SPEED 0.0015
+# define SPEED 0.5
+# define R_SPEED 0.05
 # define SENSITIVITY 0.005
 
-# define FOV 50
+# define FOV 75
 
 # define W 119
 # define A 97
@@ -90,12 +90,6 @@ typedef struct data_s
 	void			*window;
 	void			*mlx_ptr;
 	void			*img;
-
-	// char			*addr;
-
-	// int				bpp;
-	// int				size_line;
-	// int				endian;
 
 	double			pi;
 

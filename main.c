@@ -656,9 +656,21 @@ void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 
 int	is_wall(t_data *d, float new_x, float new_y)
 {
-	if (d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == '1')
+	if (!d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)]
+		|| d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == '1')
 		return (1);
 	return (0);
+}
+
+void	delete_rays_u(t_data *d, float angle, float x, float y)
+{
+		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
+		{
+			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), 0);
+			x += cos(angle) * SPEED;
+			y += sin(angle) * SPEED;
+		}
+		angle += d->pi / 180;
 }
 
 void	delete_rays(t_data *d)
@@ -668,22 +680,25 @@ void	delete_rays(t_data *d)
 	float	y;
 	int		i;
 	
-	i = 0;
-	angle = d->player->angle - d->pi / 6;
+	i = -1;
+	angle = d->player->angle - ((FOV / 2) * d->pi / 180);
 	x = d->player->x;
 	y = d->player->y;
-	while (i++ < FOV)
+	while (++i < FOV)
 	{
+		delete_rays_u(d, angle, x, y);
+		angle += d->pi / 180;
+	}
+}
+
+void	draw_rays_u(t_data *d, float angle, float x, float y)
+{
 		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
 		{
-			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), 0);
+			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), d->c);
 			x += cos(angle) * SPEED;
 			y += sin(angle) * SPEED;
 		}
-		x = d->player->x;
-		y = d->player->y;
-		angle += d->pi / 3 / FOV;
-	}
 }
 
 void	draw_rays(t_data *d)
@@ -693,21 +708,14 @@ void	draw_rays(t_data *d)
 	float	y;
 	int		i;
 	
-	i = 0;
-	angle = d->player->angle - (d->pi / 6);
+	i = -1;
+	angle = d->player->angle - ((FOV / 2) * d->pi / 180);
 	x = d->player->x;
 	y = d->player->y;
-	while (i++ < FOV)
+	while (++i < FOV)
 	{
-		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
-		{
-			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), d->c);
-			x += cos(angle) * SPEED;
-			y += sin(angle) * SPEED;
-		}
-		x = d->player->x;
-		y = d->player->y;
-		angle += d->pi / 3 / FOV;
+		draw_rays_u(d, angle, x, y);
+		angle += d->pi / 180;
 	}
 }
 
@@ -718,9 +726,9 @@ void	rotate_player(t_data *d)
 	if (d->player->turn_r)
 		d->player->angle += R_SPEED;
 	if (d->player->angle < 0)
-		d->player->angle = 2 * d->pi;
+		d->player->angle = 2 * d->pi - R_SPEED;
 	if (d->player->angle > 2 * d->pi)
-		d->player->angle = 0;
+		d->player->angle = 0 + R_SPEED;
 }
 
 void	move_player_coor(t_data *d)
@@ -887,6 +895,7 @@ void	displaying(t_data *d)
 
 	draw_square(d, d->player->x, d->player->y, SIZE, d->f); // for player
 	draw_map(d);
+	draw_rays(d);
 	
 	printf("here\n");
 	printf("d->player->map_x: %d\n", d->player->map_x);
