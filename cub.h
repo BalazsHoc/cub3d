@@ -1,4 +1,4 @@
-#ifndef CUB
+# ifndef CUB
 # define CUB
 
 # ifndef BUFFER_SIZE
@@ -11,11 +11,11 @@
 # define SIZE 10
 # define BLOCK 60
 
-# define SPEED 0.15
-# define R_SPEED 0.15
+# define SPEED 1//0.05
+# define R_SPEED 0.0015
 # define SENSITIVITY 0.005
 
-# define RAYSPRAD 50
+# define FOV 50
 
 # define W 119
 # define A 97
@@ -54,13 +54,13 @@ typedef struct player_s
 	bool			down;
 	bool			left;
 	bool			right;
-	bool			t_left;
-	bool			t_right;
+	bool			turn_l;
+	bool			turn_r;
 
 	int				map_x;
 	int				map_y;
 
-	double			angle;
+	float			angle;
 }	t_player;
 
 typedef struct data_s

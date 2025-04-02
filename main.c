@@ -186,8 +186,8 @@ void	init_player(t_data *d)
 	d->player->down = false;
 	d->player->left = false;
 	d->player->right = false;
-	d->player->t_left = false;
-	d->player->t_right = false;
+	d->player->turn_l = false;
+	d->player->turn_r = false;
 	d->player->map_x = 0;
 	d->player->map_y = 0;
 	d->player->angle = 0;
@@ -661,11 +661,53 @@ int	is_wall(t_data *d, float new_x, float new_y)
 	return (0);
 }
 
+// void	delete_rays(t_data *d)
+// {
+// 	float	angle;
+// 	float	x;
+// 	float	y;
+
+// 	angle = d->player->angle - (FOV / 2 * (d->pi / 180));
+// 	x = d->player->x;
+// 	y = d->player->y;
+// 	while (angle < d->player->angle + (FOV / 2 * (d->pi / 180)))
+// 	{
+// 		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
+// 		{
+// 			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), 0);
+// 			x += cos(angle) * SPEED;
+// 			y += sin(angle) * SPEED;
+// 		}
+// 		angle += (FOV / WIDTH) * (d->pi / 180);
+// 	}
+// }
+
+// void	draw_rays(t_data *d)
+// {
+// 	float	angle;
+// 	float	x;
+// 	float	y;
+
+// 	angle = d->player->angle - (FOV / 2 * (d->pi / 180));
+// 	x = d->player->x;
+// 	y = d->player->y;
+// 	while (angle < d->player->angle + (FOV / 2 * (d->pi / 180)))
+// 	{
+// 		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
+// 		{
+// 			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), d->c);
+// 			x += cos(angle) * SPEED;
+// 			y += sin(angle) * SPEED;
+// 		}
+// 		angle += (FOV / WIDTH) * (d->pi / 180);
+// 	}
+// }
+
 void	rotate_player(t_data *d)
 {
-	if (d->player->t_left)
+	if (d->player->turn_l)
 		d->player->angle -= R_SPEED;
-	if (d->player->t_right)
+	if (d->player->turn_r)
 		d->player->angle += R_SPEED;
 	if (d->player->angle < 0)
 		d->player->angle = 2 * d->pi;
@@ -702,12 +744,14 @@ int	draw_player(t_data *d)
 {
 	if (d->player->up == true || d->player->down == true
 		|| d->player->left == true || d->player->right == true
-		|| d->player->t_left == true || d->player->t_right == true)
+		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
 
 		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
+		// delete_rays(d);
 		move_player_coor(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
+		// draw_rays(d);
 		draw_map(d);
 	}
 	return (1);
@@ -729,9 +773,9 @@ int	key_press(int key, t_data *d)
 	if (key == D)
 		d->player->right = true;
 	if (key == LEFT)
-		d->player->t_left = true;
+		d->player->turn_l = true;
 	if (key == RIGHT)
-		d->player->t_right = true;
+		d->player->turn_r = true;
 	return (0);
 }
 
@@ -751,9 +795,9 @@ int	key_release(int key, t_data *d)
 	if (key == D)
 		d->player->right = false;
 	if (key == LEFT)
-		d->player->t_left = false;
+		d->player->turn_l = false;
 	if (key == RIGHT)
-		d->player->t_right = false;
+		d->player->turn_r = false;
 	return (0);
 }
 
@@ -800,22 +844,6 @@ void	find_player(t_data *d)
 	}
 }
 
-// void	map_flood_fill(t_data *d, int x, int y)
-// {
-// 	map_flood_fill(d, x + 1, y);
-// 	map_flood_fill(d, x - 1, y);
-// 	map_flood_fill(d, x, y + 1);
-// 	map_flood_fill(d, x, y - 1);
-// }
-
-// void	map_set_back(t_data *d, int x, int y)
-// {
-// 	map_set_back(d, x + 1, y);
-// 	map_set_back(d, x - 1, y);
-// 	map_set_back(d, x, y + 1);
-// 	map_set_back(d, x, y - 1);
-// }
-
 void	draw_map(t_data *d)
 {
 	int	y;
@@ -855,6 +883,7 @@ void	displaying(t_data *d)
 	printf("here\n");
 	printf("d->player->map_x: %d\n", d->player->map_x);
 	printf("d->player->map_y: %d\n\n", d->player->map_y);
+	printf("d->player->angle: %f\n", d->player->angle);
 	printf("d->player->x: %f\n", d->player->x);
 	printf("d->player->y: %f\n\n", d->player->y);
 	printf("d->map[map_y][map_x]: %c\n", d->map[d->player->map_y][d->player->map_x]);
