@@ -665,13 +665,12 @@ int	is_wall(t_data *d, float new_x, float new_y)
 
 void	delete_rays_u(t_data *d, float angle, float x, float y)
 {
-		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
+		while (!is_wall(d, (int)(x + cos(angle)), (int)(y + sin(angle))))
 		{
-			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), 0);
+			put_pixel(d, (int)(x + cos(angle)), (int)(y + sin(angle)), 0);
 			x += cos(angle);
 			y += sin(angle);
 		}
-		angle += d->pi / 180;
 }
 
 void	delete_rays(t_data *d)
@@ -694,13 +693,12 @@ void	delete_rays(t_data *d)
 
 void	draw_rays_u(t_data *d, float angle, float x, float y)
 {
-		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
-		{
-			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), d->c);
-			x += cos(angle);
-			y += sin(angle);
-		}
-		
+	while (!is_wall(d, (int)(x + cos(angle)), (int)(y + sin(angle))))
+	{
+		put_pixel(d, (int)(x + cos(angle)), (int)(y + sin(angle)), d->c);
+		x += cos(angle);
+		y += sin(angle);
+	}
 }
 
 void	draw_rays(t_data *d)
