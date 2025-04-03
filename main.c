@@ -657,7 +657,8 @@ void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 int	is_wall(t_data *d, float new_x, float new_y)
 {
 	if (!d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)]
-		|| d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == '1')
+		|| d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == '1'
+		|| d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == 32)
 		return (1);
 	return (0);
 }
@@ -699,6 +700,7 @@ void	draw_rays_u(t_data *d, float angle, float x, float y)
 			x += cos(angle) * SPEED;
 			y += sin(angle) * SPEED;
 		}
+		
 }
 
 void	draw_rays(t_data *d)
@@ -935,7 +937,7 @@ int	main(int argc, char **argv)
 	d->player = p;
 	init_player(d);
 	reading_data(d, argv);
-	// print_map(d);
+	print_map(d);
 	check_map(d, 0, -1, -1);
 	printf("pi: %f\n", d->pi);
 
