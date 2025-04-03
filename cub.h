@@ -8,11 +8,11 @@
 # define HEIGHT 720
 
 
-# define SIZE 60
+# define SIZE 10
 # define BLOCK 60
 
-# define SPEED 0.5
-# define R_SPEED 0.05
+# define SPEED 0.75
+# define R_SPEED 0.055
 # define SENSITIVITY 0.005
 
 # define FOV 75

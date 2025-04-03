@@ -668,8 +668,8 @@ void	delete_rays_u(t_data *d, float angle, float x, float y)
 		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
 		{
 			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), 0);
-			x += cos(angle) * SPEED;
-			y += sin(angle) * SPEED;
+			x += cos(angle);
+			y += sin(angle);
 		}
 		angle += d->pi / 180;
 }
@@ -682,13 +682,13 @@ void	delete_rays(t_data *d)
 	int		i;
 	
 	i = -1;
-	angle = d->player->angle - ((FOV / 2) * d->pi / 180);
+	angle = d->player->angle - ((FOV * d->pi / 180) / 2);
 	x = d->player->x;
 	y = d->player->y;
-	while (++i < FOV)
+	while (++i < WIDTH)
 	{
 		delete_rays_u(d, angle, x, y);
-		angle += d->pi / 180;
+		angle += (FOV * d->pi / 180) / WIDTH;
 	}
 }
 
@@ -697,8 +697,8 @@ void	draw_rays_u(t_data *d, float angle, float x, float y)
 		while (!is_wall(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED))))
 		{
 			put_pixel(d, (int)(x + (cos(angle) * SPEED)), (int)(y + (sin(angle) * SPEED)), d->c);
-			x += cos(angle) * SPEED;
-			y += sin(angle) * SPEED;
+			x += cos(angle);
+			y += sin(angle);
 		}
 		
 }
@@ -711,13 +711,13 @@ void	draw_rays(t_data *d)
 	int		i;
 	
 	i = -1;
-	angle = d->player->angle - ((FOV / 2) * d->pi / 180);
+	angle = d->player->angle - ((FOV * d->pi / 180) / 2);
 	x = d->player->x;
 	y = d->player->y;
-	while (++i < FOV)
+	while (++i < WIDTH)
 	{
 		draw_rays_u(d, angle, x, y);
-		angle += d->pi / 180;
+		angle += (FOV * d->pi / 180) / WIDTH;
 	}
 }
 
