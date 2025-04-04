@@ -691,14 +691,61 @@ void	delete_rays(t_data *d)
 	}
 }
 
-void	draw_rays_u(t_data *d, float angle, float x, float y)
+void	set_up_x(t_data *d, float angle, float px)
 {
-	while (!is_wall(d, (int)(x + cos(angle)), (int)(y + sin(angle))))
+	if (cos(angle) < 0)
 	{
-		put_pixel(d, (int)(x + cos(angle)), (int)(y + sin(angle)), d->c);
-		x += cos(angle);
-		y += sin(angle);
+		d->step_x = -1;
+		d->next_x = (px - d->mx * BLOCK) * fabs(BLOCK / cos(angle)) / BLOCK;
 	}
+	else
+	{
+		d->step_x = 1;
+		d->next_x = ((d->mx + 1) * BLOCK - px) * fabs(BLOCK / cos(angle)) / BLOCK;
+	}
+}
+
+// void	draw_wall(t_data *d, float angle, float distance)
+// {}
+
+void	set_up_y(t_data *d, float angle, float py)
+{
+	if (sin(angle) < 0)
+	{
+		d->step_y = -1;
+		d->next_y = (py - d->my * BLOCK) * fabs(BLOCK / sin(angle)) / BLOCK;
+	}
+	else
+	{
+		d->step_y = 1;
+		d->next_y = ((d->my + 1) * BLOCK - py) * fabs(BLOCK / sin(angle)) / BLOCK;
+	}
+}
+
+void	draw_rays_u(t_data *d, float angle, float px, float py)
+{
+	d->mx = (int)(px / BLOCK);
+	d->my = (int)(py / BLOCK);
+	set_up_x(d, angle, px);
+	set_up_y(d, angle, py);
+	while (!is_wall(d, d->mx, d->my))
+	{
+		put_pixel(d, d->mx * BLOCK, d->my * BLOCK, 255);
+		if (d->next_x < d->next_y)
+		{
+			d->next_x += fabs(BLOCK / cos(angle));
+			d->mx += d->step_x;
+		}
+		else
+		{
+			d->next_y += fabs(BLOCK / sin(angle));
+			d->my += d->step_y;
+		}
+	}
+	// if (d->next_x < d->next_y)
+	// 	draw_wall(d, angle, d->next_x);
+	// else
+	// 	draw_wall(d, angle, d->next_y);
 }
 
 void	draw_rays(t_data *d)
@@ -763,7 +810,7 @@ int	draw_player(t_data *d)
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
 
-		delete_rays(d);
+		// delete_rays(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
 		move_player_coor(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
@@ -895,7 +942,7 @@ void	displaying(t_data *d)
 
 	draw_square(d, d->player->x, d->player->y, SIZE, d->f); // for player
 	draw_map(d);
-	draw_rays(d);
+	// draw_rays(d);
 	
 	printf("here\n");
 	printf("d->player->map_x: %d\n", d->player->map_x);

@@ -11,8 +11,8 @@
 # define SIZE 10
 # define BLOCK 60
 
-# define SPEED 0.75
-# define R_SPEED 0.055
+# define SPEED 0.05
+# define R_SPEED 0.0015
 # define SENSITIVITY 0.005
 
 # define FOV 75
@@ -91,7 +91,17 @@ typedef struct data_s
 	void			*mlx_ptr;
 	void			*img;
 
-	double			pi;
+	float			pi;
+
+
+	int				mx;
+	int				my;
+	int				step_x;
+	int				step_y;
+	float			next_x;
+	float			next_y;
+
+
 
 	struct player_s	*player;
 	
