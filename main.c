@@ -705,8 +705,12 @@ void	set_up_x(t_data *d, float angle, float px)
 	}
 }
 
-// void	draw_wall(t_data *d, float angle, float distance)
-// {}
+void	draw_wall(t_data *d, float angle, float distance)
+{
+	(void)d;
+	(void)angle;
+	(void)distance;
+}
 
 void	set_up_y(t_data *d, float angle, float py)
 {
@@ -742,10 +746,7 @@ void	draw_rays_u(t_data *d, float angle, float px, float py)
 			d->my += d->step_y;
 		}
 	}
-	// if (d->next_x < d->next_y)
-	// 	draw_wall(d, angle, d->next_x);
-	// else
-	// 	draw_wall(d, angle, d->next_y);
+	draw_wall(d, angle, fmin(d->next_x, d->next_y));
 }
 
 void	draw_rays(t_data *d)
