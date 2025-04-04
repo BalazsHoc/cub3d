@@ -663,110 +663,6 @@ int	is_wall(t_data *d, float new_x, float new_y)
 	return (0);
 }
 
-void	delete_rays_u(t_data *d, float angle, float x, float y)
-{
-		while (!is_wall(d, (int)(x + cos(angle)), (int)(y + sin(angle))))
-		{
-			put_pixel(d, (int)(x + cos(angle)), (int)(y + sin(angle)), 0);
-			x += cos(angle);
-			y += sin(angle);
-		}
-}
-
-void	delete_rays(t_data *d)
-{
-	float	angle;
-	float	x;
-	float	y;
-	int		i;
-	
-	i = -1;
-	angle = d->player->angle - ((FOV * d->pi / 180) / 2);
-	x = d->player->x;
-	y = d->player->y;
-	while (++i < WIDTH)
-	{
-		delete_rays_u(d, angle, x, y);
-		angle += (FOV * d->pi / 180) / WIDTH;
-	}
-}
-
-void	set_up_x(t_data *d, float angle, float px)
-{
-	if (cos(angle) < 0)
-	{
-		d->step_x = -1;
-		d->next_x = (px - d->mx * BLOCK) * fabs(BLOCK / cos(angle)) / BLOCK;
-	}
-	else
-	{
-		d->step_x = 1;
-		d->next_x = ((d->mx + 1) * BLOCK - px) * fabs(BLOCK / cos(angle)) / BLOCK;
-	}
-}
-
-void	draw_wall(t_data *d, float angle, float distance)
-{
-	(void)d;
-	(void)angle;
-	(void)distance;
-}
-
-void	set_up_y(t_data *d, float angle, float py)
-{
-	if (sin(angle) < 0)
-	{
-		d->step_y = -1;
-		d->next_y = (py - d->my * BLOCK) * fabs(BLOCK / sin(angle)) / BLOCK;
-	}
-	else
-	{
-		d->step_y = 1;
-		d->next_y = ((d->my + 1) * BLOCK - py) * fabs(BLOCK / sin(angle)) / BLOCK;
-	}
-}
-
-void	draw_rays_u(t_data *d, float angle, float px, float py)
-{
-	d->mx = (int)(px / BLOCK);
-	d->my = (int)(py / BLOCK);
-	set_up_x(d, angle, px);
-	set_up_y(d, angle, py);
-	while (!is_wall(d, d->mx, d->my))
-	{
-		put_pixel(d, d->mx * BLOCK, d->my * BLOCK, 255);
-		if (d->next_x < d->next_y)
-		{
-			d->next_x += fabs(BLOCK / cos(angle));
-			d->mx += d->step_x;
-		}
-		else
-		{
-			d->next_y += fabs(BLOCK / sin(angle));
-			d->my += d->step_y;
-		}
-	}
-	draw_wall(d, angle, fmin(d->next_x, d->next_y));
-}
-
-void	draw_rays(t_data *d)
-{
-	float	angle;
-	float	x;
-	float	y;
-	int		i;
-	
-	i = -1;
-	angle = d->player->angle - ((FOV * d->pi / 180) / 2);
-	x = d->player->x;
-	y = d->player->y;
-	while (++i < WIDTH)
-	{
-		draw_rays_u(d, angle, x, y);
-		angle += (FOV * d->pi / 180) / WIDTH;
-	}
-}
-
 void	rotate_player(t_data *d)
 {
 	if (d->player->turn_l)
@@ -783,28 +679,30 @@ void	move_player_coor(t_data *d)
 {
 	rotate_player(d);
 	if (d->player->up && !is_wall(d, d->player->x + (cos(d->player->angle) * SPEED), d->player->y + (sin(d->player->angle) * SPEED)))
-    {
-        d->player->x += cos(d->player->angle) * SPEED;
-        d->player->y += sin(d->player->angle) * SPEED;
-    }
-    if (d->player->down && !is_wall(d, d->player->x - (cos(d->player->angle) * SPEED), d->player->y - (sin(d->player->angle) * SPEED)))
-    {
-        d->player->x -= cos(d->player->angle) * SPEED;
-        d->player->y -= sin(d->player->angle) * SPEED;
-    }
-    if (d->player->left  && !is_wall(d, d->player->x + (sin(d->player->angle) * SPEED), d->player->y - (cos(d->player->angle) * SPEED)))
-    {
-        d->player->x += sin(d->player->angle) * SPEED;
-        d->player->y -= cos(d->player->angle) * SPEED;
-    }
-    if (d->player->right && !is_wall(d, d->player->x - (sin(d->player->angle) * SPEED), d->player->y + (cos(d->player->angle) * SPEED)))
-    {
-        d->player->x -= sin(d->player->angle) * SPEED;
-        d->player->y += cos(d->player->angle) * SPEED;
-    }
+	{
+		d->player->x += cos(d->player->angle) * SPEED;
+		d->player->y += sin(d->player->angle) * SPEED;
+	}
+	if (d->player->down && !is_wall(d, d->player->x - (cos(d->player->angle) * SPEED), d->player->y - (sin(d->player->angle) * SPEED)))
+	{
+		d->player->x -= cos(d->player->angle) * SPEED;
+		d->player->y -= sin(d->player->angle) * SPEED;
+	}
+	if (d->player->left && !is_wall(d, d->player->x + (sin(d->player->angle) * SPEED), d->player->y - (cos(d->player->angle) * SPEED)))
+	{
+		d->player->x += sin(d->player->angle) * SPEED;
+		d->player->y -= cos(d->player->angle) * SPEED;
+	}
+	if (d->player->right && !is_wall(d, d->player->x - (sin(d->player->angle) * SPEED), d->player->y + (cos(d->player->angle) * SPEED)))
+	{
+		d->player->x -= sin(d->player->angle) * SPEED;
+		d->player->y += cos(d->player->angle) * SPEED;
+	}
 }
 
-int	draw_player(t_data *d)
+
+
+int	drawing(t_data *d)
 {
 	if (d->player->up == true || d->player->down == true
 		|| d->player->left == true || d->player->right == true
@@ -815,7 +713,7 @@ int	draw_player(t_data *d)
 		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
 		move_player_coor(d);
 		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
-		draw_rays(d);
+		// raycast(d);
 		draw_map(d);
 	}
 	return (1);
@@ -958,7 +856,7 @@ void	displaying(t_data *d)
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
 
-	mlx_loop_hook(d->mlx_ptr, draw_player, d);
+	mlx_loop_hook(d->mlx_ptr, drawing, d);
 	
 	mlx_loop(d->mlx_ptr);
 }
