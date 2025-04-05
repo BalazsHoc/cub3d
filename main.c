@@ -168,7 +168,7 @@ void	init_rays(t_data *d)
 	d->delta_dist_y = 0;
 	d->side_dist_x = 0;
 	d->side_dist_y = 0;
-	d->this_wall = 0;
+	d->y_wall = 0;
 }
 
 void	init_data(t_data *d)
@@ -787,16 +787,16 @@ void	raycast_u(t_data *d, int cur_col)
 		{
         	d->side_dist_x += d->delta_dist_x;
         	d->mx += d->step_x;
-			d->this_wall = 0;
+			d->y_wall = 0;
 		}
 		else
 		{
 			d->side_dist_y += d->delta_dist_y;
 			d->my += d->step_y;
-			d->this_wall = 1;
+			d->y_wall = 1;
 		}
 	}
-	if (d->this_wall == 0)
+	if (d->y_wall == 0)
 		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0xff0000);
 	else
 		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00);

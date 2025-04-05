@@ -8,13 +8,13 @@
 # define HEIGHT 720
 
 
-# define WALL 150
-# define PLAYER 25
+# define WALL 190
+# define PLAYER 20
 # define MINI_PLAYER 5
 # define MINI_BLOCK 10
 
-# define SPEED 0.1
-# define R_SPEED 0.0075
+# define SPEED 0.3
+# define R_SPEED 0.025
 # define SENSITIVITY 0.005
 
 # define FOV 75
@@ -109,7 +109,7 @@ typedef struct data_s
 	double			delta_dist_y;
 	double			side_dist_x;
 	double			side_dist_y;
-	bool			this_wall;
+	bool			y_wall;
 
 
 
