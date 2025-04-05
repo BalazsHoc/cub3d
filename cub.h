@@ -8,11 +8,13 @@
 # define HEIGHT 720
 
 
-# define SIZE 10
-# define BLOCK 60
+# define WALL 150
+# define PLAYER 25
+# define MINI_PLAYER 5
+# define MINI_BLOCK 10
 
-# define SPEED 1.5
-# define R_SPEED 0.015
+# define SPEED 0.1
+# define R_SPEED 0.0075
 # define SENSITIVITY 0.005
 
 # define FOV 75
