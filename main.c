@@ -153,6 +153,21 @@ void	init_dblptr(char **dbptr, int size)
 	}
 }
 
+void	init_rays(t_data *d)
+{
+	d->mx = 0;
+	d->my = 0;
+	d->r_angle = 0;
+	d->rx = 0;
+	d->ry = 0;
+	d->step_x = 0;
+	d->step_y = 0;
+	d->delta_dist_x = 0;
+	d->delta_dist_y = 0;
+	d->side_dist_x = 0;
+	d->side_dist_y = 0;
+}
+
 void	init_data(t_data *d)
 {
 	d->line = NULL;
@@ -171,6 +186,7 @@ void	init_data(t_data *d)
 	d->read_buf = NULL;
 	d->width = 0;
 	d->heigth = 0;
+	init_rays(d);
 	d->window = NULL;
 	d->mlx_ptr = NULL;
 	d->img = NULL;
@@ -700,7 +716,79 @@ void	move_player_coor(t_data *d)
 	}
 }
 
+// void	draw_wall(t_data *d, float distance)
+// {
 
+// }
+
+void	setup_xy(t_data *d)
+{
+	d->delta_dist_x = fabs(1 / cos(d->r_angle));
+	d->delta_dist_y = fabs(1 / sin(d->r_angle));
+
+	if (cos(d->r_angle) < 0)
+	{
+		d->step_x = -1;
+		d->side_dist_x = (d->rx - d->mx) * d->delta_dist_x;
+	}
+	else
+	{
+		d->step_x = 1;
+		d->side_dist_x = (d->mx + 1.0 - d->rx) * d->delta_dist_x;
+	}
+
+	if (sin(d->r_angle) < 0)
+	{
+		d->step_y = -1;
+		d->delta_dist_y = (d->ry - d->my) * d->delta_dist_y;
+	}
+	else
+	{
+		d->step_y = 1;
+		d->delta_dist_y = (d->my + 1.0 - d->ry) * d->delta_dist_y;
+	}
+}
+
+void	raycast_u(t_data *d)
+{
+	d->rx = d->player->x;
+	d->ry = d->player->y;
+	d->mx = (int)d->rx;
+	d->my = (int)d->ry;
+	setup_xy(d);
+	while (!is_wall(d, d->mx, d->my))
+	{
+		if (d->side_dist_x < d->delta_dist_y)
+		{
+        	d->side_dist_x += d->delta_dist_x;
+        	d->mx += d->step_x;
+		}
+		else
+		{
+			d->delta_dist_y += d->delta_dist_y;
+			d->my += d->step_y;
+		}
+	}
+	// if (d->side_dist_x < d->delta_dist_y)
+	// 	draw_wall(d, d->side_dist_x);
+	// else
+	// 	draw_wall(d, d->side_dist_y);
+}
+
+void	raycast(t_data *d)
+{
+	int		i;
+
+	i = -1;
+	d->r_angle = d->player->angle - ((FOV * d->pi / 180) / 2);
+	d->rx = d->player->x;
+	d->ry = d->player->y;
+	while (++i < WIDTH)
+	{
+		raycast_u(d);
+		d->r_angle += (FOV * d->pi / 180) / WIDTH;
+	}
+}
 
 int	drawing(t_data *d)
 {

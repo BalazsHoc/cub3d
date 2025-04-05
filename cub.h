@@ -96,10 +96,15 @@ typedef struct data_s
 
 	int				mx;
 	int				my;
+	float			r_angle;
+	float			rx;
+	float			ry;
 	int				step_x;
 	int				step_y;
-	float			next_x;
-	float			next_y;
+	float			delta_dist_x;
+	float			delta_dist_y;
+	float			side_dist_x;
+	float			side_dist_y;
 
 
 
