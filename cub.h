@@ -11,8 +11,8 @@
 # define SIZE 10
 # define BLOCK 60
 
-# define SPEED 0.05
-# define R_SPEED 0.0015
+# define SPEED 1.5
+# define R_SPEED 0.015
 # define SENSITIVITY 0.005
 
 # define FOV 75
@@ -48,8 +48,8 @@ typedef struct line_s
 
 typedef struct player_s
 {
-	float			x;
-	float			y;
+	double			x;
+	double			y;
 	bool			up;
 	bool			down;
 	bool			left;
@@ -60,7 +60,7 @@ typedef struct player_s
 	int				map_x;
 	int				map_y;
 
-	float			angle;
+	double			angle;
 }	t_player;
 
 typedef struct data_s
@@ -91,20 +91,23 @@ typedef struct data_s
 	void			*mlx_ptr;
 	void			*img;
 
-	float			pi;
+	double			pi;
 
 
 	int				mx;
 	int				my;
-	float			r_angle;
-	float			rx;
-	float			ry;
+	double			r_angle;
+	double			rx;
+	double			ry;
 	int				step_x;
 	int				step_y;
-	float			delta_dist_x;
-	float			delta_dist_y;
-	float			side_dist_x;
-	float			side_dist_y;
+	double			ray_dir_x;
+	double			ray_dir_y;
+	double			delta_dist_x;
+	double			delta_dist_y;
+	double			side_dist_x;
+	double			side_dist_y;
+	bool			this_wall;
 
 
 

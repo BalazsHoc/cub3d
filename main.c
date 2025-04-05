@@ -162,10 +162,13 @@ void	init_rays(t_data *d)
 	d->ry = 0;
 	d->step_x = 0;
 	d->step_y = 0;
+	d->ray_dir_x = 0;
+	d->ray_dir_y = 0;
 	d->delta_dist_x = 0;
 	d->delta_dist_y = 0;
 	d->side_dist_x = 0;
 	d->side_dist_y = 0;
+	d->this_wall = 0;
 }
 
 void	init_data(t_data *d)
@@ -450,7 +453,7 @@ void	check_rgb(t_data *data, char *color, int *to_store)
 	*to_store = to_rgb(data);
 }
 
-int	sort_dataata_u_2(t_data *d, char *line, int i)
+int	sort_data_u_2(t_data *d, char *line, int i)
 {
 	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
 	{
@@ -473,7 +476,7 @@ int	sort_dataata_u_2(t_data *d, char *line, int i)
 	return (0);
 }
 
-int	sort_dataata_u(t_data *d, char *line, int i)
+int	sort_data_u(t_data *d, char *line, int i)
 {
 	if (!ft_strncmp("WE ", line + i, 2) || !ft_strncmp("WE\t", line + i, 3))
 	{
@@ -494,7 +497,7 @@ int	sort_dataata_u(t_data *d, char *line, int i)
 	return (0);
 }
 
-void	sort_dataata(t_data *d, char *line, int i)
+void	sort_data(t_data *d, char *line, int i)
 {
 	while (line[i] && ((line[i] >= 7 && line[i] <= 13) || line[i] == 32))
 		i++;
@@ -518,7 +521,7 @@ void	sort_dataata(t_data *d, char *line, int i)
 		d->south = ft_strdup(d, d->read_buf);
 		return ;
 	}
-	else if (!sort_dataata_u(d, line, i) && !sort_dataata_u_2(d, line, i))
+	else if (!sort_data_u(d, line, i) && !sort_data_u_2(d, line, i))
 		save_map(d, line);
 }
 
@@ -558,7 +561,7 @@ void	reading_data(t_data *d, char **argv)
 		return (error_clean(d));
 	while (d->read_buf)
 	{
-		sort_dataata(d, d->read_buf, 0);
+		sort_data(d, d->read_buf, 0);
 		free_str(d->read_buf);
 		d->read_buf = get_next_line(fd);
 	}
@@ -632,7 +635,7 @@ void	check_map(t_data *d, int pos, int x, int y)
 		}
 		x = -1;
 	}
-	if (d->heigth > 15 || d->width > 16)
+	if (d->heigth > 10 || d->width > 16)
 		return (ft_printe("Error, map is too big\n"),
 					error_clean(d));
 	check_walls(d, -1, -1);
@@ -670,7 +673,7 @@ void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 	
 }
 
-int	is_wall(t_data *d, float new_x, float new_y)
+int	is_wall(t_data *d, double new_x, double new_y)
 {
 	if (!d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)]
 		|| d->map[(int)(new_y / BLOCK)][(int)(new_x / BLOCK)] == '1'
@@ -716,17 +719,34 @@ void	move_player_coor(t_data *d)
 	}
 }
 
-// void	draw_wall(t_data *d, float distance)
-// {
+void	draw_wall(t_data *d, double distance, int cur_col, int color)
+{
+	int	line_height;
+	int	draw_start;
+	int	draw_end;
 
-// }
+    // distance *= cos(d->r_angle - d->player->angle);
+	line_height = ((int)(HEIGHT / distance) * BLOCK);
+	// printf("line_heighzt: %d\n", line_height);
+	draw_start = -line_height / 2 + HEIGHT / 2;
+	if (draw_start < 0)
+		draw_start = 0;
+	draw_end = line_height / 2 + HEIGHT / 2;
+	if (draw_end >= HEIGHT)
+		draw_end = HEIGHT - 1;
+	while (draw_start++ < draw_end)
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, color);
+	// line_height = (int)(HEIGHT / distance);
+	// printf("distance: %f\n", distance);
+}
 
 void	setup_xy(t_data *d)
 {
-	d->delta_dist_x = fabs(1 / cos(d->r_angle));
-	d->delta_dist_y = fabs(1 / sin(d->r_angle));
-
-	if (cos(d->r_angle) < 0)
+	d->ray_dir_x = cos(d->r_angle);
+	d->ray_dir_y = sin(d->r_angle);
+	d->delta_dist_x = sqrt(1 + (d->ray_dir_y * d->ray_dir_y) / (d->ray_dir_x * d->ray_dir_x));
+	d->delta_dist_y = sqrt(1 + (d->ray_dir_x * d->ray_dir_x) / (d->ray_dir_y * d->ray_dir_y));
+	if (d->ray_dir_x < 0)
 	{
 		d->step_x = -1;
 		d->side_dist_x = (d->rx - d->mx) * d->delta_dist_x;
@@ -734,22 +754,22 @@ void	setup_xy(t_data *d)
 	else
 	{
 		d->step_x = 1;
-		d->side_dist_x = (d->mx + 1.0 - d->rx) * d->delta_dist_x;
+		d->side_dist_x = (d->mx + 1 - d->rx) * d->delta_dist_x;
 	}
 
-	if (sin(d->r_angle) < 0)
+	if (d->ray_dir_y < 0)
 	{
 		d->step_y = -1;
-		d->delta_dist_y = (d->ry - d->my) * d->delta_dist_y;
+		d->side_dist_y = (d->ry - d->my) * d->delta_dist_y;
 	}
 	else
 	{
 		d->step_y = 1;
-		d->delta_dist_y = (d->my + 1.0 - d->ry) * d->delta_dist_y;
+		d->side_dist_y = (d->my + 1.0 - d->ry) * d->delta_dist_y;
 	}
 }
 
-void	raycast_u(t_data *d)
+void	raycast_u(t_data *d, int cur_col)
 {
 	d->rx = d->player->x;
 	d->ry = d->player->y;
@@ -758,21 +778,23 @@ void	raycast_u(t_data *d)
 	setup_xy(d);
 	while (!is_wall(d, d->mx, d->my))
 	{
-		if (d->side_dist_x < d->delta_dist_y)
+		if (d->side_dist_x < d->side_dist_y)
 		{
         	d->side_dist_x += d->delta_dist_x;
         	d->mx += d->step_x;
+			d->this_wall = 0;
 		}
 		else
 		{
-			d->delta_dist_y += d->delta_dist_y;
+			d->side_dist_y += d->delta_dist_y;
 			d->my += d->step_y;
+			d->this_wall = 1;
 		}
 	}
-	// if (d->side_dist_x < d->delta_dist_y)
-	// 	draw_wall(d, d->side_dist_x);
-	// else
-	// 	draw_wall(d, d->side_dist_y);
+	if (d->this_wall == 0)
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0xff0000);
+	else
+		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00);
 }
 
 void	raycast(t_data *d)
@@ -780,13 +802,17 @@ void	raycast(t_data *d)
 	int		i;
 
 	i = -1;
-	d->r_angle = d->player->angle - ((FOV * d->pi / 180) / 2);
+	d->r_angle = d->player->angle - ((FOV * (d->pi / 180)) / 2);
+	if (d->r_angle < 0)
+		d->r_angle += (2 * d->pi); 
 	d->rx = d->player->x;
 	d->ry = d->player->y;
 	while (++i < WIDTH)
 	{
-		raycast_u(d);
-		d->r_angle += (FOV * d->pi / 180) / WIDTH;
+		raycast_u(d, i);
+		d->r_angle += (FOV * (d->pi / 180)) / WIDTH;
+		if (d->r_angle >= 2 * d->pi)
+			d->r_angle -= (2 * d->pi);
 	}
 }
 
@@ -796,13 +822,11 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-
-		// delete_rays(d);
-		draw_square(d, d->player->x, d->player->y, SIZE, 0); // deleting porpouse
+		mlx_clear_window(d->mlx_ptr, d->window);
 		move_player_coor(d);
-		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
-		// raycast(d);
+		raycast(d);
 		draw_map(d);
+		draw_square(d, d->player->x, d->player->y, SIZE, d->f);
 	}
 	return (1);
 }
@@ -927,9 +951,9 @@ void	displaying(t_data *d)
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
 
-	draw_square(d, d->player->x, d->player->y, SIZE, d->f); // for player
+	draw_square(d, d->player->x, d->player->y, SIZE, d->f);
 	draw_map(d);
-	// draw_rays(d);
+	raycast(d);
 	
 	printf("here\n");
 	printf("d->player->map_x: %d\n", d->player->map_x);
@@ -971,7 +995,7 @@ int	main(int argc, char **argv)
 	reading_data(d, argv);
 	print_map(d);
 	check_map(d, 0, -1, -1);
-	printf("pi: %f\n", d->pi);
+	printf("pi / 180 * FOV: %f\n", d->pi / 180 * FOV);
 
 	displaying(d);
 
