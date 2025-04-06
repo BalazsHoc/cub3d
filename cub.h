@@ -18,7 +18,6 @@
 # define SENSITIVITY 0.005
 
 # define FOV 75
-
 # define W 119
 # define A 97
 # define S 115

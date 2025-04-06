@@ -724,9 +724,9 @@ void	draw_wall(t_data *d, double distance, int cur_col, int color)
 	int	line_height;
 	int	draw_start;
 	int	draw_end;
-	// int	i;
+	int	i;
 
-	// i = -1;
+	i = 0;
     distance *= cos(d->r_angle - d->player->angle);
 	line_height = ((int)(HEIGHT / distance));
 	line_height *= (WALL / PLAYER);
@@ -736,13 +736,12 @@ void	draw_wall(t_data *d, double distance, int cur_col, int color)
 	draw_end = line_height / 2 + HEIGHT / 2;
 	if (draw_end >= HEIGHT)
 		draw_end = HEIGHT - 1;
-	// while (++i < draw_start)
-	// 	mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, d->c);
+	while (i++ < draw_start)
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, i, d->c);
 	while (draw_start++ < draw_end)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, color);
-	// i = draw_end;
-	// while (++i < HEIGHT)
-	// 	mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, d->f);
+	while (draw_start++ < HEIGHT)
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, d->f);
 }
 
 void	setup_xy(t_data *d)
@@ -801,9 +800,9 @@ void	raycast_u(t_data *d, int cur_col)
 	else if (d->y_wall == 1)
 		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00); // NORTH
 	else if (d->y_wall == 0 && d->r_angle >= d->pi / 2 && d->r_angle <= 3 * d->pi / 2)
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x00fff0); // WEST
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0xf00ff0); // WEST
 	else
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x00ffff); // EAST
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x0000ff); // EAST
 	
 }
 
@@ -836,7 +835,7 @@ int	drawing(t_data *d)
 		move_player_coor(d);
 		raycast(d);
 		draw_map(d);
-		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, d->f);
+		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, 0xFF00FF);
 	}
 	return (1);
 }
@@ -940,7 +939,7 @@ void	draw_map(t_data *d)
 		while (d->map[y][x])
 		{
 			if (d->map[y][x] == '1')
-				draw_square(d, x * MINI_BLOCK, y * MINI_BLOCK, MINI_BLOCK, d->c);
+				draw_square(d, x * MINI_BLOCK, y * MINI_BLOCK, MINI_BLOCK, 0xFFFF00);
 			x++;
 		}
 		x = 0;
