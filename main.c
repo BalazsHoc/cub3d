@@ -224,7 +224,7 @@ void	*ft_calloc(t_data *d, size_t nmemb, size_t size)
 		return (error_clean(d), NULL);
 	buffer = (void *)malloc(size * nmemb);
 	if (!buffer)
-		return (ft_printe("Error, malloc fail\n"), error_clean(d), NULL);
+		return (ft_printe("Error\nmalloc fail\n"), error_clean(d), NULL);
 	while (++i < size)
 		buffer[i] = '\0';
 	return (buffer);
@@ -401,7 +401,7 @@ void	cut_num(t_data *d, char *color, int i, int loop)
 	if (ft_atoi(d->colors[loop]) != ft_atoi(d->buf)
 		|| ft_atoi(d->colors[loop]) >= 256
 		|| ft_atoi(d->colors[loop]) < 0)
-		return (ft_printe("Error, wrong RGB number\n"), error_clean(d));
+		return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
 	free_str(d->buf);
 	d->buf = NULL;	//important idk why
 }
@@ -442,13 +442,13 @@ void	check_rgb(t_data *data, char *color, int *to_store)
 			i++;
 		if (color[i] && (color[i] != ',' && color[i] != 32 && color[i] != '\t'
 			&& color[i] != '\n'))
-			return (ft_printe("Error, wrong color format\n"),
+			return (ft_printe("Error\nwrong color format\n"),
 			error_clean(data));
 		stk++;
 	}
 	stk--;
 	if (stk != 3)
-		return (ft_printe("Error, wrong color format\n"),
+		return (ft_printe("Error\nwrong color format\n"),
 			error_clean(data));
 	*to_store = to_rgb(data);
 }
@@ -458,7 +458,7 @@ int	sort_data_u_2(t_data *d, char *line, int i)
 	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
 	{
 		if (d->ceiling)
-			return (ft_printe("Error, multiple definition of 'F'\n"),
+			return (ft_printe("Error\nmultiple definition of 'F'\n"),
 				error_clean(d), 1);
 		d->ceiling = ft_strdup(d, d->read_buf);
 		check_rgb(d, d->ceiling, &d->c);
@@ -467,7 +467,7 @@ int	sort_data_u_2(t_data *d, char *line, int i)
 	if (!ft_strncmp("F ", line + i, 2) || !ft_strncmp("F\t", line + i, 2))
 	{
 		if (d->floor)
-			return (ft_printe("Error, multiple definition of 'F'\n"),
+			return (ft_printe("Error\nmultiple definition of 'F'\n"),
 				error_clean(d), 1);
 		d->floor = ft_strdup(d, d->read_buf);
 		check_rgb(d, d->floor, &d->f);
@@ -481,7 +481,7 @@ int	sort_data_u(t_data *d, char *line, int i)
 	if (!ft_strncmp("WE ", line + i, 2) || !ft_strncmp("WE\t", line + i, 3))
 	{
 		if (d->west)
-			return (ft_printe("Error, multiple definition of 'WE'\n"),
+			return (ft_printe("Error\nmultiple definition of 'WE'\n"),
 				error_clean(d), 1);
 		d->west = ft_strdup(d, d->read_buf);
 		return (1);
@@ -489,7 +489,7 @@ int	sort_data_u(t_data *d, char *line, int i)
 	if (!ft_strncmp("EA ", line + i, 3) || !ft_strncmp("EA\t", line + i, 3))
 	{
 		if (d->east)
-			return (ft_printe("Error, multiple definition of 'EA'\n"),
+			return (ft_printe("Error\nmultiple definition of 'EA'\n"),
 				error_clean(d), 1);
 		d->east = ft_strdup(d, d->read_buf);
 		return (1);
@@ -507,7 +507,7 @@ void	sort_data(t_data *d, char *line, int i)
 	if (!ft_strncmp("NO ", line + i, 3) || !ft_strncmp("NO\t", line + i, 3))
 	{
 		if (d->north)
-			return (ft_printe("Error, multiple definition of 'NO'\n"),
+			return (ft_printe("Error\nmultiple definition of 'NO'\n"),
 				error_clean(d));
 		d->north = ft_strdup(d, d->read_buf);
 		return ;
@@ -516,7 +516,7 @@ void	sort_data(t_data *d, char *line, int i)
 		|| !ft_strncmp("SO\t", line + i, 3))
 	{
 		if (d->south)
-			return (ft_printe("Error, multiple definition of 'SO'\n"),
+			return (ft_printe("Error\nmultiple definition of 'SO'\n"),
 				error_clean(d));
 		d->south = ft_strdup(d, d->read_buf);
 		return ;
@@ -556,7 +556,7 @@ void	reading_data(t_data *d, char **argv)
 
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
-		return (ft_printe("Error, map can not be open\n"), error_clean(d));
+		return (ft_printe("Error\nmap can not be open\n"), error_clean(d));
 	d->read_buf = get_next_line(fd);
 	if (!d->read_buf)
 		return (error_clean(d));
@@ -569,7 +569,7 @@ void	reading_data(t_data *d, char **argv)
 	if (!d->north || !d->south || !d->west || !d->east
 			|| !d->floor || !d->ceiling || !d->map || !d->map[0]
 			|| !d->map[0][0])
-		return (ft_printe("Error, poor declaration of the map\n"),
+		return (ft_printe("Error\npoor declaration of the map\n"),
 			error_clean(d));
 	init_line_struct(d);
 }
@@ -607,7 +607,7 @@ void	check_walls(t_data *d, int y, int x)
 				|| (!d->map[y][x - 1] || d->map[y][x - 1] == 32)
 				|| (!d->map[y][x + 1] || d->map[y][x + 1] == 32
 				|| d->map[y][x + 1] == '\n')))
-			return (ft_printe("Error, map must be surrounded by walls\n"),
+			return (ft_printe("Error\nmap must be surrounded by walls\n"),
 					error_clean(d));
 		}
 		x = -1;
@@ -625,19 +625,19 @@ void	check_map(t_data *d, int pos, int x, int y)
 				pos = 1;
 			else if (pos && (d->map[y][x] == 'N' || d->map[y][x] == 'S'
 				|| d->map[y][x] == 'E' || d->map[y][x] == 'W'))
-				return (ft_printe("Error, multiple spawnpoint\n"),
+				return (ft_printe("Error\nmultiple spawnpoint\n"),
 					error_clean(d));
 			if (d->map[y][x] != 32 && d->map[y][x] != '\n'
 				&& d->map[y][x] != '1' && d->map[y][x] != '0'
 				&& d->map[y][x] != 'N' && d->map[y][x] != 'S'
 				&& d->map[y][x] != 'E' && d->map[y][x] != 'W')
-			return (ft_printe("Error, unexpected character\n"),
+			return (ft_printe("Error\nunexpected character\n"),
 					error_clean(d));
 		}
 		x = -1;
 	}
 	if (d->heigth > 10 || d->width > 16)
-		return (ft_printe("Error, map is too big\n"),
+		return (ft_printe("Error\nmap is too big\n"),
 					error_clean(d));
 	check_walls(d, -1, -1);
 }
@@ -955,13 +955,13 @@ void	displaying(t_data *d)
 	find_player(d);
 	d->mlx_ptr = mlx_init();
 	if (!d->mlx_ptr)
-		return (ft_printe("Error, mlx_init\n"), error_clean(d));
+		return (ft_printe("Error\nmlx_init\n"), error_clean(d));
 	d->window = mlx_new_window(d->mlx_ptr, WIDTH, HEIGHT, "cub3D");
 	if (!d->window)
-		return (ft_printe("Error, mlx_new_window\n"), error_clean(d));
+		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
-		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
+		return (ft_printe("Error\nmlx_new_image\n"), error_clean(d));
 	draw_square(d, d->player->x, d->player->y, MINI_PLAYER, d->f);
 	draw_map(d);
 	raycast(d);
@@ -980,16 +980,16 @@ int	main(int argc, char **argv)
 	
 	p = NULL;
 	if (argc != 2)
-		return(ft_printe("Error, map as input needed\n"), 1);
+		return(ft_printe("Error\nmap as input needed\n"), 1);
 	if (!map_name(argv[1]))
-		return(ft_printe("Error, map must be '.cub' format\n"), 1);
+		return(ft_printe("Error\nmap must be '.cub' format\n"), 1);
 	d = malloc(sizeof(t_data));
 	if (!d)
-		return (ft_printe("Error, malloc fail\n"), 1);
+		return (ft_printe("Error\nmalloc fail\n"), 1);
 	init_data(d);
 	p = malloc(sizeof(t_player));
 	if (!p)
-		return (ft_printe("Error, malloc fail\n"), error_clean(d), 1);
+		return (ft_printe("Error\nmalloc fail\n"), error_clean(d), 1);
 	d->player = p;
 	init_player(d);
 	reading_data(d, argv);
