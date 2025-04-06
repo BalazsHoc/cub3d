@@ -796,10 +796,15 @@ void	raycast_u(t_data *d, int cur_col)
 			d->y_wall = 1;
 		}
 	}
-	if (d->y_wall == 0)
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0xff0000);
+	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
+		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0xff0000); // SOUTH
+	else if (d->y_wall == 1)
+		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00); // NORTH
+	else if (d->y_wall == 0 && d->r_angle >= d->pi / 2 && d->r_angle <= 3 * d->pi / 2)
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x00fff0); // WEST
 	else
-		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00);
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x00ffff); // EAST
+	
 }
 
 void	raycast(t_data *d)
