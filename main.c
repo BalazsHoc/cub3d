@@ -679,7 +679,7 @@ int	is_wall(t_data *d, double new_x, double new_y)
 	return (0);
 }
 
-void	rotate_player(t_data *d)
+void	rotate_player(t_data *d, double *sin_a, double *cos_a)
 {
 	if (d->player->turn_l)
 		d->player->angle -= R_SPEED;
@@ -689,30 +689,35 @@ void	rotate_player(t_data *d)
 		d->player->angle = 2 * d->pi - R_SPEED;
 	if (d->player->angle > 2 * d->pi)
 		d->player->angle = 0 + R_SPEED;
+	*sin_a = sin(d->player->angle);
+	*cos_a = cos(d->player->angle);
 }
 
 void	move_player_coor(t_data *d)
 {
-	rotate_player(d);
-	if (d->player->up && !is_wall(d, d->player->x + (cos(d->player->angle) * SPEED), d->player->y + (sin(d->player->angle) * SPEED)))
+	double	sin_a;
+	double	cos_a;
+
+	rotate_player(d, &sin_a, &cos_a);
+	if (d->player->up && !is_wall(d, d->player->x + (cos_a * SPEED), d->player->y + (sin_a * SPEED)))
 	{
-		d->player->x += cos(d->player->angle) * SPEED;
-		d->player->y += sin(d->player->angle) * SPEED;
+		d->player->x += cos_a * SPEED;
+		d->player->y += sin_a * SPEED;
 	}
-	if (d->player->down && !is_wall(d, d->player->x - (cos(d->player->angle) * SPEED), d->player->y - (sin(d->player->angle) * SPEED)))
+	if (d->player->down && !is_wall(d, d->player->x - (cos_a * SPEED), d->player->y - (sin_a * SPEED)))
 	{
-		d->player->x -= cos(d->player->angle) * SPEED;
-		d->player->y -= sin(d->player->angle) * SPEED;
+		d->player->x -= cos_a * SPEED;
+		d->player->y -= sin_a * SPEED;
 	}
-	if (d->player->left && !is_wall(d, d->player->x + (sin(d->player->angle) * SPEED), d->player->y - (cos(d->player->angle) * SPEED)))
+	if (d->player->left && !is_wall(d, d->player->x + (sin_a * SPEED), d->player->y - (cos_a * SPEED)))
 	{
-		d->player->x += sin(d->player->angle) * SPEED;
-		d->player->y -= cos(d->player->angle) * SPEED;
+		d->player->x += sin_a * SPEED;
+		d->player->y -= cos_a * SPEED;
 	}
-	if (d->player->right && !is_wall(d, d->player->x - (sin(d->player->angle) * SPEED), d->player->y + (cos(d->player->angle) * SPEED)))
+	if (d->player->right && !is_wall(d, d->player->x - (sin_a * SPEED), d->player->y + (cos_a * SPEED)))
 	{
-		d->player->x -= sin(d->player->angle) * SPEED;
-		d->player->y += cos(d->player->angle) * SPEED;
+		d->player->x -= sin_a * SPEED;
+		d->player->y += cos_a * SPEED;
 	}
 }
 
@@ -744,7 +749,6 @@ void	draw_wall(t_data *d, double distance, int cur_col, int color)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, color);
 	while (draw_start++ < HEIGHT)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, d->f);
-		
 }
 
 void	setup_xy(t_data *d)
@@ -802,11 +806,10 @@ void	raycast_u(t_data *d, int cur_col)
 		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0xff0000); // SOUTH
 	else if (d->y_wall == 1)
 		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00); // NORTH
-	else if (d->y_wall == 0 && d->r_angle >= d->pi / 2 && d->r_angle <= 3 * d->pi / 2)
+	else if (d->y_wall == 0 && d->r_angle > d->pi / 2 && d->r_angle < 3 * d->pi / 2)
 		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0xf00ff0); // WEST
 	else
 		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x0000ff); // EAST
-	
 }
 
 void	raycast(t_data *d)
@@ -897,9 +900,6 @@ void	set_angle(t_data *d, int x, int y)
 		d->player->angle = 0;
 	if (d->map[y][x] == 'W')
 		d->player->angle = d->pi;
-	// printf("map[y][x]: %c\n", d->map[y][x]);
-	// printf("angle: %f\n", d->player->angle);
-	
 }
 
 void	find_player(t_data *d)
@@ -962,26 +962,14 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error, mlx_new_image\n"), error_clean(d));
-
 	draw_square(d, d->player->x, d->player->y, MINI_PLAYER, d->f);
 	draw_map(d);
 	raycast(d);
 	
-	// printf("here\n");
-	// printf("d->player->map_x: %d\n", d->player->map_x);
-	// printf("d->player->map_y: %d\n\n", d->player->map_y);
-	// printf("d->player->angle: %f\n", d->player->angle);
-	// printf("d->player->x: %f\n", d->player->x);
-	// printf("d->player->y: %f\n\n", d->player->y);
-	// printf("d->map[map_y][map_x]: %c\n", d->map[d->player->map_y][d->player->map_x]);
-	
-	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
-
 	mlx_loop_hook(d->mlx_ptr, drawing, d);
-	
 	mlx_loop(d->mlx_ptr);
 }
 
@@ -1007,9 +995,6 @@ int	main(int argc, char **argv)
 	reading_data(d, argv);
 	// print_map(d);
 	check_map(d, 0, -1, -1);
-	// printf("pi / 180 * FOV: %f\n", d->pi / 180 * FOV);
-
 	displaying(d);
-
 	return (exit_clean(d), 0);
 }
