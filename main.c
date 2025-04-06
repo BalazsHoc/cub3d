@@ -546,6 +546,7 @@ void	init_line_struct(t_data *d)
 		d->line[i].length = length;
 		if (d->width < length)
 			d->width = length;
+		// printf("num: %d | length: %d\n", d->line[i].num, d->line[i].length);
 	}
 }
 
@@ -657,20 +658,16 @@ void	put_pixel(t_data *d, int x, int y, int color)
 void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 {
 	int	i;
+	int	j;
 
 	i = -1;
+	j = -1;
 	while (++i < size)
-		put_pixel(d, pixel_x + i, pixel_y, color);
-	i = -1;
-	while (++i < size)
-		put_pixel(d, pixel_x, pixel_y + i, color);
-	i = -1;
-	while (++i < size)
-		put_pixel(d, pixel_x + i, pixel_y + size, color);
-	i = -1;
-	while (++i <= size)
-		put_pixel(d, pixel_x + size, pixel_y + i, color);
-	
+	{
+		while (++j < size)
+			put_pixel(d, pixel_x + j, pixel_y + i, color);
+		j = -1;
+	}
 }
 
 int	is_wall(t_data *d, double new_x, double new_y)
@@ -736,12 +733,18 @@ void	draw_wall(t_data *d, double distance, int cur_col, int color)
 	draw_end = line_height / 2 + HEIGHT / 2;
 	if (draw_end >= HEIGHT)
 		draw_end = HEIGHT - 1;
+	// cur_col < ((d->line[cur_col % MINI_BLOCK].length) * MINI_BLOCK) && i < d->heigth * MINI_BLOCK)
+	while (cur_col + MINI_BLOCK < (d->width * MINI_BLOCK) && i < d->heigth * MINI_BLOCK)
+		i++;
+	if (i >= draw_start)
+		draw_start = i;
 	while (i++ < draw_start)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, i, d->c);
 	while (draw_start++ < draw_end)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, color);
 	while (draw_start++ < HEIGHT)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, d->f);
+		
 }
 
 void	setup_xy(t_data *d)
@@ -831,11 +834,11 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		// mlx_clear_window(d->mlx_ptr, d->window);
+		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, 0); // deleting porpouse
 		move_player_coor(d);
+		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, 0xFF00FF);
 		raycast(d);
 		draw_map(d);
-		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, 0xFF00FF);
 	}
 	return (1);
 }
@@ -894,8 +897,8 @@ void	set_angle(t_data *d, int x, int y)
 		d->player->angle = 0;
 	if (d->map[y][x] == 'W')
 		d->player->angle = d->pi;
-	printf("map[y][x]: %c\n", d->map[y][x]);
-	printf("angle: %f\n", d->player->angle);
+	// printf("map[y][x]: %c\n", d->map[y][x]);
+	// printf("angle: %f\n", d->player->angle);
 	
 }
 
@@ -964,13 +967,13 @@ void	displaying(t_data *d)
 	draw_map(d);
 	raycast(d);
 	
-	printf("here\n");
-	printf("d->player->map_x: %d\n", d->player->map_x);
-	printf("d->player->map_y: %d\n\n", d->player->map_y);
-	printf("d->player->angle: %f\n", d->player->angle);
-	printf("d->player->x: %f\n", d->player->x);
-	printf("d->player->y: %f\n\n", d->player->y);
-	printf("d->map[map_y][map_x]: %c\n", d->map[d->player->map_y][d->player->map_x]);
+	// printf("here\n");
+	// printf("d->player->map_x: %d\n", d->player->map_x);
+	// printf("d->player->map_y: %d\n\n", d->player->map_y);
+	// printf("d->player->angle: %f\n", d->player->angle);
+	// printf("d->player->x: %f\n", d->player->x);
+	// printf("d->player->y: %f\n\n", d->player->y);
+	// printf("d->map[map_y][map_x]: %c\n", d->map[d->player->map_y][d->player->map_x]);
 	
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
@@ -1002,9 +1005,9 @@ int	main(int argc, char **argv)
 	d->player = p;
 	init_player(d);
 	reading_data(d, argv);
-	print_map(d);
+	// print_map(d);
 	check_map(d, 0, -1, -1);
-	printf("pi / 180 * FOV: %f\n", d->pi / 180 * FOV);
+	// printf("pi / 180 * FOV: %f\n", d->pi / 180 * FOV);
 
 	displaying(d);
 
