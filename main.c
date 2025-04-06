@@ -831,7 +831,7 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		mlx_clear_window(d->mlx_ptr, d->window);
+		// mlx_clear_window(d->mlx_ptr, d->window);
 		move_player_coor(d);
 		raycast(d);
 		draw_map(d);
