@@ -4,13 +4,15 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 8
 
+/******************** 
+	CONTROLL CENTER 
+*********************/
+
 # define WIDTH 1280
 # define HEIGHT 720
-
-
 # define FOV 75
 # define WALL_RESIZE 9.5
-
+# define MINI_MAP 1
 # define MINI_PLAYER 10
 # define MINI_WALL 20
 
@@ -23,10 +25,8 @@
 # define A 97
 # define S 115
 # define D 100
-
 # define LEFT 65361
 # define RIGHT 65363
-
 # endif
 
 # include <unistd.h>

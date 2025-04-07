@@ -633,7 +633,7 @@ void	check_map(t_data *d, int pos, int x, int y)
 		}
 		x = -1;
 	}
-	if (d->heigth > 10 || d->width > 16)
+	if (d->heigth > 16 || d->width > 22)
 		return (ft_printe("Error\nmap is too big\n"),
 					error_clean(d));
 	check_walls(d, -1, -1);
@@ -661,7 +661,7 @@ void	draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size, int color)
 	pixel_y -= size / 2;
 	i = -1;
 	j = -1;
-	while (++i < size)
+	while (MINI_MAP && ++i < size)
 	{
 		while (++j < size)
 			put_pixel(d, pixel_x + j, pixel_y + i, color);
@@ -747,27 +747,27 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT - 1;
 }
 
-void	draw_wall(t_data *d, double distance, int cur_col, int color)
+void	draw_wall(t_data *d, double distance, int x, int color)
 {
 	int	line_height;
 	int	draw_start;
 	int	draw_end;
-	int	i;
+	int	y;
 
-	i = 0;
+	y = 0;
 	distance *= cos(d->r_angle - d->player->angle);
 	line_height = ((int)(HEIGHT / distance));
 	draw_wall_u(&line_height, &draw_start, &draw_end);
-	while (cur_col + MINI_WALL < (d->width * MINI_WALL) && i < d->heigth * MINI_WALL)
-		i++;
-	if (i >= draw_start)
-		draw_start = i;
-	while (i++ < draw_start)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, i, d->c);
+	while (MINI_MAP && y < d->heigth * MINI_WALL && x + MINI_WALL < d->width * MINI_WALL)
+		y++;
+	if (y >= draw_start)
+		draw_start = y;
+	while (y++ < draw_start)
+		mlx_pixel_put(d->mlx_ptr, d->window, x, y, d->c);
 	while (draw_start++ < draw_end)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, color);
+		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, color);
 	while (draw_start++ < HEIGHT)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col, draw_start, d->f);
+		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, d->f);
 }
 
 void	setup_xy(t_data *d)
@@ -960,7 +960,7 @@ void	draw_mini_map(t_data *d)
 
 	y = 0;
 	x = 0;
-	while (d->map[y])
+	while (MINI_MAP && d->map[y])
 	{
 		while (d->map[y][x])
 		{
@@ -989,6 +989,7 @@ void	displaying(t_data *d)
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 	draw_mini_map(d);
 	raycast(d);
+	printf("d->buf: %s\n", d->buf);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
