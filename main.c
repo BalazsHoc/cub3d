@@ -672,9 +672,9 @@ void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 
 int	is_wall(t_data *d, double new_x, double new_y)
 {
-	if (!d->map[(int)(new_y / MINI_BLOCK)][(int)(new_x / MINI_BLOCK)]
-		|| d->map[(int)(new_y / MINI_BLOCK)][(int)(new_x / MINI_BLOCK)] == '1'
-		|| d->map[(int)(new_y / MINI_BLOCK)][(int)(new_x / MINI_BLOCK)] == 32)
+	if (!d->map[(int)(new_y / WALL)][(int)(new_x / WALL)]
+		|| d->map[(int)(new_y / WALL)][(int)(new_x / WALL)] == '1'
+		|| d->map[(int)(new_y / WALL)][(int)(new_x / WALL)] == 32)
 		return (1);
 	return (0);
 }
@@ -731,15 +731,15 @@ void	draw_wall(t_data *d, double distance, int cur_col, int color)
 	i = 0;
     distance *= cos(d->r_angle - d->player->angle);
 	line_height = ((int)(HEIGHT / distance));
-	line_height *= (WALL / PLAYER);
+	line_height *= WALL_RESIZE;
 	draw_start = -line_height / 2 + HEIGHT / 2;
 	if (draw_start < 0)
 		draw_start = 0;
 	draw_end = line_height / 2 + HEIGHT / 2;
 	if (draw_end >= HEIGHT)
 		draw_end = HEIGHT - 1;
-	// cur_col < ((d->line[cur_col % MINI_BLOCK].length) * MINI_BLOCK) && i < d->heigth * MINI_BLOCK)
-	while (cur_col + MINI_BLOCK < (d->width * MINI_BLOCK) && i < d->heigth * MINI_BLOCK)
+	// cur_col < ((d->line[cur_col % WALL].length) * WALL) && i < d->heigth * WALL)
+	while (cur_col + MINI_WALL < (d->width * MINI_WALL) && i < d->heigth * MINI_WALL)
 		i++;
 	if (i >= draw_start)
 		draw_start = i;
@@ -837,11 +837,12 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, 0); // deleting porpouse
+		draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0); // deleting porpouse
 		move_player_coor(d);
-		draw_square(d, d->player->x, d->player->y, MINI_PLAYER, 0xFF00FF);
+		draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF); // without its blinking
+		draw_mini_map(d);
+		draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 		raycast(d);
-		draw_map(d);
 	}
 	return (1);
 }
@@ -919,8 +920,8 @@ void	find_player(t_data *d)
 				set_angle(d, x, y);
 				d->player->map_x = x;
 				d->player->map_y = y;
-				d->player->x = x * MINI_BLOCK + (MINI_BLOCK / 2);
-				d->player->y = y * MINI_BLOCK + (MINI_BLOCK / 2);
+				d->player->x = x * WALL + (WALL / 2);
+				d->player->y = y * WALL + (WALL / 2);
 				d->map[y][x] = '0';
 			}
 			x++;
@@ -930,7 +931,7 @@ void	find_player(t_data *d)
 	}
 }
 
-void	draw_map(t_data *d)
+void	draw_mini_map(t_data *d)
 {
 	int	y;
 	int	x;
@@ -942,7 +943,7 @@ void	draw_map(t_data *d)
 		while (d->map[y][x])
 		{
 			if (d->map[y][x] == '1')
-				draw_square(d, x * MINI_BLOCK, y * MINI_BLOCK, MINI_BLOCK, 0xFFFF00);
+				draw_square(d, x * MINI_WALL, y * MINI_WALL, MINI_WALL, 0xFFFF00);
 			x++;
 		}
 		x = 0;
@@ -962,8 +963,8 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error\nmlx_new_image\n"), error_clean(d));
-	draw_square(d, d->player->x, d->player->y, MINI_PLAYER, d->f);
-	draw_map(d);
+	draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+	draw_mini_map(d);
 	raycast(d);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);

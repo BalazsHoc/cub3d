@@ -8,16 +8,17 @@
 # define HEIGHT 720
 
 
-# define WALL 190
-# define PLAYER 20
-# define MINI_PLAYER 5
-# define MINI_BLOCK 10
+# define FOV 75
+# define WALL_RESIZE 9.5
 
+# define MINI_PLAYER 10
+# define MINI_WALL 20
+
+# define WALL 10
 # define SPEED 0.3
 # define R_SPEED 0.025
 # define SENSITIVITY 0.005
 
-# define FOV 75
 # define W 119
 # define A 97
 # define S 115
@@ -133,7 +134,7 @@ int		gnl_newline(char *str);
 char	*gnl_strcpy(char *str);
 char	*gnl_fromnl(char *str);
 
-void	draw_map(t_data *d);
+void	draw_mini_map(t_data *d);
 
 
 # endif
