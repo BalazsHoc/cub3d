@@ -100,7 +100,7 @@ char	*get_next_line(int fd)
 		return (gnl_free(&buf), NULL);
 	buf = reading(fd, buf);
 	if (!buf)
-		return (NULL);
+		return (ft_printe("Error\nmalloc fail\n"), NULL);
 	output = gnl_strcpy(buf);
 	if (!output)
 		return (gnl_free(&buf), NULL);
@@ -111,22 +111,3 @@ char	*get_next_line(int fd)
 	}
 	return (gnl_free(&buf), output);
 }
-// #include <fcntl.h>
-// #include <stdio.h>
-
-// int main()
-// {
-// 	int fd = 0; //open("test.txt", O_RDONLY);
-// 	char *line = get_next_line(fd);
-
-// 	printf("line: x%sx", line);
-// 	while (line != NULL)
-// 	{
-// 		printf("line: x%sx", line);
-// 		free(line);
-// 		line = get_next_line(fd);
-// 	}
-// 	free(line);
-// 	close(fd);
-// 	return 0;
-// }

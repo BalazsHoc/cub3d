@@ -83,7 +83,7 @@ char	*gnl_fromnl(char *str)
 		return (gnl_free(&str), NULL);
 	rest = (char *)gnl_calloc((end - start + 1), sizeof(char));
 	if (!rest)
-		return (gnl_free(&str), NULL);
+		return (ft_printe("Error\nmalloc fail\n"), gnl_free(&str), NULL);
 	while (start <= end)
 		rest[i++] = str[start++];
 	rest[i] = '\0';

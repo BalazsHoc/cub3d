@@ -104,7 +104,7 @@ void	error_clean(t_data *d)
 		free_str(d->ceiling);
 		free_str(d->buf);
 		free_colors(d->colors, 3);
-		free_colors(d->textures, 4);
+		free_colors((char **)d->textures, 4);
 		free_str(d->read_buf);
 		get_next_line(-1);
 		free_str((char *)d->line);
@@ -129,7 +129,7 @@ void	exit_clean(t_data *d)
 		free_str(d->ceiling);
 		free_str(d->buf);
 		free_colors(d->colors, 3);
-		free_colors(d->textures, 4);
+		free_colors((char **)d->textures, 4);
 		free_str(d->read_buf);
 		get_next_line(-1);
 		free_str((char *)d->line);
@@ -182,7 +182,7 @@ void	init_data(t_data *d)
 	d->floor = NULL;
 	d->ceiling = NULL;
 	init_dblptr(d->colors, 3);
-	init_dblptr(d->textures, 4);
+	init_dblptr((char **)d->textures, 4);
 	d->buf = NULL;
 	d->c = 0;
 	d->f = 0;
