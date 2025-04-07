@@ -68,9 +68,17 @@ void	free_str(char *str)
 
 void	free_mlx(t_data *d)
 {
-	if (d->img)
-		mlx_destroy_image(d->mlx_ptr, d->img);
-	d->img = NULL;
+	int	i;
+
+	i = -1;
+	while (++i < 4)
+	{
+		if (d->textures[i].img)
+		{
+			mlx_destroy_image(d->mlx_ptr, d->textures[i].img);
+			d->textures[i].img = NULL;
+		}
+	}
 	if (d->window)
 		mlx_destroy_window(d->mlx_ptr, d->window);
 	d->window = NULL;
@@ -171,9 +179,18 @@ void	init_rays(t_data *d)
 	d->y_wall = 0;
 }
 
+void	init_texture(t_data *d)
+{
+	d->textures[0].img = NULL;
+	d->textures[1].img = NULL;
+	d->textures[2].img = NULL;
+	d->textures[3].img = NULL;
+}
+
 void	init_data(t_data *d)
 {
 	d->line = NULL;
+	init_texture(d);
 	d->map = NULL;
 	d->north = NULL;
 	d->south = NULL;
@@ -192,7 +209,6 @@ void	init_data(t_data *d)
 	init_rays(d);
 	d->window = NULL;
 	d->mlx_ptr = NULL;
-	d->img = NULL;
 	d->player = NULL;
 	d->pi = acos(-1.0);
 }
@@ -450,17 +466,67 @@ void	check_rgb(t_data *d, char *color, int *to_store)
 	*to_store = to_rgb(d);
 }
 
-void	convert_texture(t_data *d, char *line_a_storage)
+int	ft_strlen(const char *str)
 {
-	(void)d;
-	printf("line_a_storage: |%s|\n", line_a_storage);
-	if (!line_a_storage[3] || !ft_strncmp(line_a_storage + 3, "./", 2))
+	int	length;
+
+	length = 0;
+	while (str[length] != '\0')
+	{
+		length++;
+	}
+	return (length);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	while ((char)c != *s)
+	{
+		if (!*s)
+			return (0);
+		s++;
+	}
+	return ((char *)s);
+}
+
+char	*ft_strtrim(t_data *d, char const *s1, char const *set)
+{
+	size_t	end;
+
+	if (s1 == 0 || set == 0)
+		return (0);
+	while (*s1 && ft_strchr(set, *s1))
+		s1++;
+	end = ft_strlen(s1);
+	while (end != 0 && ft_strchr(set, s1[end]))
+		end--;
+	return (ft_substr(d, s1, 0, end + 1));
+}
+
+int	is_white_space(char c)
+{
+	if (c && ((c >= 7 && c <= 13) || c == 32))
+		return (1);
+	return (0);
+}
+
+void	convert_texture(t_data *d, int type, char *line_a_storage)
+{
+	// d->textures[type].width = 64;
+	// d->textures[type].height = 64;
+	if (!line_a_storage[3] || line_a_storage[3] == '\n'
+		|| ft_strncmp(line_a_storage + 3, "./", 2)
+		|| is_white_space(line_a_storage[5]))
 		return (ft_printe("Error\nwrong texture location\n"), error_clean(d));
+	printf("line_a_storage + 3: |%s|\n", line_a_storage + 5);
 	printf("d->buf: |%s|\n", d->buf);
-	// d->buf = mlx_xpm_file_to_image(d->mlx_ptr, line_a_storage + 3);
-	// if (!d->buf)
-	// 	return (ft_printe("Error\nmlx_xpm_file_to_image fail\n\n"),
-	// 		error_clean(d));
+	d->buf = ft_strtrim(d, line_a_storage + 5, "\n");
+	printf("d->buf: |%s|\n", d->buf);
+	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf, &d->textures[type].width, &d->textures[type].height);
+	if (!d->textures[type].img)
+		return (ft_printe("Error\ntexture could not be loaded\n"),
+			error_clean(d));
+	free_str(d->buf);
 }
 
 int	sort_data_u_2(t_data *d, char *line, int i)
@@ -494,7 +560,7 @@ int	sort_data_u(t_data *d, char *line, int i)
 			return (ft_printe("Error\nmultiple definition of 'WE'\n"),
 				error_clean(d), 1);
 		d->west = ft_strdup(d, d->read_buf);
-		convert_texture(d, d->west);
+		// convert_texture(d, WEST, d->west);
 		return (1);
 	}
 	if (!ft_strncmp("EA ", line + i, 3) || !ft_strncmp("EA\t", line + i, 3))

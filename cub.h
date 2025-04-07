@@ -27,6 +27,12 @@
 # define D 100
 # define LEFT 65361
 # define RIGHT 65363
+
+# define NORTH 0
+# define SOUTH 1
+# define WEST 2
+# define EAST 3
+
 # endif
 
 # include <unistd.h>
@@ -42,78 +48,90 @@
 // # include "mlx.h"
 # include "minilibx-linux/mlx.h"
 
+typedef struct texture_s
+{
+	void				*img;
+	int					pixel[64][64];
+	int					width;
+	int					height;
+	int					bpp;
+	int					line_length;
+	int					edian;
+}	t_texture;
+
 typedef struct line_s
 {
-	int		num;
-	int		length;
+	int					num;
+	int					length;
 }	t_line;
 
-typedef struct player_s
+typedef struct	player_s
 {
-	double			x;
-	double			y;
-	bool			up;
-	bool			down;
-	bool			left;
-	bool			right;
-	bool			turn_l;
-	bool			turn_r;
+	double				x;
+	double				y;
+	bool				up;
+	bool				down;
+	bool				left;
+	bool				right;
+	bool				turn_l;
+	bool				turn_r;
 
-	int				map_x;
-	int				map_y;
+	int					map_x;
+	int					map_y;
 
-	double			angle;
+	double				angle;
 }	t_player;
 
-typedef struct data_s
+typedef struct	data_s
 {
-	char			**map;
+	char				**map;
 
-	char			*north;
-	char			*south;
-	char			*west;
-	char			*east;
-	char			*floor;
-	char			*ceiling;
+	char				*north;
+	char				*south;
+	char				*west;
+	char				*east;
+	char				*floor;
+	char				*ceiling;
 
-	char			*buf;
+	char				*buf;
 
-	char			*colors[3];
-	void			*textures[4];
+	char				*colors[3];
+	// void				*textures[4];
 
-	char			*read_buf;
-	struct line_s	*line;
+	char				*read_buf;
+	struct line_s		*line;
 
-	int				width;
-	int				heigth;
-	int				f;
-	int				c;
+	int					width;
+	int					heigth;
+	int					f;
+	int					c;
 
-	void			*window;
-	void			*mlx_ptr;
-	void			*img;
+	void				*window;
+	void				*mlx_ptr;
+	void				*img;
 
-	double			pi;
-
-
-	int				mx;
-	int				my;
-	double			r_angle;
-	double			rx;
-	double			ry;
-	int				step_x;
-	int				step_y;
-	double			ray_dir_x;
-	double			ray_dir_y;
-	double			delta_dist_x;
-	double			delta_dist_y;
-	double			side_dist_x;
-	double			side_dist_y;
-	bool			y_wall;
+	double				pi;
 
 
+	int					mx;
+	int					my;
+	double				r_angle;
+	double				rx;
+	double				ry;
+	int					step_x;
+	int					step_y;
+	double				ray_dir_x;
+	double				ray_dir_y;
+	double				delta_dist_x;
+	double				delta_dist_y;
+	double				side_dist_x;
+	double				side_dist_y;
+	bool				y_wall;
 
-	struct player_s	*player;
+
+
+	struct player_s		*player;
+	struct texture_s	textures[4];
 	
 }	t_data;
 
