@@ -652,6 +652,23 @@ void	put_pixel(t_data *d, int x, int y, int color)
 	mlx_pixel_put(d->mlx_ptr, d->window, x, y, color);
 }
 
+void	draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size, int color)
+{
+	int	i;
+	int	j;
+
+	pixel_x -= size / 2;
+	pixel_y -= size / 2;
+	i = -1;
+	j = -1;
+	while (++i < size)
+	{
+		while (++j < size)
+			put_pixel(d, pixel_x + j, pixel_y + i, color);
+		j = -1;
+	}
+}
+
 void	draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color)
 {
 	int	i;
@@ -671,7 +688,8 @@ int	is_wall(t_data *d, double new_x, double new_y)
 {
 	if (!d->map[(int)(new_y / WALL)][(int)(new_x / WALL)]
 		|| d->map[(int)(new_y / WALL)][(int)(new_x / WALL)] == '1'
-		|| d->map[(int)(new_y / WALL)][(int)(new_x / WALL)] == 32)
+		|| d->map[(int)(new_y / WALL)][(int)(new_x / WALL)] == 32
+		|| d->map[(int)(new_y / WALL)][(int)(new_x / WALL)] == '\n')
 		return (1);
 	return (0);
 }
@@ -838,13 +856,13 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		draw_square(d, (d->player->x / WALL) * MINI_WALL,
+		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0); // deleting porpouse
 		move_player_coor(d);
-		draw_square(d, (d->player->x / WALL) * MINI_WALL,
+		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF); // without its blinking
 		draw_mini_map(d);
-		draw_square(d, (d->player->x / WALL) * MINI_WALL,
+		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 		raycast(d);
 	}
@@ -967,7 +985,7 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error\nmlx_new_image\n"), error_clean(d));
-	draw_square(d, (d->player->x / WALL) * MINI_WALL,
+	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 	draw_mini_map(d);
 	raycast(d);
