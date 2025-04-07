@@ -721,6 +721,17 @@ void	move_player_coor(t_data *d)
 	}
 }
 
+void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
+{
+	*line_height *= WALL_RESIZE;
+	*draw_start = -(*line_height) / 2 + HEIGHT / 2;
+	if (*draw_start < 0)
+		*draw_start = 0;
+	*draw_end = (*line_height) / 2 + HEIGHT / 2;
+	if (*draw_end >= HEIGHT)
+		*draw_end = HEIGHT - 1;
+}
+
 void	draw_wall(t_data *d, double distance, int cur_col, int color)
 {
 	int	line_height;
@@ -729,16 +740,9 @@ void	draw_wall(t_data *d, double distance, int cur_col, int color)
 	int	i;
 
 	i = 0;
-    distance *= cos(d->r_angle - d->player->angle);
+	distance *= cos(d->r_angle - d->player->angle);
 	line_height = ((int)(HEIGHT / distance));
-	line_height *= WALL_RESIZE;
-	draw_start = -line_height / 2 + HEIGHT / 2;
-	if (draw_start < 0)
-		draw_start = 0;
-	draw_end = line_height / 2 + HEIGHT / 2;
-	if (draw_end >= HEIGHT)
-		draw_end = HEIGHT - 1;
-	// cur_col < ((d->line[cur_col % WALL].length) * WALL) && i < d->heigth * WALL)
+	draw_wall_u(&line_height, &draw_start, &draw_end);
 	while (cur_col + MINI_WALL < (d->width * MINI_WALL) && i < d->heigth * MINI_WALL)
 		i++;
 	if (i >= draw_start)
@@ -837,11 +841,14 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0); // deleting porpouse
+		draw_square(d, (d->player->x / WALL) * MINI_WALL,
+		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0); // deleting porpouse
 		move_player_coor(d);
-		draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF); // without its blinking
+		draw_square(d, (d->player->x / WALL) * MINI_WALL,
+		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF); // without its blinking
 		draw_mini_map(d);
-		draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+		draw_square(d, (d->player->x / WALL) * MINI_WALL,
+		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 		raycast(d);
 	}
 	return (1);
@@ -963,7 +970,8 @@ void	displaying(t_data *d)
 	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
 	if (!d->img)
 		return (ft_printe("Error\nmlx_new_image\n"), error_clean(d));
-	draw_square(d, (d->player->x / WALL) * MINI_WALL, (d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+	draw_square(d, (d->player->x / WALL) * MINI_WALL,
+	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 	draw_mini_map(d);
 	raycast(d);
 	
