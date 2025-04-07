@@ -450,6 +450,19 @@ void	check_rgb(t_data *d, char *color, int *to_store)
 	*to_store = to_rgb(d);
 }
 
+void	convert_texture(t_data *d, char *line_a_storage)
+{
+	(void)d;
+	printf("line_a_storage: |%s|\n", line_a_storage);
+	if (!line_a_storage[3] || !ft_strncmp(line_a_storage + 3, "./", 2))
+		return (ft_printe("Error\nwrong texture location\n"), error_clean(d));
+	printf("d->buf: |%s|\n", d->buf);
+	// d->buf = mlx_xpm_file_to_image(d->mlx_ptr, line_a_storage + 3);
+	// if (!d->buf)
+	// 	return (ft_printe("Error\nmlx_xpm_file_to_image fail\n\n"),
+	// 		error_clean(d));
+}
+
 int	sort_data_u_2(t_data *d, char *line, int i)
 {
 	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
@@ -481,6 +494,7 @@ int	sort_data_u(t_data *d, char *line, int i)
 			return (ft_printe("Error\nmultiple definition of 'WE'\n"),
 				error_clean(d), 1);
 		d->west = ft_strdup(d, d->read_buf);
+		convert_texture(d, d->west);
 		return (1);
 	}
 	if (!ft_strncmp("EA ", line + i, 3) || !ft_strncmp("EA\t", line + i, 3))
