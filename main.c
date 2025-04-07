@@ -989,7 +989,6 @@ void	displaying(t_data *d)
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 	draw_mini_map(d);
 	raycast(d);
-	printf("d->buf: %s\n", d->buf);
 	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);

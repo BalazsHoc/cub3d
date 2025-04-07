@@ -14,7 +14,7 @@
 # define WALL_RESIZE 9.5
 # define MINI_MAP 1
 # define MINI_PLAYER 10
-# define MINI_WALL 20
+# define MINI_WALL 15
 
 # define WALL 10
 # define SPEED 0.3
