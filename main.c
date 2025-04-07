@@ -391,7 +391,7 @@ void	cut_num(t_data *d, char *color, int i, int loop)
 
 	l = 0;
 	if (!color[i] || color[i] < 48 || color[i] > 57)
-		return (ft_printe("Error\nwrong RGB number0\n"), error_clean(d));
+		return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
 	while (color[i + l] && color[i + l] >= 48 && color[i + l] <= 57)
 		l++;
 	if (loop == 3 || l == 0)
@@ -401,7 +401,7 @@ void	cut_num(t_data *d, char *color, int i, int loop)
 	if (ft_atoi(d->colors[loop]) != ft_atoi(d->buf)
 		|| ft_atoi(d->colors[loop]) >= 256
 		|| ft_atoi(d->colors[loop]) < 0)
-		return (ft_printe("Error\nwrong RGB number1\n"), error_clean(d));
+		return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
 	free_str(d->buf);
 	d->buf = NULL;	//important idk why
 }
@@ -441,11 +441,11 @@ void	check_rgb(t_data *d, char *color, int *to_store)
 		stk++;
 		if ((stk != 3 && color[i] && color[i] != ',') || (stk == 3 && color[i]
 			&& color[i] != '\n'))
-			return (ft_printe("Error\nwrong RGB number2\n"), error_clean(d));
+			return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
 		i++;
 	}
 	if (stk != 3)
-		return (ft_printe("Error\nwrong color format3\n"),
+		return (ft_printe("Error\nwrong color format\n"),
 			error_clean(d));
 	*to_store = to_rgb(d);
 }
