@@ -828,6 +828,33 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 	if (*draw_end >= HEIGHT)
 		*draw_end = HEIGHT - 1;
 }
+/*		// THIS IS FOR TEXTURES
+void	draw_textures(t_data *d, double distance, int x, int type)
+{
+	int	line_height;
+	int	draw_start;
+	int	draw_end;
+	int	y;
+
+	y = 0;
+	distance *= cos(d->r_angle - d->player->angle);
+	line_height = ((int)(HEIGHT / distance));
+	draw_wall_u(&line_height, &draw_start, &draw_end);
+	while (MINI_MAP && y < d->heigth * MINI_WALL && x + MINI_WALL < d->width * MINI_WALL)
+		y++;
+	if (y >= draw_start)
+		draw_start = y;
+	while (y++ < draw_start)
+		mlx_pixel_put(d->mlx_ptr, d->window, x, y, d->c);
+	while (draw_start++ < draw_end)
+	{
+		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, color);
+
+	}
+	while (draw_start++ < HEIGHT)
+		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, d->f);
+}
+*/
 
 void	draw_wall(t_data *d, double distance, int x, int color)
 {
@@ -1070,14 +1097,14 @@ void	displaying(t_data *d)
 	convert_texture(d, EAST, d->east);
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
-	// draw_mini_map(d);
-	// raycast(d);
+	draw_mini_map(d);
+	raycast(d);
 	
-	// mlx_hook(d->window, 17, 0, handle_click_x, d);
-	// mlx_hook(d->window, 2, 1L << 0, key_press, d);
-	// mlx_hook(d->window, 3, 1L << 1, key_release, d);
-	// mlx_loop_hook(d->mlx_ptr, drawing, d);
-	// mlx_loop(d->mlx_ptr);
+	mlx_hook(d->window, 17, 0, handle_click_x, d);
+	mlx_hook(d->window, 2, 1L << 0, key_press, d);
+	mlx_hook(d->window, 3, 1L << 1, key_release, d);
+	mlx_loop_hook(d->mlx_ptr, drawing, d);
+	mlx_loop(d->mlx_ptr);
 }
 
 int	main(int argc, char **argv)
