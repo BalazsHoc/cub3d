@@ -70,14 +70,15 @@ void	free_mlx(t_data *d)
 {
 	int	i;
 
-	i = -1;
-	while (++i < 4)
+	i = 0;
+	while (i < 4 && d->mlx_ptr)
 	{
 		if (d->textures[i].img)
 		{
 			mlx_destroy_image(d->mlx_ptr, d->textures[i].img);
 			d->textures[i].img = NULL;
 		}
+		i++;
 	}
 	if (d->window)
 		mlx_destroy_window(d->mlx_ptr, d->window);
@@ -112,7 +113,6 @@ void	error_clean(t_data *d)
 		free_str(d->ceiling);
 		free_str(d->buf);
 		free_colors(d->colors, 3);
-		free_colors((char **)d->textures, 4);
 		free_str(d->read_buf);
 		get_next_line(-1);
 		free_str((char *)d->line);
@@ -137,7 +137,6 @@ void	exit_clean(t_data *d)
 		free_str(d->ceiling);
 		free_str(d->buf);
 		free_colors(d->colors, 3);
-		free_colors((char **)d->textures, 4);
 		free_str(d->read_buf);
 		get_next_line(-1);
 		free_str((char *)d->line);
@@ -510,23 +509,21 @@ int	is_white_space(char c)
 	return (0);
 }
 
-void	convert_texture(t_data *d, int type, char *line_a_storage)
+void	convert_texture(t_data *d, int type, char *texture)
 {
-	// d->textures[type].width = 64;
-	// d->textures[type].height = 64;
-	if (!line_a_storage[3] || line_a_storage[3] == '\n'
-		|| ft_strncmp(line_a_storage + 3, "./", 2)
-		|| is_white_space(line_a_storage[5]))
+	if (!texture[3] || texture[3] == '\n'
+		|| ft_strncmp(texture + 3, "./", 2)
+		|| !texture[5] || is_white_space(texture[5]))
 		return (ft_printe("Error\nwrong texture location\n"), error_clean(d));
-	printf("line_a_storage + 3: |%s|\n", line_a_storage + 5);
-	printf("d->buf: |%s|\n", d->buf);
-	d->buf = ft_strtrim(d, line_a_storage + 5, "\n");
-	printf("d->buf: |%s|\n", d->buf);
+	printf("texture + 3: |%s|\n", texture + 5);
+	d->buf = ft_strtrim(d, texture + 5, "\n");
 	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf, &d->textures[type].width, &d->textures[type].height);
 	if (!d->textures[type].img)
 		return (ft_printe("Error\ntexture could not be loaded\n"),
 			error_clean(d));
 	free_str(d->buf);
+	d->buf = NULL;
+	printf("d->textures[type].height: %d\n", d->textures[type].height);
 }
 
 int	sort_data_u_2(t_data *d, char *line, int i)
@@ -560,7 +557,6 @@ int	sort_data_u(t_data *d, char *line, int i)
 			return (ft_printe("Error\nmultiple definition of 'WE'\n"),
 				error_clean(d), 1);
 		d->west = ft_strdup(d, d->read_buf);
-		// convert_texture(d, WEST, d->west);
 		return (1);
 	}
 	if (!ft_strncmp("EA ", line + i, 3) || !ft_strncmp("EA\t", line + i, 3))
@@ -1062,19 +1058,20 @@ void	displaying(t_data *d)
 	d->window = mlx_new_window(d->mlx_ptr, WIDTH, HEIGHT, "cub3D");
 	if (!d->window)
 		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
-	d->img = mlx_new_image(d->mlx_ptr, WIDTH, HEIGHT);
-	if (!d->img)
-		return (ft_printe("Error\nmlx_new_image\n"), error_clean(d));
+	convert_texture(d, NORTH, d->north);
+	convert_texture(d, SOUTH, d->south);
+	convert_texture(d, WEST, d->west);
+	convert_texture(d, EAST, d->east);
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
-	draw_mini_map(d);
-	raycast(d);
+	// draw_mini_map(d);
+	// raycast(d);
 	
-	mlx_hook(d->window, 17, 0, handle_click_x, d);
-	mlx_hook(d->window, 2, 1L << 0, key_press, d);
-	mlx_hook(d->window, 3, 1L << 1, key_release, d);
-	mlx_loop_hook(d->mlx_ptr, drawing, d);
-	mlx_loop(d->mlx_ptr);
+	// mlx_hook(d->window, 17, 0, handle_click_x, d);
+	// mlx_hook(d->window, 2, 1L << 0, key_press, d);
+	// mlx_hook(d->window, 3, 1L << 1, key_release, d);
+	// mlx_loop_hook(d->mlx_ptr, drawing, d);
+	// mlx_loop(d->mlx_ptr);
 }
 
 int	main(int argc, char **argv)

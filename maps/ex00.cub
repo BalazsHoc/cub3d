@@ -1,12 +1,12 @@
 lol
-NO 
+NO ./textures/brick.xpm
 WE ./textures/brick.xpm
 F 100,25, 72
 
 
 
-SO      l
-EA 
+SO ./textures/brick.xpm
+EA ./textures/brick.xpm
 C 25,23,70
 
 

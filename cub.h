@@ -96,7 +96,6 @@ typedef struct	data_s
 	char				*buf;
 
 	char				*colors[3];
-	// void				*textures[4];
 
 	char				*read_buf;
 	struct line_s		*line;
@@ -108,7 +107,6 @@ typedef struct	data_s
 
 	void				*window;
 	void				*mlx_ptr;
-	void				*img;
 
 	double				pi;
 
