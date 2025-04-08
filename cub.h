@@ -51,6 +51,7 @@
 typedef struct texture_s
 {
 	void				*img;
+	void				*addr;
 	int					pixel[64][64];
 	int					width;
 	int					height;

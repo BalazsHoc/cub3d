@@ -70,15 +70,12 @@ void	free_mlx(t_data *d)
 {
 	int	i;
 
-	i = 0;
-	while (i < 4 && d->mlx_ptr)
+	i = -1;
+	while (++i < 4 && d->mlx_ptr)
 	{
 		if (d->textures[i].img)
-		{
 			mlx_destroy_image(d->mlx_ptr, d->textures[i].img);
-			d->textures[i].img = NULL;
-		}
-		i++;
+		d->textures[i].img = NULL;
 	}
 	if (d->window)
 		mlx_destroy_window(d->mlx_ptr, d->window);
@@ -184,6 +181,10 @@ void	init_texture(t_data *d)
 	d->textures[1].img = NULL;
 	d->textures[2].img = NULL;
 	d->textures[3].img = NULL;
+	d->textures[0].addr = NULL;
+	d->textures[1].addr = NULL;
+	d->textures[2].addr = NULL;
+	d->textures[3].addr = NULL;
 }
 
 void	init_data(t_data *d)
@@ -515,7 +516,6 @@ void	convert_texture(t_data *d, int type, char *texture)
 		|| ft_strncmp(texture + 3, "./", 2)
 		|| !texture[5] || is_white_space(texture[5]))
 		return (ft_printe("Error\nwrong texture location\n"), error_clean(d));
-	printf("texture + 3: |%s|\n", texture + 5);
 	d->buf = ft_strtrim(d, texture + 5, "\n");
 	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf, &d->textures[type].width, &d->textures[type].height);
 	if (!d->textures[type].img)
@@ -523,7 +523,13 @@ void	convert_texture(t_data *d, int type, char *texture)
 			error_clean(d));
 	free_str(d->buf);
 	d->buf = NULL;
-	printf("d->textures[type].height: %d\n", d->textures[type].height);
+	d->textures[type].addr = mlx_get_data_addr(d->textures[type].img,
+	&d->textures[type].bpp,
+	&d->textures[type].line_length,
+	&d->textures[type].edian);
+	if (!d->textures[type].addr)
+		return (ft_printe("Error\ntexture could not be loaded\n"),
+			error_clean(d));
 }
 
 int	sort_data_u_2(t_data *d, char *line, int i)
