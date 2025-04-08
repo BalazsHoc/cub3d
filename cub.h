@@ -4,6 +4,8 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 8
 
+# define TEXTURE_SIZE 1024
+
 /******************** 
 	CONTROLL CENTER 
 *********************/

@@ -521,6 +521,9 @@ void	convert_texture(t_data *d, int type, char *texture)
 	if (!d->textures[type].img)
 		return (ft_printe("Error\ntexture could not be loaded\n"),
 			error_clean(d));
+	if (d->textures[type].height != TEXTURE_SIZE || d->textures[type].width != TEXTURE_SIZE)
+		return (ft_printe("Error\ntexturesize must be 1024x1024\n"),
+			error_clean(d));
 	free_str(d->buf);
 	d->buf = NULL;
 	d->textures[type].addr = mlx_get_data_addr(d->textures[type].img,
