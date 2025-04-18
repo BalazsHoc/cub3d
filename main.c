@@ -832,27 +832,13 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT - 1;
 }
 
+	//	This function is for getting the right pixel from the 1024x1024 texture
 int	get_tex_color(t_data *d, int type, int draw_start, double distance)
 {
-	double	hit_coo;
-	(void)distance;
+	(void)d;
+	(void)type;
 	(void)draw_start;
-	double	its_hit;
-	if (type == NORTH || type == SOUTH)
-	{
-		hit_coo = d->player->x + cos(d->r_angle) * distance;
-		// printf("hit_coo - (mx / WALL * WALL): %f\n", hit_coo - (d->mx / WALL * WALL));
-		its_hit = hit_coo - d->mx;
-		if (its_hit < 0)
-			its_hit += WALL;
-		printf("its_hit: %f\n", its_hit);
-		// printf("hit_coo: %f\n", hit_coo);
-		// printf("mx + 1 - hit_coor: %f\n", d->mx - hit_coor);
-	}
-	else if (type == WEST || type == EAST)
-	{
-		// hit_coord = d->player->y + sin(d->r_angle) * distance;
-	}
+	(void)distance;
 	return (0);
 }
 
@@ -883,6 +869,7 @@ void	draw_textures(t_data *d, double distance, int x, int type)
 		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, d->f);
 }
 
+	// THIS IS HOMOGEN WALLS (only for testing)
 void	draw_wall(t_data *d, double distance, int x, int color)
 {
 	int	line_height;
