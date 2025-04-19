@@ -6,6 +6,11 @@
 
 # define TEXTURE_SIZE 1024
 
+# define NORTH 0
+# define SOUTH 1
+# define WEST 2
+# define EAST 3
+
 /******************** 
 	CONTROLL CENTER 
 *********************/
@@ -29,11 +34,6 @@
 # define D 100
 # define LEFT 65361
 # define RIGHT 65363
-
-# define NORTH 0
-# define SOUTH 1
-# define WEST 2
-# define EAST 3
 
 # endif
 
