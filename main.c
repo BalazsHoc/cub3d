@@ -173,6 +173,7 @@ void	init_rays(t_data *d)
 	d->side_dist_x = 0;
 	d->side_dist_y = 0;
 	d->y_wall = 0;
+	d->tex_x = 0;
 }
 
 void	init_texture(t_data *d)
@@ -832,6 +833,23 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT - 1;
 }
 
+void	set_tex_x(t_data *d, int type)
+{
+	if (type == NORTH)
+		d->tex_x = (int)(1 - (d->rx - (int)d->rx)
+				* d->textures[type].width);
+	else if (type == SOUTH)
+		d->tex_x = (int)((d->rx - (int)d->rx)
+				* d->textures[type].width);
+	
+	else if (type == EAST)
+		d->tex_x = (int)(1 - (d->ry - (int)d->ry)
+				* d->textures[type].width);
+	else if (type == WEST)
+		d->tex_x = (int)((d->ry - (int)d->ry)
+				* d->textures[type].width);
+}
+
 	//	This function is for getting the right pixel from the 1024x1024 texture
 int	get_tex_color(t_data *d, int type, int draw_start, double distance)
 {
@@ -843,7 +861,7 @@ int	get_tex_color(t_data *d, int type, int draw_start, double distance)
 }
 
 	// THIS IS FOR TEXTURES
-void	draw_textures(t_data *d, double distance, int x, int type)
+void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 {
 	int	line_height;
 	int	draw_start;
@@ -854,19 +872,21 @@ void	draw_textures(t_data *d, double distance, int x, int type)
 	distance *= cos(d->r_angle - d->player->angle);
 	line_height = ((int)(HEIGHT / distance));
 	draw_wall_u(&line_height, &draw_start, &draw_end);
-	while (MINI_MAP && y < d->heigth * MINI_WALL && x + MINI_WALL < d->width * MINI_WALL)
+	set_tex_x(d, type);
+	while (MINI_MAP && y < d->heigth * MINI_WALL && cur_col_x + MINI_WALL < d->width * MINI_WALL)
 		y++;
 	if (y >= draw_start)
 		draw_start = y;
 	while (y++ < draw_start)
-		mlx_pixel_put(d->mlx_ptr, d->window, x, y, d->c);
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
 	while (draw_start++ < draw_end)
 	{
-		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, get_tex_color(d, type, draw_start, distance));
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, draw_start, *(int *)d->textures[type].addr + 1); // must have a calculation for the exact pixel
+		// mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, draw_start, get_tex_color(d, type, draw_start, distance));
 
 	}
 	while (draw_start++ < HEIGHT)
-		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, d->f);
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, draw_start, d->f);
 }
 
 	// THIS IS HOMOGEN WALLS (only for testing)
@@ -922,7 +942,7 @@ void	setup_xy(t_data *d)
 	}
 }
 
-void	raycast_u(t_data *d, int cur_col)
+void	raycast_u(t_data *d, int cur_col_x)
 {
 	d->rx = d->player->x;
 	d->ry = d->player->y;
@@ -945,28 +965,28 @@ void	raycast_u(t_data *d, int cur_col)
 		}
 	}
 	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
-		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col, SOUTH); // SOUTH
+		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH); // SOUTH
 	else if (d->y_wall == 1)
-		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col, 0x00ff00); // NORTH
+		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col_x, 0x00ff00); // NORTH
 	else if (d->y_wall == 0 && d->r_angle > d->pi / 2 && d->r_angle < 3 * d->pi / 2)
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0xf00ff0); // WEST
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col_x, 0xf00ff0); // WEST
 	else
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col, 0x0000ff); // EAST
+		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col_x, 0x0000ff); // EAST
 }
 
 void	raycast(t_data *d)
 {
-	int		i;
+	int		cur_col_x;
 
-	i = -1;
+	cur_col_x = -1;
 	d->r_angle = d->player->angle - ((FOV * (d->pi / 180)) / 2);
 	if (d->r_angle < 0)
 		d->r_angle += (2 * d->pi); 
 	d->rx = d->player->x;
 	d->ry = d->player->y;
-	while (++i < WIDTH)
+	while (++cur_col_x < WIDTH)
 	{
-		raycast_u(d, i);
+		raycast_u(d, cur_col_x);
 		d->r_angle += (FOV * (d->pi / 180)) / WIDTH;
 		if (d->r_angle >= 2 * d->pi)
 			d->r_angle -= (2 * d->pi);

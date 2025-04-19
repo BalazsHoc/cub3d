@@ -54,7 +54,6 @@ typedef struct texture_s
 {
 	void				*img;
 	void				*addr;
-	int					pixel[64][64];
 	int					width;
 	int					height;
 	int					bpp;
@@ -128,6 +127,7 @@ typedef struct	data_s
 	double				side_dist_x;
 	double				side_dist_y;
 	bool				y_wall;
+	int					tex_x;
 
 
 
