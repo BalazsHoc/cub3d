@@ -271,9 +271,9 @@ int	ft_dataigit_count(int n)
 
 char	*ft_itoa(int n, t_data *data)
 {
-	char		*result;
-	int			digits;
-	int			num;
+	char	*result;
+	int		digits;
+	int		num;
 
 	num = n;
 	digits = ft_dataigit_count(num);
@@ -952,7 +952,6 @@ void	setup_xy(t_data *d)
 		d->step_x = 1;
 		d->side_dist_x = (d->mx + 1 - d->rx) * d->delta_dist_x;
 	}
-
 	if (d->ray_dir_y < 0)
 	{
 		d->step_y = -1;
