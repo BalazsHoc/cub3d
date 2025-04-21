@@ -5,8 +5,8 @@ F 100,25, 72
 
 
 
-SO ./textures/gold.xpm
-EA ./textures/wood.xpm
+SO ./textures/wood.xpm
+EA ./textures/gold.xpm
 C 25,23,70
 
 

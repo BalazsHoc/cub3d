@@ -836,7 +836,6 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 
 void	set_tex_x(t_data *d, int type)
 {
-	// printf("tex_x: %f\n", (d->rx - (int)d->rx) * d->textures[type].width);
 	if (type == NORTH)
 		d->tex_x = (int)(1 - (d->rx - (int)d->rx)
 				* d->textures[type].width);
@@ -850,10 +849,11 @@ void	set_tex_x(t_data *d, int type)
 	else if (type == WEST)
 		d->tex_x = (int)((d->ry - (int)d->ry)
 				* d->textures[type].width);
-	if (d->tex_x == TEXTURE_SIZE)
-			d->tex_x = TEXTURE_SIZE - 1;
+	if (d->tex_x >= TEXTURE_SIZE)
+			d->tex_x = TEXTURE_SIZE;
 	else if (d->tex_x < 0)
 			d->tex_x = 0;
+	// printf("tex_x: %d\n", d->tex_x);
 }
 
 	// THIS IS FOR TEXTURES
@@ -875,9 +875,9 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
 	while (y++ < draw_end)
 	{
-		d->tex_y = (int)(y - draw_start) * line_height / (draw_end - draw_start);
-		if (d->tex_y == TEXTURE_SIZE)
-			d->tex_y = TEXTURE_SIZE - 1;
+		d->tex_y = (int)(y - draw_start) * d->textures[type].height / (draw_end - draw_start);
+		if (d->tex_y >= TEXTURE_SIZE)
+			d->tex_y = TEXTURE_SIZE;
 		else if (d->tex_y < 0)
 			d->tex_y = 0;
 		// printf("tex_x: %d\n", d->tex_x);
