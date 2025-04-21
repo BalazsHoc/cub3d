@@ -850,16 +850,10 @@ void	set_tex_x(t_data *d, int type)
 	else if (type == WEST)
 		d->tex_x = (int)((d->ry - (int)d->ry)
 				* d->textures[type].width);
-}
-
-	//	This function is for getting the right pixel from the 1024x1024 texture
-int	get_tex_color(t_data *d, int type, int draw_start, double distance)
-{
-	(void)d;
-	(void)type;
-	(void)draw_start;
-	(void)distance;
-	return (0);
+	if (d->tex_x == TEXTURE_SIZE)
+			d->tex_x = TEXTURE_SIZE - 1;
+	else if (d->tex_x < 0)
+			d->tex_x = 0;
 }
 
 	// THIS IS FOR TEXTURES
@@ -877,16 +871,22 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	set_tex_x(d, type);
 	while (MINI_MAP && y < d->heigth * MINI_WALL && cur_col_x + MINI_WALL < d->width * MINI_WALL)
 		y++;
-	if (y >= draw_start)
-		draw_start = y;
 	while (y++ < draw_start)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
 	while (y++ < draw_end)
 	{
 		d->tex_y = (int)(y - draw_start) * line_height / (draw_end - draw_start);
+		if (d->tex_y == TEXTURE_SIZE)
+			d->tex_y = TEXTURE_SIZE - 1;
+		else if (d->tex_y < 0)
+			d->tex_y = 0;
 		// printf("tex_x: %d\n", d->tex_x);
 		// printf("tex_y: %d\n\n", d->tex_y);
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, *(unsigned int *)d->textures[type].addr + ( int)((d->tex_y) + (d->tex_x))); // must have a calculation for the exact pixel
+		// printf("%ld\n", sizeof(d->textures[type].addr));
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y,
+			*(unsigned int *)(d->textures[type].addr
+			+ (unsigned int)((d->tex_y * d->textures[type].line_length)
+			+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8))))); // must have a calculation for the exact pixel
 
 	}
 	while (y++ < HEIGHT)
