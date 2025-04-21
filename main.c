@@ -834,26 +834,45 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT - 1;
 }
 
-void	set_tex_x(t_data *d, int type)
-{
-	if (type == NORTH)
-		d->tex_x = (int)(1 - (d->rx - (int)d->rx)
-				* d->textures[type].width);
-	else if (type == SOUTH)
-		d->tex_x = (int)((d->rx - (int)d->rx)
-				* d->textures[type].width);
+// void	set_tex_x(t_data *d, int type)
+// {
+// 	if (type == NORTH)
+// 		d->tex_x = (int)(1 - (d->rx - (int)d->rx)
+// 				* d->textures[type].width);
+// 	else if (type == SOUTH)
+// 		d->tex_x = (int)((d->rx - (int)d->rx)
+// 				* d->textures[type].width);
 	
-	else if (type == EAST)
-		d->tex_x = (int)(1 - (d->ry - (int)d->ry)
-				* d->textures[type].width);
-	else if (type == WEST)
-		d->tex_x = (int)((d->ry - (int)d->ry)
-				* d->textures[type].width);
-	if (d->tex_x >= TEXTURE_SIZE)
-			d->tex_x = TEXTURE_SIZE;
-	else if (d->tex_x < 0)
-			d->tex_x = 0;
-	// printf("tex_x: %d\n", d->tex_x);
+// 	else if (type == EAST)
+// 		d->tex_x = (int)(1 - (d->ry - (int)d->ry)
+// 				* d->textures[type].width);
+// 	else if (type == WEST)
+// 		d->tex_x = (int)((d->ry - (int)d->ry)
+// 				* d->textures[type].width);
+// 	if (d->tex_x >= TEXTURE_SIZE)
+// 			d->tex_x = TEXTURE_SIZE;
+// 	else if (d->tex_x < 0)
+// 			d->tex_x = 0;
+// 	// printf("tex_x: %d\n", d->tex_x);
+// }
+
+void set_tex_x(t_data *d, int type)
+{
+	double	wall_hit;
+
+	if (d->y_wall == 0)
+		wall_hit = d->ry + ((d->side_dist_x - d->delta_dist_x) * d->ray_dir_y);
+	else
+		wall_hit = d->rx + ((d->side_dist_y - d->delta_dist_y) * d->ray_dir_x);
+	wall_hit -= (int)(wall_hit);
+	d->tex_x = (int)(wall_hit * d->textures[type].width);
+	if (d->tex_x < 0)
+		d->tex_x = 0;
+	if (d->tex_x >= d->textures[type].width)
+		d->tex_x = d->textures[type].width - 1;
+	if ((d->y_wall == 0 && d->ray_dir_x > 0)
+		|| (d->y_wall == 1 && d->ray_dir_y < 0))
+		d->tex_x = d->textures[type].width - d->tex_x - 1;
 }
 
 	// THIS IS FOR TEXTURES
@@ -877,7 +896,7 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	{
 		d->tex_y = (int)(y - draw_start) * d->textures[type].height / (draw_end - draw_start);
 		if (d->tex_y >= TEXTURE_SIZE)
-			d->tex_y = TEXTURE_SIZE;
+			d->tex_y = TEXTURE_SIZE - 1;
 		else if (d->tex_y < 0)
 			d->tex_y = 0;
 		// printf("tex_x: %d\n", d->tex_x);
@@ -957,8 +976,8 @@ void	raycast_u(t_data *d, int cur_col_x)
 	{
 		if (d->side_dist_x < d->side_dist_y)
 		{
-        	d->side_dist_x += d->delta_dist_x;
-        	d->mx += d->step_x;
+			d->side_dist_x += d->delta_dist_x;
+			d->mx += d->step_x;
 			d->y_wall = 0;
 		}
 		else
@@ -968,8 +987,8 @@ void	raycast_u(t_data *d, int cur_col_x)
 			d->y_wall = 1;
 		}
 	}
-	d->rx += d->side_dist_x;
-	d->ry += d->side_dist_y;
+	// d->rx += d->side_dist_x;
+	// d->ry += d->side_dist_y;
 	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
 		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH); // SOUTH
 	else if (d->y_wall == 1)
