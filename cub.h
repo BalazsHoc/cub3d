@@ -128,6 +128,7 @@ typedef struct	data_s
 	double				side_dist_y;
 	bool				y_wall;
 	int					tex_x;
+	int					tex_y;
 
 
 

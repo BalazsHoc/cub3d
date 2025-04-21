@@ -174,6 +174,7 @@ void	init_rays(t_data *d)
 	d->side_dist_y = 0;
 	d->y_wall = 0;
 	d->tex_x = 0;
+	d->tex_y = 0;
 }
 
 void	init_texture(t_data *d)
@@ -835,6 +836,7 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 
 void	set_tex_x(t_data *d, int type)
 {
+	// printf("tex_x: %f\n", (d->rx - (int)d->rx) * d->textures[type].width);
 	if (type == NORTH)
 		d->tex_x = (int)(1 - (d->rx - (int)d->rx)
 				* d->textures[type].width);
@@ -879,14 +881,16 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 		draw_start = y;
 	while (y++ < draw_start)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
-	while (draw_start++ < draw_end)
+	while (y++ < draw_end)
 	{
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, draw_start, *(int *)d->textures[type].addr + 1); // must have a calculation for the exact pixel
-		// mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, draw_start, get_tex_color(d, type, draw_start, distance));
+		d->tex_y = (int)(y - draw_start) * line_height / (draw_end - draw_start);
+		// printf("tex_x: %d\n", d->tex_x);
+		// printf("tex_y: %d\n\n", d->tex_y);
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, *(unsigned int *)d->textures[type].addr + ( int)((d->tex_y) + (d->tex_x))); // must have a calculation for the exact pixel
 
 	}
-	while (draw_start++ < HEIGHT)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, draw_start, d->f);
+	while (y++ < HEIGHT)
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->f);
 }
 
 	// THIS IS HOMOGEN WALLS (only for testing)
@@ -964,6 +968,8 @@ void	raycast_u(t_data *d, int cur_col_x)
 			d->y_wall = 1;
 		}
 	}
+	d->rx += d->side_dist_x;
+	d->ry += d->side_dist_y;
 	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
 		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH); // SOUTH
 	else if (d->y_wall == 1)
