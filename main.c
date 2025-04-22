@@ -823,7 +823,7 @@ void	move_player_coor(t_data *d)
 	}
 }
 
-void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
+void	draw_textures_u(int * line_height, int *draw_start, int *draw_end)
 {
 	*line_height *= WALL_RESIZE;
 	*draw_start = -(*line_height) / 2 + HEIGHT / 2;
@@ -865,7 +865,7 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	y = 0;
 	distance *= cos(d->r_angle - d->player->angle);
 	line_height = ((int)(HEIGHT / distance));
-	draw_wall_u(&line_height, &draw_start, &draw_end);
+	draw_textures_u(&line_height, &draw_start, &draw_end);
 	set_tex_x(d, type);
 	while (MINI_MAP && y < d->heigth * MINI_WALL && cur_col_x + MINI_WALL < d->width * MINI_WALL)
 		y++;
@@ -885,30 +885,6 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	}
 	while (y++ < HEIGHT)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->f);
-}
-
-	// THIS IS HOMOGEN WALLS (only for testing)
-void	draw_wall(t_data *d, double distance, int x, int color)
-{
-	int	line_height;
-	int	draw_start;
-	int	draw_end;
-	int	y;
-
-	y = 0;
-	distance *= cos(d->r_angle - d->player->angle);
-	line_height = ((int)(HEIGHT / distance));
-	draw_wall_u(&line_height, &draw_start, &draw_end);
-	while (MINI_MAP && y < d->heigth * MINI_WALL && x + MINI_WALL < d->width * MINI_WALL)
-		y++;
-	if (y >= draw_start)
-		draw_start = y;
-	while (y++ < draw_start)
-		mlx_pixel_put(d->mlx_ptr, d->window, x, y, d->c);
-	while (draw_start++ < draw_end)
-		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, color);
-	while (draw_start++ < HEIGHT)
-		mlx_pixel_put(d->mlx_ptr, d->window, x, draw_start, d->f);
 }
 
 void	setup_xy(t_data *d)
@@ -962,13 +938,13 @@ void	raycast_u(t_data *d, int cur_col_x)
 		}
 	}
 	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
-		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH); // SOUTH
+		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH);
 	else if (d->y_wall == 1)
-		draw_wall(d, d->side_dist_y - d->delta_dist_y, cur_col_x, 0x00ff00); // NORTH
+		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, NORTH);
 	else if (d->y_wall == 0 && d->r_angle > d->pi / 2 && d->r_angle < 3 * d->pi / 2)
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col_x, 0xf00ff0); // WEST
+		draw_textures(d, d->side_dist_x - d->delta_dist_x, cur_col_x, WEST);
 	else
-		draw_wall(d, d->side_dist_x - d->delta_dist_x, cur_col_x, 0x0000ff); // EAST
+		draw_textures(d, d->side_dist_x - d->delta_dist_x, cur_col_x, EAST);
 }
 
 void	raycast(t_data *d)
