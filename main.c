@@ -827,11 +827,11 @@ void	draw_textures_u(int * line_height, int *draw_start, int *draw_end)
 {
 	*line_height *= WALL_RESIZE;
 	*draw_start = -(*line_height) / 2 + HEIGHT / 2;
-	if (*draw_start < 0)
-		*draw_start = 0;
+	// if (*draw_start < 0)
+	// 	*draw_start = 0;
 	*draw_end = (*line_height) / 2 + HEIGHT / 2;
-	if (*draw_end >= HEIGHT)
-		*draw_end = HEIGHT - 1;
+	// if (*draw_end >= HEIGHT)
+	// 	*draw_end = HEIGHT - 1;
 }
 
 void set_tex_x(t_data *d, int type)
@@ -854,7 +854,6 @@ void set_tex_x(t_data *d, int type)
 		d->tex_x = d->textures[type].width - d->tex_x - 1;
 }
 
-	// THIS IS FOR TEXTURES
 void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 {
 	int	line_height;
@@ -869,6 +868,7 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	set_tex_x(d, type);
 	while (MINI_MAP && y < d->heigth * MINI_WALL && cur_col_x + MINI_WALL < d->width * MINI_WALL)
 		y++;
+	y--;
 	while (y++ < draw_start)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
 	while (y++ < draw_end)
