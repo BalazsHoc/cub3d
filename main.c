@@ -834,28 +834,6 @@ void	draw_wall_u(int * line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT - 1;
 }
 
-// void	set_tex_x(t_data *d, int type)
-// {
-// 	if (type == NORTH)
-// 		d->tex_x = (int)(1 - (d->rx - (int)d->rx)
-// 				* d->textures[type].width);
-// 	else if (type == SOUTH)
-// 		d->tex_x = (int)((d->rx - (int)d->rx)
-// 				* d->textures[type].width);
-	
-// 	else if (type == EAST)
-// 		d->tex_x = (int)(1 - (d->ry - (int)d->ry)
-// 				* d->textures[type].width);
-// 	else if (type == WEST)
-// 		d->tex_x = (int)((d->ry - (int)d->ry)
-// 				* d->textures[type].width);
-// 	if (d->tex_x >= TEXTURE_SIZE)
-// 			d->tex_x = TEXTURE_SIZE;
-// 	else if (d->tex_x < 0)
-// 			d->tex_x = 0;
-// 	// printf("tex_x: %d\n", d->tex_x);
-// }
-
 void set_tex_x(t_data *d, int type)
 {
 	double	wall_hit;
@@ -864,6 +842,7 @@ void set_tex_x(t_data *d, int type)
 		wall_hit = d->ry + ((d->side_dist_x - d->delta_dist_x) * d->ray_dir_y);
 	else
 		wall_hit = d->rx + ((d->side_dist_y - d->delta_dist_y) * d->ray_dir_x);
+	wall_hit /= WALL;
 	wall_hit -= (int)(wall_hit);
 	d->tex_x = (int)(wall_hit * d->textures[type].width);
 	if (d->tex_x < 0)
@@ -899,14 +878,10 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 			d->tex_y = TEXTURE_SIZE - 1;
 		else if (d->tex_y < 0)
 			d->tex_y = 0;
-		// printf("tex_x: %d\n", d->tex_x);
-		// printf("tex_y: %d\n\n", d->tex_y);
-		// printf("%ld\n", sizeof(d->textures[type].addr));
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y,
 			*(unsigned int *)(d->textures[type].addr
 			+ (unsigned int)((d->tex_y * d->textures[type].line_length)
-			+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8))))); // must have a calculation for the exact pixel
-
+			+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
 	}
 	while (y++ < HEIGHT)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->f);
@@ -986,8 +961,6 @@ void	raycast_u(t_data *d, int cur_col_x)
 			d->y_wall = 1;
 		}
 	}
-	// d->rx += d->side_dist_x;
-	// d->ry += d->side_dist_y;
 	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
 		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH); // SOUTH
 	else if (d->y_wall == 1)
@@ -1000,7 +973,7 @@ void	raycast_u(t_data *d, int cur_col_x)
 
 void	raycast(t_data *d)
 {
-	int		cur_col_x;
+	int	cur_col_x;
 
 	cur_col_x = -1;
 	d->r_angle = d->player->angle - ((FOV * (d->pi / 180)) / 2);
