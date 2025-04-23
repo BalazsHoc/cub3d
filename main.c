@@ -1081,7 +1081,7 @@ void	draw_mini_map(t_data *d)
 		while (d->map[y][x])
 		{
 			if (d->map[y][x] == '1')
-				draw_square(d, x * MINI_WALL, y * MINI_WALL, MINI_WALL, 0xFFFF00);
+				draw_square(d, x * MINI_WALL, y * MINI_WALL, MINI_WALL, 0x808080);
 			x++;
 		}
 		x = 0;
