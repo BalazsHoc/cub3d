@@ -156,5 +156,7 @@ char	*gnl_fromnl(char *str);
 
 void	draw_mini_map(t_data *d);
 
+int		is_white_space(char c);
+
 
 # endif

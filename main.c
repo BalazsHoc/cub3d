@@ -442,6 +442,18 @@ int	to_rgb(t_data *d)
 	return (r + g + b);
 }
 
+int	only_whitespace(char *color)
+{
+	int	i;
+
+	i = 0;
+	while (color[i] && color[i] != '\n' && is_white_space(color[i]))
+		i++;
+	if (!color[i] || (color[i] && color[i] == '\n'))
+		return (1);
+	return (0);
+}
+
 void	check_rgb(t_data *d, char *color, int *to_store)
 {
 	int	i;
@@ -449,20 +461,21 @@ void	check_rgb(t_data *d, char *color, int *to_store)
 
 	i = 1;
 	stk = 0;
-	while (color[i] && color[i] != '\n')
-	{
-		if (color[i] && (color[i] == 32 || color[i] == '\t'))
-			i++;
-		cut_num(d, color, i, stk);
-		while (color[i] && color[i] >= 48 && color[i] <= 57)
-			i++;
-		stk++;
-		if ((stk != 3 && color[i] && color[i] != ',') || (stk == 3 && color[i]
-			&& color[i] != '\n'))
-			return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
+	while (color[i] && (is_white_space(color[i])))
 		i++;
+	while (color[i] && color[i] != '\n' && stk != 3)
+	{
+		cut_num(d, color, i, stk);
+		stk++;
+		while (color[i] && color[i] != '\n' && color[i] >= 48 && color[i] <= 57)
+			i++;
+		if ((stk != 3 && color[i] && color[i] != ',') || (stk == 3 && color[i]
+			&& !only_whitespace(color + i)))
+			return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
+		if (color[i] && color[i] == ',')
+			i++;
 	}
-	if (stk != 3)
+	if (!only_whitespace(color + i))
 		return (ft_printe("Error\nwrong color format\n"),
 			error_clean(d));
 	*to_store = to_rgb(d);
@@ -512,13 +525,15 @@ int	is_white_space(char c)
 	return (0);
 }
 
-void	convert_texture(t_data *d, int type, char *texture)
+void	convert_texture(t_data *d, int type, char *texture, int i)
 {
-	if (!texture[3] || texture[3] == '\n'
-		|| ft_strncmp(texture + 3, "./", 2)
-		|| !texture[5] || is_white_space(texture[5]))
-		return (ft_printe("Error\nwrong texture location\n"), error_clean(d));
-	d->buf = ft_strtrim(d, texture + 5, "\n");
+	if (!texture[3] || texture[3] == '\n')
+		return (ft_printe("Error\nwrong texture format\n"), error_clean(d));
+	while (is_white_space(texture[i]))
+		i++;
+	if (!texture[i] || ft_strncmp(texture + i, "./", 2))
+		return (ft_printe("Error\nno texture included\n"), error_clean(d));
+	d->buf = ft_strtrim(d, texture + i, "\n");
 	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf, &d->textures[type].width, &d->textures[type].height);
 	if (!d->textures[type].img)
 		return (ft_printe("Error\ntexture could not be loaded\n"),
@@ -1098,10 +1113,10 @@ void	displaying(t_data *d)
 	d->window = mlx_new_window(d->mlx_ptr, WIDTH, HEIGHT, "cub3D");
 	if (!d->window)
 		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
-	convert_texture(d, NORTH, d->north);
-	convert_texture(d, SOUTH, d->south);
-	convert_texture(d, WEST, d->west);
-	convert_texture(d, EAST, d->east);
+	convert_texture(d, NORTH, d->north, 3);
+	convert_texture(d, SOUTH, d->south, 3);
+	convert_texture(d, WEST, d->west,3);
+	convert_texture(d, EAST, d->east, 3);
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 	draw_mini_map(d);
@@ -1136,6 +1151,6 @@ int	main(int argc, char **argv)
 	reading_data(d, argv);
 	// print_map(d);
 	check_map(d, 0, -1, -1);
-	displaying(d);
+	// displaying(d);
 	return (exit_clean(d), 0);
 }
