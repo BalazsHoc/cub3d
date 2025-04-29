@@ -475,7 +475,7 @@ void	check_rgb(t_data *d, char *color, int *to_store)
 		if (color[i] && color[i] == ',')
 			i++;
 	}
-	if (!only_whitespace(color + i))
+	if ( stk != 3 || !only_whitespace(color + i))
 		return (ft_printe("Error\nwrong color format\n"),
 			error_clean(d));
 	*to_store = to_rgb(d);
@@ -533,7 +533,7 @@ void	convert_texture(t_data *d, int type, char *texture, int i)
 		i++;
 	if (!texture[i] || ft_strncmp(texture + i, "./", 2))
 		return (ft_printe("Error\nno texture included\n"), error_clean(d));
-	d->buf = ft_strtrim(d, texture + i, "\n");
+	d->buf = ft_strtrim(d, texture + i, "\n \t");
 	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf, &d->textures[type].width, &d->textures[type].height);
 	if (!d->textures[type].img)
 		return (ft_printe("Error\ntexture could not be loaded\n"),
@@ -1115,7 +1115,7 @@ void	displaying(t_data *d)
 		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
 	convert_texture(d, NORTH, d->north, 3);
 	convert_texture(d, SOUTH, d->south, 3);
-	convert_texture(d, WEST, d->west,3);
+	convert_texture(d, WEST, d->west, 3);
 	convert_texture(d, EAST, d->east, 3);
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
@@ -1151,6 +1151,6 @@ int	main(int argc, char **argv)
 	reading_data(d, argv);
 	// print_map(d);
 	check_map(d, 0, -1, -1);
-	// displaying(d);
+	displaying(d);
 	return (exit_clean(d), 0);
 }
