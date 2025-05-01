@@ -18,14 +18,14 @@
 # define WIDTH 1280
 # define HEIGHT 720
 # define FOV 75
-# define WALL_RESIZE 9.5
+# define WALL_RESIZE 9
 # define MINI_MAP 1
 # define MINI_PLAYER 10
 # define MINI_WALL 15
 
 # define WALL 10
-# define SPEED 0.3
-# define R_SPEED 0.025
+# define SPEED 1
+# define R_SPEED 0.05
 # define SENSITIVITY 0.005
 
 # define W 119
