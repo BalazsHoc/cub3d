@@ -25,14 +25,14 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0);
+		delete_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
+			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
 		move_player_coor(d);
 		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
 		draw_mini_map(d);
 		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
 		raycast(d);
 	}
 	return (1);
@@ -52,7 +52,7 @@ void	displaying(t_data *d)
 	if (!d->window)
 		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
 	draw_mini_map(d);
 	raycast(d);
 	mlx_hook(d->window, 17, 0, handle_click_x, d);

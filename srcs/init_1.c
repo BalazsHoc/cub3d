@@ -80,6 +80,7 @@ void	init_data(t_data *d)
 	d->mlx_ptr = NULL;
 	d->player = NULL;
 	d->pi = acos(-1.0);
+	init_draw_var(d);
 }
 
 void	init_player(t_data *d)

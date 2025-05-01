@@ -12,6 +12,19 @@
 
 #include "../cub.h"
 
+void	draw_correct_texture(t_data *d, int cur_col_x)
+{
+	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
+		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH);
+	else if (d->y_wall == 1)
+		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, NORTH);
+	else if (d->y_wall == 0 && d->r_angle > d->pi / 2
+		&& d->r_angle < 3 * d->pi / 2)
+		draw_textures(d, d->side_dist_x - d->delta_dist_x, cur_col_x, WEST);
+	else
+		draw_textures(d, d->side_dist_x - d->delta_dist_x, cur_col_x, EAST);
+}
+
 void	raycast_u(t_data *d, int cur_col_x)
 {
 	d->rx = d->player->x;
@@ -34,14 +47,7 @@ void	raycast_u(t_data *d, int cur_col_x)
 			d->y_wall = 1;
 		}
 	}
-	if (d->y_wall == 1 && d->r_angle >= 0 && d->r_angle <= d->pi)
-		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, SOUTH);
-	else if (d->y_wall == 1)
-		draw_textures(d, d->side_dist_y - d->delta_dist_y, cur_col_x, NORTH);
-	else if (d->y_wall == 0 && d->r_angle > d->pi / 2 && d->r_angle < 3 * d->pi / 2)
-		draw_textures(d, d->side_dist_x - d->delta_dist_x, cur_col_x, WEST);
-	else
-		draw_textures(d, d->side_dist_x - d->delta_dist_x, cur_col_x, EAST);
+	draw_correct_texture(d, cur_col_x);
 }
 
 void	raycast(t_data *d)

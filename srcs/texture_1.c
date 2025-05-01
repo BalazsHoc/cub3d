@@ -21,11 +21,13 @@ void	convert_texture(t_data *d, int type, char *texture, int i)
 	if (!texture[i] || ft_strncmp(texture + i, "./", 2))
 		return (ft_printe("Error\nno texture included\n"), error_clean(d));
 	d->buf = ft_strtrim(d, texture + i, "\n \t");
-	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf, &d->textures[type].width, &d->textures[type].height);
+	d->textures[type].img = mlx_xpm_file_to_image(d->mlx_ptr, d->buf,
+			&d->textures[type].width, &d->textures[type].height);
 	if (!d->textures[type].img)
 		return (ft_printe("Error\ntexture could not be loaded\n"),
 			error_clean(d));
-	if (d->textures[type].height != TEXTURE_SIZE || d->textures[type].width != TEXTURE_SIZE)
+	if (d->textures[type].height != TEXTURE_SIZE
+		|| d->textures[type].width != TEXTURE_SIZE)
 		return (ft_printe("Error\ntexturesize must be 1024x1024\n"),
 			error_clean(d));
 	free_str(d->buf);
@@ -50,38 +52,40 @@ void	draw_textures_u(int *line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT * WALL_RESIZE;
 }
 
-void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
+void	draw_textures_loop(t_data *d, int cur_col_x, int type)
 {
-	int	line_height;
-	int	draw_start;
-	int	draw_end;
-	int	y;
-
-	y = 0;
-	distance *= cos(d->r_angle - d->player->angle);
-	line_height = ((int)(HEIGHT / distance));
-	draw_textures_u(&line_height, &draw_start, &draw_end);
-	set_tex_x(d, type);
-	while (MINI_MAP && y < d->heigth * MINI_WALL && cur_col_x + MINI_WALL < d->width * MINI_WALL)
-		y++;
-	if (y)
-		y--;
-	while (y++ <= draw_start)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
-	y--;
-	while (y++ < draw_end)
+	while (d->draw_y++ < d->draw_end)
 	{
-		d->tex_y = ((int)(y - draw_start) * d->textures[type].height / (draw_end - draw_start));
+		d->tex_y = ((int)(d->draw_y - d->draw_start) * d->textures[type].height
+				/ (d->draw_end - d->draw_start));
 		if (d->tex_y >= TEXTURE_SIZE)
 			d->tex_y = TEXTURE_SIZE - 1;
 		else if (d->tex_y < 0)
 			d->tex_y = 0;
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y,
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y,
 			*(unsigned int *)(d->textures[type].addr
 				+ (unsigned int)((d->tex_y * d->textures[type].line_length)
 					+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
 	}
-	y--;
-	while (y++ <= HEIGHT)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->f);
+}
+
+void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
+{
+	d->draw_y = 0;
+	distance *= cos(d->r_angle - d->player->angle);
+	d->line_height = ((int)(HEIGHT / distance));
+	draw_textures_u(&d->line_height, &d->draw_start, &d->draw_end);
+	set_tex_x(d, type);
+	while (MINI_MAP && d->draw_y < d->heigth * MINI_WALL && cur_col_x
+		+ MINI_WALL < d->width * MINI_WALL)
+		d->draw_y++;
+	if (d->draw_y)
+		d->draw_y--;
+	while (d->draw_y++ <= d->draw_start)
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y, d->c);
+	d->draw_y--;
+	draw_textures_loop(d, cur_col_x, type);
+	d->draw_y--;
+	while (d->draw_y++ <= HEIGHT)
+		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y, d->f);
 }

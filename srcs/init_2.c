@@ -12,6 +12,14 @@
 
 #include "../cub.h"
 
+void	init_draw_var(t_data *d)
+{
+	d->line_height = 0;
+	d->draw_start = 0;
+	d->draw_end = 0;
+	d->draw_y = 0;
+}
+
 void	init_line_struct(t_data *d)
 {
 	int	i;

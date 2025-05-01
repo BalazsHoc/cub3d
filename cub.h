@@ -32,6 +32,8 @@
 # define MINI_MAP 1
 # define MINI_PLAYER 10
 # define MINI_WALL 15
+# define MINI_PLAYER_C 16711935
+# define MINI_WALL_C 8421504
 
 # define WALL 10
 # define SPEED 1
@@ -110,6 +112,10 @@ typedef struct data_s
 	void				*window;
 	void				*mlx_ptr;
 	double				pi;
+	int					line_height;
+	int					draw_start;
+	int					draw_end;
+	int					draw_y;
 	int					mx;
 	int					my;
 	double				r_angle;
@@ -130,7 +136,6 @@ typedef struct data_s
 	struct texture_s	textures[4];
 }	t_data;
 
-void		free_str(char *str);
 void		ft_printe(char *str);
 
 //	srcs/get_next_line/get_next_line.c
@@ -209,8 +214,10 @@ void		raycast_u(t_data *d, int cur_col_x);
 void		raycast(t_data *d);
 
 //	srcs/minimap.c
-void		draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size, int color);
-void		draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color);
+void		draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size);
+void		delete_miniplayer(t_data *d, int pixel_x, int pixel_y, int size);
+void		draw_square(t_data *d, int pixel_x, int pixel_y, int size);
+void		delete_square(t_data *d, int pixel_x, int pixel_y, int size);
 void		draw_mini_map(t_data *d);
 
 //	srcs/displaying.c
@@ -226,6 +233,7 @@ void		init_data(t_data *d);
 void		init_player(t_data *d);
 
 //	srcs/init_2.c
+void		init_draw_var(t_data *d);
 void		init_line_struct(t_data *d);
 
 //	srcs/free.c

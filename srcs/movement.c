@@ -66,30 +66,39 @@ void	rotate_player(t_data *d, double *sin_a, double *cos_a)
 	*cos_a = cos(d->player->angle);
 }
 
+void	move_player_coor_u(t_data *d, double sin_a, double cos_a)
+{
+	if (d->player->left && !is_wall(d, d->player->x
+			+ (sin_a * SPEED), d->player->y - (cos_a * SPEED)))
+	{
+		d->player->x += sin_a * SPEED;
+		d->player->y -= cos_a * SPEED;
+	}
+	if (d->player->right && !is_wall(d, d->player->x
+			- (sin_a * SPEED), d->player->y + (cos_a * SPEED)))
+	{
+		d->player->x -= sin_a * SPEED;
+		d->player->y += cos_a * SPEED;
+	}
+}
+
 void	move_player_coor(t_data *d)
 {
 	double	sin_a;
 	double	cos_a;
 
 	rotate_player(d, &sin_a, &cos_a);
-	if (d->player->up && !is_wall(d, d->player->x + (cos_a * SPEED), d->player->y + (sin_a * SPEED)))
+	if (d->player->up && !is_wall(d, d->player->x
+			+ (cos_a * SPEED), d->player->y + (sin_a * SPEED)))
 	{
 		d->player->x += cos_a * SPEED;
 		d->player->y += sin_a * SPEED;
 	}
-	if (d->player->down && !is_wall(d, d->player->x - (cos_a * SPEED), d->player->y - (sin_a * SPEED)))
+	if (d->player->down && !is_wall(d, d->player->x
+			- (cos_a * SPEED), d->player->y - (sin_a * SPEED)))
 	{
 		d->player->x -= cos_a * SPEED;
 		d->player->y -= sin_a * SPEED;
 	}
-	if (d->player->left && !is_wall(d, d->player->x + (sin_a * SPEED), d->player->y - (cos_a * SPEED)))
-	{
-		d->player->x += sin_a * SPEED;
-		d->player->y -= cos_a * SPEED;
-	}
-	if (d->player->right && !is_wall(d, d->player->x - (sin_a * SPEED), d->player->y + (cos_a * SPEED)))
-	{
-		d->player->x -= sin_a * SPEED;
-		d->player->y += cos_a * SPEED;
-	}
+	move_player_coor_u(d, sin_a, cos_a);
 }

@@ -32,12 +32,19 @@ void	set_tex_x(t_data *d, int type)
 		d->tex_x = d->textures[type].width - d->tex_x - 1;
 }
 
-void	setup_xy(t_data *d)
+void	setup_xy_u(t_data *d)
 {
 	d->ray_dir_x = cos(d->r_angle);
 	d->ray_dir_y = sin(d->r_angle);
-	d->delta_dist_x = sqrt(1 + (d->ray_dir_y * d->ray_dir_y) / (d->ray_dir_x * d->ray_dir_x));
-	d->delta_dist_y = sqrt(1 + (d->ray_dir_x * d->ray_dir_x) / (d->ray_dir_y * d->ray_dir_y));
+	d->delta_dist_x = sqrt(1
+			+ (d->ray_dir_y * d->ray_dir_y) / (d->ray_dir_x * d->ray_dir_x));
+	d->delta_dist_y = sqrt(1
+			+ (d->ray_dir_x * d->ray_dir_x) / (d->ray_dir_y * d->ray_dir_y));
+}
+
+void	setup_xy(t_data *d)
+{
+	setup_xy_u(d);
 	if (d->ray_dir_x < 0)
 	{
 		d->step_x = -1;
