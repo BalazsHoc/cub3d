@@ -71,7 +71,7 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	y--;
 	while (y++ < draw_end)
 	{
-		d->tex_y = (int)(y - draw_start) * d->textures[type].height / (draw_end - draw_start);
+		d->tex_y = ((int)(y - draw_start) * d->textures[type].height / (draw_end - draw_start));
 		if (d->tex_y >= TEXTURE_SIZE)
 			d->tex_y = TEXTURE_SIZE - 1;
 		else if (d->tex_y < 0)

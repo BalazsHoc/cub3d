@@ -3,7 +3,8 @@ NAME = cub3D
 
 CC = cc
 CFLAGS = -Wall -Werror -Wextra -g
-MLXFLAGS = -L$(MINILIBX_PATH) -lmlx_Linux -lXext -lX11 -lm
+# MLXFLAGS = -lmlx -lXext -lX11 -lm -L$(MINILIBX_PATH)    
+MLXFLAGS = -lmlx -lXext -lX11 -lm
 
 MINILIBX_PATH = minilibx-linux/
 
@@ -30,8 +31,9 @@ OBJ = $(SRCS:.c=.o)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJ)
-	@make -C $(MINILIBX_PATH) all
-	@$(CC) $(CFLAGS) $(OBJ) -L$(MINILIBX_PATH) -lmlx_Linux $(MLXFLAGS) -o $(NAME)
+#	@make -C $(MINILIBX_PATH) all
+	@$(CC) $(CFLAGS) $(OBJ) $(MLXFLAGS) -o $(NAME)
+#	@$(CC) $(CFLAGS) $(OBJ) -L$(MINILIBX_PATH) -lmlx_Linux $(MLXFLAGS) -o $(NAME)
 
 all: $(NAME)
 
@@ -39,7 +41,7 @@ clean:
 	@rm -f $(OBJ)
 
 fclean: clean
-	@make -C $(MINILIBX_PATH) clean
+#	@make -C $(MINILIBX_PATH) clean
 	@rm -f $(NAME)
 
 re: fclean all

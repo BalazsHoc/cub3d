@@ -55,8 +55,8 @@
 # include <fcntl.h>
 # include <X11/keysym.h>
 # include <math.h>
-// # include "mlx.h"
-# include "minilibx-linux/mlx.h"
+# include "mlx.h"
+// # include "minilibx-linux/mlx.h"
 
 typedef struct texture_s
 {
