@@ -23,7 +23,7 @@ void	print_map(t_data *d)
 	int	i;
 
 	i = -1;
-	while(d->map[++i])
+	while (d->map[++i])
 		printf("%s", d->map[i]);
 	printf("\n");
 }
@@ -58,7 +58,6 @@ void	free_map(char **map)
 
 void	free_str(char *str)
 {
-	
 	if (str)
 	{
 		free(str);
@@ -421,7 +420,7 @@ void	cut_num(t_data *d, char *color, int i, int loop)
 		|| ft_atoi(d->colors[loop]) < 0)
 		return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
 	free_str(d->buf);
-	d->buf = NULL;	//important idk why
+	d->buf = NULL;
 }
 
 int	to_rgb(t_data *d)
@@ -437,7 +436,7 @@ int	to_rgb(t_data *d)
 	d->colors[0] = NULL;
 	free_str(d->colors[1]);
 	d->colors[1] = NULL;
-	free_str(d->colors[2]);	// those are important idk why
+	free_str(d->colors[2]);
 	d->colors[2] = NULL;
 	return (r + g + b);
 }
@@ -470,12 +469,12 @@ void	check_rgb(t_data *d, char *color, int *to_store)
 		while (color[i] && color[i] != '\n' && color[i] >= 48 && color[i] <= 57)
 			i++;
 		if ((stk != 3 && color[i] && color[i] != ',') || (stk == 3 && color[i]
-			&& !only_whitespace(color + i)))
+				&& !only_whitespace(color + i)))
 			return (ft_printe("Error\nwrong RGB number\n"), error_clean(d));
 		if (color[i] && color[i] == ',')
 			i++;
 	}
-	if ( stk != 3 || !only_whitespace(color + i))
+	if (stk != 3 || !only_whitespace(color + i))
 		return (ft_printe("Error\nwrong color format\n"),
 			error_clean(d));
 	*to_store = to_rgb(d);
@@ -544,9 +543,9 @@ void	convert_texture(t_data *d, int type, char *texture, int i)
 	free_str(d->buf);
 	d->buf = NULL;
 	d->textures[type].addr = mlx_get_data_addr(d->textures[type].img,
-	&d->textures[type].bpp,
-	&d->textures[type].line_length,
-	&d->textures[type].edian);
+			&d->textures[type].bpp,
+			&d->textures[type].line_length,
+			&d->textures[type].edian);
 	if (!d->textures[type].addr)
 		return (ft_printe("Error\ntexture could not be loaded\n"),
 			error_clean(d));
@@ -601,7 +600,7 @@ void	sort_data(t_data *d, char *line, int i)
 	while (line[i] && ((line[i] >= 7 && line[i] <= 13) || line[i] == 32))
 		i++;
 	if (!line[i] && (!d->map || !d->north || !d->south || !d->west
-		|| !d->east || !d->floor || !d->ceiling))
+			|| !d->east || !d->floor || !d->ceiling))
 		return ;
 	if (!ft_strncmp("NO ", line + i, 3) || !ft_strncmp("NO\t", line + i, 3))
 	{
@@ -645,7 +644,6 @@ void	init_line_struct(t_data *d)
 		d->line[i].length = length;
 		if (d->width < length)
 			d->width = length;
-		// printf("num: %d | length: %d\n", d->line[i].num, d->line[i].length);
 	}
 }
 
@@ -666,13 +664,12 @@ void	reading_data(t_data *d, char **argv)
 		d->read_buf = get_next_line(fd);
 	}
 	if (!d->north || !d->south || !d->west || !d->east
-			|| !d->floor || !d->ceiling || !d->map || !d->map[0]
-			|| !d->map[0][0])
+		|| !d->floor || !d->ceiling || !d->map || !d->map[0]
+		|| !d->map[0][0])
 		return (ft_printe("Error\npoor declaration of the map\n"),
 			error_clean(d));
 	init_line_struct(d);
 }
-
 
 int	map_name(char *map_name)
 {
@@ -706,7 +703,7 @@ void	check_walls(t_data *d, int y, int x)
 				|| (!d->map[y][x - 1] || d->map[y][x - 1] == 32)
 				|| (!d->map[y][x + 1] || d->map[y][x + 1] == 32
 				|| d->map[y][x + 1] == '\n')))
-			return (ft_printe("Error\nmap must be surrounded by walls\n"),
+				return (ft_printe("Error\nmap must be surrounded by walls\n"),
 					error_clean(d));
 		}
 		x = -1;
@@ -730,14 +727,14 @@ void	check_map(t_data *d, int pos, int x, int y)
 				&& d->map[y][x] != '1' && d->map[y][x] != '0'
 				&& d->map[y][x] != 'N' && d->map[y][x] != 'S'
 				&& d->map[y][x] != 'E' && d->map[y][x] != 'W')
-			return (ft_printe("Error\nunexpected character\n"),
+				return (ft_printe("Error\nunexpected character\n"),
 					error_clean(d));
 		}
 		x = -1;
 	}
 	if (d->heigth > 16 || d->width > 22)
 		return (ft_printe("Error\nmap is too big\n"),
-					error_clean(d));
+			error_clean(d));
 	check_walls(d, -1, -1);
 }
 
@@ -838,7 +835,7 @@ void	move_player_coor(t_data *d)
 	}
 }
 
-void	draw_textures_u(int * line_height, int *draw_start, int *draw_end)
+void	draw_textures_u(int *line_height, int *draw_start, int *draw_end)
 {
 	*line_height *= WALL_RESIZE;
 	*draw_start = -(*line_height) / 2 + HEIGHT / 2;
@@ -849,7 +846,7 @@ void	draw_textures_u(int * line_height, int *draw_start, int *draw_end)
 		*draw_end = HEIGHT * WALL_RESIZE;
 }
 
-void set_tex_x(t_data *d, int type)
+void	set_tex_x(t_data *d, int type)
 {
 	double	wall_hit;
 
@@ -883,7 +880,6 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	set_tex_x(d, type);
 	while (MINI_MAP && y < d->heigth * MINI_WALL && cur_col_x + MINI_WALL < d->width * MINI_WALL)
 		y++;
-	// y--;
 	while (y++ < draw_start)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->c);
 	while (y++ < draw_end)
@@ -895,8 +891,8 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 			d->tex_y = 0;
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y,
 			*(unsigned int *)(d->textures[type].addr
-			+ (unsigned int)((d->tex_y * d->textures[type].line_length)
-			+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
+				+ (unsigned int)((d->tex_y * d->textures[type].line_length)
+					+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
 	}
 	while (y++ < HEIGHT)
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, y, d->f);
@@ -969,7 +965,7 @@ void	raycast(t_data *d)
 	cur_col_x = -1;
 	d->r_angle = d->player->angle - ((FOV * (d->pi / 180)) / 2);
 	if (d->r_angle < 0)
-		d->r_angle += (2 * d->pi); 
+		d->r_angle += (2 * d->pi);
 	d->rx = d->player->x;
 	d->ry = d->player->y;
 	while (++cur_col_x < WIDTH)
@@ -988,13 +984,13 @@ int	drawing(t_data *d)
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
 		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0); // deleting porpouse
+			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0);
 		move_player_coor(d);
 		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF); // without its blinking
+			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 		draw_mini_map(d);
 		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 		raycast(d);
 	}
 	return (1);
@@ -1110,18 +1106,17 @@ void	displaying(t_data *d)
 	d->mlx_ptr = mlx_init();
 	if (!d->mlx_ptr)
 		return (ft_printe("Error\nmlx_init\n"), error_clean(d));
-	d->window = mlx_new_window(d->mlx_ptr, WIDTH, HEIGHT, "cub3D");
-	if (!d->window)
-		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
 	convert_texture(d, NORTH, d->north, 3);
 	convert_texture(d, SOUTH, d->south, 3);
 	convert_texture(d, WEST, d->west, 3);
 	convert_texture(d, EAST, d->east, 3);
+	d->window = mlx_new_window(d->mlx_ptr, WIDTH, HEIGHT, "cub3D");
+	if (!d->window)
+		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-	(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
+		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER, 0xFF00FF);
 	draw_mini_map(d);
 	raycast(d);
-	
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);
 	mlx_hook(d->window, 3, 1L << 1, key_release, d);
@@ -1133,12 +1128,12 @@ int	main(int argc, char **argv)
 {
 	t_data		*d;
 	t_player	*p;
-	
+
 	p = NULL;
 	if (argc != 2)
-		return(ft_printe("Error\nmap as input needed\n"), 1);
+		return (ft_printe("Error\nmap as input needed\n"), 1);
 	if (!map_name(argv[1]))
-		return(ft_printe("Error\nmap must be '.cub' format\n"), 1);
+		return (ft_printe("Error\nmap must be '.cub' format\n"), 1);
 	d = malloc(sizeof(t_data));
 	if (!d)
 		return (ft_printe("Error\nmalloc fail\n"), 1);
@@ -1149,7 +1144,6 @@ int	main(int argc, char **argv)
 	d->player = p;
 	init_player(d);
 	reading_data(d, argv);
-	// print_map(d);
 	check_map(d, 0, -1, -1);
 	displaying(d);
 	return (exit_clean(d), 0);

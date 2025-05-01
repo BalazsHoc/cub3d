@@ -1,9 +1,19 @@
-# ifndef CUB
-# define CUB
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub.h                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bhocsak <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/01 13:11:08 by bhocsak           #+#    #+#             */
+/*   Updated: 2025/05/01 13:11:10 by bhocsak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 8
+#ifndef CUB_H
+# define CUB_H
 
+# define BUFFER_SIZE 16
 # define TEXTURE_SIZE 1024
 
 # define NORTH 0
@@ -12,8 +22,8 @@
 # define EAST 3
 
 /******************** 
-	CONTROLL CENTER 
-*********************/
+ CONTROLL CENTER 
+ *********************/
 
 # define WIDTH 1280
 # define HEIGHT 720
@@ -34,8 +44,6 @@
 # define D 100
 # define LEFT 65361
 # define RIGHT 65363
-
-# endif
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -67,7 +75,7 @@ typedef struct line_s
 	int					length;
 }	t_line;
 
-typedef struct	player_s
+typedef struct player_s
 {
 	double				x;
 	double				y;
@@ -77,42 +85,31 @@ typedef struct	player_s
 	bool				right;
 	bool				turn_l;
 	bool				turn_r;
-
 	int					map_x;
 	int					map_y;
-
 	double				angle;
 }	t_player;
 
-typedef struct	data_s
+typedef struct data_s
 {
 	char				**map;
-
 	char				*north;
 	char				*south;
 	char				*west;
 	char				*east;
 	char				*floor;
 	char				*ceiling;
-
 	char				*buf;
-
 	char				*colors[3];
-
 	char				*read_buf;
 	struct line_s		*line;
-
 	int					width;
 	int					heigth;
 	int					f;
 	int					c;
-
 	void				*window;
 	void				*mlx_ptr;
-
 	double				pi;
-
-
 	int					mx;
 	int					my;
 	double				r_angle;
@@ -129,15 +126,9 @@ typedef struct	data_s
 	bool				y_wall;
 	int					tex_x;
 	int					tex_y;
-
-
-
 	struct player_s		*player;
 	struct texture_s	textures[4];
-	
 }	t_data;
-
-
 
 void	free_str(char *str);
 void	ft_printe(char *str);
@@ -158,5 +149,4 @@ void	draw_mini_map(t_data *d);
 
 int		is_white_space(char c);
 
-
-# endif
+#endif
