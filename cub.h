@@ -34,6 +34,7 @@
 # define MINI_WALL 15
 # define MINI_PLAYER_C 16711935
 # define MINI_WALL_C 8421504
+# define MAP_SIZE 20
 
 # define WALL 10
 # define SPEED 1

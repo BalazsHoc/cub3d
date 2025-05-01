@@ -38,6 +38,9 @@ int	main(int argc, char **argv)
 	d->player = p;
 	init_player(d);
 	reading_data(d, argv);
+	if (MAP_SIZE && MAP_SIZE < 3)
+		return (ft_printe("Error\nIf there is a limit of\
+MAP_SIZE it must be bigger than 2\n"), error_clean(d), 1);
 	check_map(d, 0, -1, -1);
 	displaying(d);
 	return (exit_clean(d), 0);

@@ -68,7 +68,7 @@ void	check_map(t_data *d, int pos, int x, int y)
 		}
 		x = -1;
 	}
-	if (d->heigth > 16 || d->width > 22)
+	if (MAP_SIZE && (d->heigth > MAP_SIZE || d->width > MAP_SIZE))
 		return (ft_printe("Error\nmap is too big\n"),
 			error_clean(d));
 	check_walls(d, -1, -1);
