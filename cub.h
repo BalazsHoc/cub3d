@@ -37,8 +37,8 @@
 # define MAP_SIZE 20
 
 # define WALL 10
-# define SPEED 1
-# define R_SPEED 0.05
+# define SPEED 0.5
+# define R_SPEED 0.025
 # define SENSITIVITY 0.005
 
 # define W 119

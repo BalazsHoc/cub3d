@@ -68,8 +68,8 @@ void	check_map(t_data *d, int pos, int x, int y)
 		}
 		x = -1;
 	}
-	if (MAP_SIZE && (d->heigth > MAP_SIZE || d->width > MAP_SIZE))
-		return (ft_printe("Error\nmap is too big\n"),
+	if (!pos)
+		return (ft_printe("Error\nNo spawnpoint\n"),
 			error_clean(d));
 	check_walls(d, -1, -1);
 }

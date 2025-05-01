@@ -1,16 +1,16 @@
 lol
 
-NO ./textures/brick.xpm
+NO ./textures/stone.xpm
  
-WE ./textures/tribe.xpm
+WE ./textures/smooth_stone.xpm
 F  100,25,72 
 
 
 
-SO 	./textures/dirt.xpm
-EA ./textures/wood.xpm 	   
+SO 	./textures/wood.xpm
+EA ./textures/sand.xpm 	   
 
-C   	  25,23,70    
+C   	  135,206,235    
 
             
      11111111111  
