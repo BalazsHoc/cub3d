@@ -130,23 +130,113 @@ typedef struct data_s
 	struct texture_s	textures[4];
 }	t_data;
 
-void	free_str(char *str);
-void	ft_printe(char *str);
+void		free_str(char *str);
+void		ft_printe(char *str);
 
-void	*gnl_calloc(size_t nmemb, size_t size);
-char	*gnl_join_free(char *static_buf, char *buffer);
-char	*gnl_join_buffer(char *line, char *buffer);
-char	*reading(int fd, char *static_buf);
-char	*get_next_line(int fd);
+//	srcs/get_next_line/get_next_line.c
+void		*gnl_calloc(size_t nmemb, size_t size);
+char		*gnl_join_free(char *static_buf, char *buffer);
+char		*gnl_join_buffer(char *line, char *buffer);
+char		*reading(int fd, char *static_buf);
+char		*get_next_line(int fd);
 
-void	gnl_free(char **ptr);
-int		gnl_strlen(char *str);
-int		gnl_newline(char *str);
-char	*gnl_strcpy(char *str);
-char	*gnl_fromnl(char *str);
+//	srcs/get_next_line/get_next_line_utils.c
+void		gnl_free(char **ptr);
+int			gnl_strlen(char *str);
+int			gnl_newline(char *str);
+char		*gnl_strcpy(char *str);
+char		*gnl_fromnl(char *str);
 
-void	draw_mini_map(t_data *d);
+//	srcs/libft/libft_1.c
+void		*ft_calloc(t_data *d, size_t nmemb, size_t size);
+int			ft_dataigit_count(int n);
+char		*ft_itoa(int n, t_data *data);
+long long	ft_atoi(const char *nptr);
+char		*ft_strdup(t_data *d, const char *s);
 
-int		is_white_space(char c);
+//	srcs/libft/libft_2.c
+int			ft_strncmp(const char *s1, const char *s2, size_t n);
+char		*ft_substr(t_data *d, char const *s, unsigned int start, size_t l);
+int			ft_strlen(const char *str);
+char		*ft_strchr(const char *s, int c);
+char		*ft_strtrim(t_data *d, char const *s1, char const *set);
+
+//	srcs/rgb.c
+void		cut_num(t_data *d, char *color, int i, int loop);
+int			to_rgb(t_data *d);
+void		check_rgb(t_data *d, char *color, int *to_store);
+
+//	srcs/sort_data.c
+int			sort_data_u_2(t_data *d, char *line, int i);
+int			sort_data_u(t_data *d, char *line, int i);
+void		sort_data(t_data *d, char *line, int i);
+void		reading_data(t_data *d, char **argv);
+
+//	srcs/map.c
+void		print_map(t_data *d);
+void		check_walls(t_data *d, int y, int x);
+void		check_map(t_data *d, int pos, int x, int y);
+void		save_map(t_data *d, char *line);
+int			map_name(char *map_name);
+
+//	srcs/control.c
+int			handle_click_x(t_data *d);
+int			key_press(int key, t_data *d);
+int			key_release(int key, t_data *d);
+
+//	srcs/movement.c
+void		find_player(t_data *d);
+void		set_angle(t_data *d, int x, int y);
+void		rotate_player(t_data *d, double *sin_a, double *cos_a);
+void		move_player_coor(t_data *d);
+
+//	srcs/is.c
+int			only_whitespace(char *color);
+int			is_white_space(char c);
+int			is_wall(t_data *d, double new_x, double new_y);
+
+//	srcs/texture_1.c
+void		convert_texture(t_data *d, int type, char *texture, int i);
+void		draw_textures_u(int *line_height, int *draw_start, int *draw_end);
+void		draw_textures(t_data *d, double distance, int cur_col_x, int type);
+
+//	srcs/texture_2.c
+void		set_tex_x(t_data *d, int type);
+void		setup_xy(t_data *d);
+
+//	srcs/raycasting.c
+void		raycast_u(t_data *d, int cur_col_x);
+void		raycast(t_data *d);
+
+//	srcs/minimap.c
+void		draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size, int color);
+void		draw_square(t_data *d, int pixel_x, int pixel_y, int size, int color);
+void		draw_mini_map(t_data *d);
+
+//	srcs/displaying.c
+void		put_pixel(t_data *d, int x, int y, int color);
+int			drawing(t_data *d);
+void		displaying(t_data *d);
+
+//	srcs/init_1.c
+void		init_dblptr(char **dbptr, int size);
+void		init_rays(t_data *d);
+void		init_texture(t_data *d);
+void		init_data(t_data *d);
+void		init_player(t_data *d);
+
+//	srcs/init_2.c
+void		init_line_struct(t_data *d);
+
+//	srcs/free.c
+void		free_colors(char **dbptr, int size);
+void		free_map(char **map);
+void		free_str(char *str);
+void		free_mlx(t_data *d);
+void		free_player(t_data *d);
+
+//	srcs/exit.c
+void		error_clean(t_data *d);
+void		exit_clean(t_data *d);
 
 #endif

@@ -7,7 +7,22 @@ MLXFLAGS = -L$(MINILIBX_PATH) -lmlx_Linux -lXext -lX11 -lm
 
 MINILIBX_PATH = minilibx-linux/
 
-SRCS =	main.c get_next_line.c get_next_line_utils.c
+SRCS =	main.c\
+		srcs/get_next_line/get_next_line.c srcs/get_next_line/get_next_line_utils.c\
+		srcs/libft/libft_1.c srcs/libft/libft_2.c\
+		srcs/init_1.c srcs/init_2.c\
+		srcs/free.c srcs/exit.c\
+		srcs/rgb.c\
+		srcs/sort_data.c\
+		srcs/map.c\
+		srcs/control.c\
+		srcs/movement.c\
+		srcs/is.c\
+		srcs/raycasting.c\
+		srcs/minimap.c\
+		srcs/displaying.c\
+		srcs/texture_1.c srcs/texture_2.c
+
 
 OBJ = $(SRCS:.c=.o)
 
