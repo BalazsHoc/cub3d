@@ -76,7 +76,6 @@ void	check_map(t_data *d, int pos, int x, int y)
 
 void	save_map(t_data *d, char *line)
 {
-	char	**buf;
 	int		i;
 
 	i = 0;
@@ -84,20 +83,18 @@ void	save_map(t_data *d, char *line)
 		|| !d->floor || !d->ceiling)
 		return ;
 	if (!d->map)
-	{
-		d->map = ft_calloc(d, 2, sizeof(char *));
-		d->map[0] = NULL;
-	}
+		d->map = ft_calloc(d, sizeof(char *), 2);
 	while (d->map[i])
 		i++;
-	buf = ft_calloc(d, i + 2, sizeof(char *));
+	d->buf_arr = ft_calloc(d, sizeof(char *), i + 2);
 	i = -1;
 	while (d->map[++i] != NULL)
-		buf[i] = d->map[i];
-	buf[i] = ft_strdup(d, line);
-	buf[i + 1] = NULL;
+		d->buf_arr[i] = d->map[i];
+	d->buf_arr[i] = ft_strdup(d, line);
+	d->buf_arr[i + 1] = NULL;
 	free(d->map);
-	d->map = buf;
+	d->map = d->buf_arr;
+	d->buf_arr = NULL;
 }
 
 int	map_name(char *map_name)

@@ -70,6 +70,7 @@ void	init_data(t_data *d)
 	init_dblptr(d->colors, 3);
 	init_dblptr((char **)d->textures, 4);
 	d->buf = NULL;
+	d->buf_arr = NULL;
 	d->c = 0;
 	d->f = 0;
 	d->read_buf = NULL;

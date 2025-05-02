@@ -101,8 +101,7 @@ void	reading_data(t_data *d, char **argv)
 		d->read_buf = get_next_line(fd);
 	}
 	if (!d->north || !d->south || !d->west || !d->east
-		|| !d->floor || !d->ceiling || !d->map || !d->map[0]
-		|| !d->map[0][0])
+		|| !d->floor || !d->ceiling || !d->map || !d->map[0])
 		return (ft_printe("Error\npoor declaration of the map\n"),
 			error_clean(d));
 	init_line_struct(d);

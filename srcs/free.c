@@ -29,7 +29,7 @@ void	free_map(char **map)
 	int	i;
 
 	i = 0;
-	if (!map || !map[i])
+	if (!map)
 		return ;
 	while (map[i])
 	{

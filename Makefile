@@ -10,7 +10,7 @@ MINILIBX_PATH = minilibx-linux/
 
 SRCS =	main.c\
 		srcs/get_next_line/get_next_line.c srcs/get_next_line/get_next_line_utils.c\
-		srcs/libft/libft_1.c srcs/libft/libft_2.c\
+		srcs/libft/libft_1.c srcs/libft/libft_2.c srcs/libft/libft_3.c\
 		srcs/init_1.c srcs/init_2.c\
 		srcs/free.c srcs/exit.c\
 		srcs/rgb.c\

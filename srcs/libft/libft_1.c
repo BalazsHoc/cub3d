@@ -14,10 +14,8 @@
 
 void	*ft_calloc(t_data *d, size_t nmemb, size_t size)
 {
-	char	*buffer;
-	size_t	i;
+	void	*buffer;
 
-	i = -1;
 	if (!nmemb || !size)
 		return (error_clean(d), NULL);
 	if (size > SIZE_MAX / nmemb)
@@ -25,8 +23,7 @@ void	*ft_calloc(t_data *d, size_t nmemb, size_t size)
 	buffer = (void *)malloc(size * nmemb);
 	if (!buffer)
 		return (ft_printe("Error\nmalloc fail\n"), error_clean(d), NULL);
-	while (++i < size)
-		buffer[i] = '\0';
+	ft_bzero(buffer, size * nmemb);
 	return (buffer);
 }
 

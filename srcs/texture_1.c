@@ -59,9 +59,15 @@ void	draw_textures_loop(t_data *d, int cur_col_x, int type)
 		d->tex_y = ((int)(d->draw_y - d->draw_start) * d->textures[type].height
 				/ (d->draw_end - d->draw_start));
 		if (d->tex_y >= TEXTURE_SIZE)
+		{
 			d->tex_y = TEXTURE_SIZE - 1;
+			return ;
+		}
 		else if (d->tex_y < 0)
+		{
 			d->tex_y = 0;
+			return ;
+		}
 		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y,
 			*(unsigned int *)(d->textures[type].addr
 				+ (unsigned int)((d->tex_y * d->textures[type].line_length)

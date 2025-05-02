@@ -105,6 +105,7 @@ typedef struct data_s
 	char				*buf;
 	char				*colors[3];
 	char				*read_buf;
+	char				**buf_arr;
 	struct line_s		*line;
 	int					width;
 	int					heigth;
@@ -164,6 +165,9 @@ char		*ft_substr(t_data *d, char const *s, unsigned int start, size_t l);
 int			ft_strlen(const char *str);
 char		*ft_strchr(const char *s, int c);
 char		*ft_strtrim(t_data *d, char const *s1, char const *set);
+
+//	srcs/libft/libft_3.c
+void		ft_bzero(void *s, size_t n);
 
 //	srcs/rgb.c
 void		cut_num(t_data *d, char *color, int i, int loop);

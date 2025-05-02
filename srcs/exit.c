@@ -17,6 +17,7 @@ void	error_clean(t_data *d)
 	if (d)
 	{
 		free_map(d->map);
+		free_map(d->buf_arr);
 		free_str(d->north);
 		free_str(d->south);
 		free_str(d->west);
@@ -41,6 +42,7 @@ void	exit_clean(t_data *d)
 	if (d)
 	{
 		free_map(d->map);
+		free_map(d->buf_arr);
 		free_str(d->north);
 		free_str(d->south);
 		free_str(d->west);
