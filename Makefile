@@ -2,7 +2,7 @@
 NAME = cub3D
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -g
+CFLAGS = -Wall -Werror -Wextra
 # MLXFLAGS = -lmlx -lXext -lX11 -lm -L$(MINILIBX_PATH)    
 MLXFLAGS = -lmlx -lXext -lX11 -lm
 
