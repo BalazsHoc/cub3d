@@ -54,7 +54,7 @@ void	draw_textures_u(int *line_height, int *draw_start, int *draw_end)
 
 void	draw_textures_loop(t_data *d, int cur_col_x, int type)
 {
-	while (d->draw_y++ < d->draw_end)
+	while (d->draw_y < d->draw_end && d->draw_y < HEIGHT)
 	{
 		d->tex_y = ((int)(d->draw_y - d->draw_start) * d->textures[type].height
 				/ (d->draw_end - d->draw_start));
@@ -71,7 +71,8 @@ void	draw_textures_loop(t_data *d, int cur_col_x, int type)
 		put_pixel(d, cur_col_x, d->draw_y,
 			*(unsigned int *)(d->textures[type].addr
 				+ (unsigned int)((d->tex_y * d->textures[type].line_length)
-					+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
+					- (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
+		d->draw_y++;
 	}
 }
 
