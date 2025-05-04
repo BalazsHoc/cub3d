@@ -1,16 +1,12 @@
-lol
+
 
 NO ./textures/sand.xpm
- 
-WE ./textures/smooth_stone.xpm
-F  100,25,72 
+WE ./textures/wood.xpm
+SO ./textures/smooth_stone.xpm
+EA ./textures/stone.xpm
 
-
-
-SO 	./textures/wood.xpm
-EA ./textures/stone.xpm 	   
-
-C   	  135,206,235    
+F 100,25,72
+C 135,206,235
 
             
      11111111111  

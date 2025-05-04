@@ -38,7 +38,7 @@
 
 # define WALL 10
 # define SPEED 0.3
-# define R_SPEED 0.03
+# define R_SPEED 0.015
 
 # define W 119
 # define A 97
@@ -57,8 +57,8 @@
 # include <fcntl.h>
 # include <X11/keysym.h>
 # include <math.h>
-// # include "mlx.h"
-# include "minilibx-linux/mlx.h"
+# include "mlx.h"
+// # include "minilibx-linux/mlx.h"
 
 typedef struct screen_s
 {
