@@ -43,7 +43,6 @@ void	convert_texture(t_data *d, int type, char *texture, int i)
 
 void	draw_textures_u(int *line_height, int *draw_start, int *draw_end)
 {
-	// *line_height *= WALL_RESIZE;
 	*draw_start = -(*line_height) / 2 + HEIGHT / 2;
 	if (*draw_start < -HEIGHT * WALL_RESIZE)
 		*draw_start = -HEIGHT * WALL_RESIZE;
