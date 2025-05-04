@@ -68,7 +68,7 @@ void	draw_textures_loop(t_data *d, int cur_col_x, int type)
 			d->tex_y = 0;
 			return ;
 		}
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y,
+		put_pixel(d, cur_col_x, d->draw_y,
 			*(unsigned int *)(d->textures[type].addr
 				+ (unsigned int)((d->tex_y * d->textures[type].line_length)
 					+ (unsigned int)(d->tex_x * (d->textures[type].bpp / 8)))));
@@ -88,10 +88,10 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	if (d->draw_y)
 		d->draw_y--;
 	while (d->draw_y++ <= d->draw_start)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y, d->c);
+		put_pixel(d, cur_col_x, d->draw_y, d->c);
 	d->draw_y--;
 	draw_textures_loop(d, cur_col_x, type);
 	d->draw_y--;
 	while (d->draw_y++ <= HEIGHT)
-		mlx_pixel_put(d->mlx_ptr, d->window, cur_col_x, d->draw_y, d->f);
+		put_pixel(d, cur_col_x, d->draw_y, d->f);
 }

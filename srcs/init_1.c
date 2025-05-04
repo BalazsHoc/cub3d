@@ -79,6 +79,7 @@ void	init_data(t_data *d)
 	init_rays(d);
 	d->window = NULL;
 	d->mlx_ptr = NULL;
+	d->screen_img[0].img = NULL;
 	d->player = NULL;
 	d->pi = acos(-1.0);
 	init_draw_var(d);

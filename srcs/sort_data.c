@@ -17,7 +17,7 @@ int	sort_data_u_2(t_data *d, char *line, int i)
 	if (!ft_strncmp("C ", line + i, 2) || !ft_strncmp("C\t", line + i, 2))
 	{
 		if (d->ceiling)
-			return (ft_printe("Error\nmultiple definition of 'F'\n"),
+			return (ft_printe("Error\nmultiple definition of 'C'\n"),
 				error_clean(d), 1);
 		d->ceiling = ft_strdup(d, d->read_buf);
 		check_rgb(d, d->ceiling, &d->c);

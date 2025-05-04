@@ -54,6 +54,9 @@ void	free_mlx(t_data *d)
 	int	i;
 
 	i = -1;
+	if (d->screen_img[0].img)
+		mlx_destroy_image(d->mlx_ptr, d->screen_img[0].img);
+	d->screen_img[0].img = NULL;
 	while (++i < 4 && d->mlx_ptr)
 	{
 		if (d->textures[i].img)

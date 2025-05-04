@@ -60,6 +60,17 @@
 # include "mlx.h"
 // # include "minilibx-linux/mlx.h"
 
+typedef struct screen_s
+{
+	void				*img;
+	void				*addr;
+	int					width;
+	int					height;
+	int					bpp;
+	int					line_length;
+	int					edian;
+}	t_screen;
+
 typedef struct texture_s
 {
 	void				*img;
@@ -133,6 +144,7 @@ typedef struct data_s
 	bool				y_wall;
 	int					tex_x;
 	int					tex_y;
+	struct texture_s	screen_img[1];
 	struct player_s		*player;
 	struct texture_s	textures[4];
 }	t_data;
