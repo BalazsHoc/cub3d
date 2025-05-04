@@ -1,4 +1,3 @@
-
 NAME = cub3D
 
 CC = cc

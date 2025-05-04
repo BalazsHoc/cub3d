@@ -86,11 +86,8 @@ void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 	while (MINI_MAP && d->draw_y < d->heigth * MINI_WALL && cur_col_x
 		+ MINI_WALL < d->width * MINI_WALL)
 		d->draw_y++;
-	if (d->draw_y)
-		d->draw_y--;
 	while (d->draw_y++ <= d->draw_start)
 		put_pixel(d, cur_col_x, d->draw_y, d->c);
-	d->draw_y--;
 	draw_textures_loop(d, cur_col_x, type);
 	d->draw_y--;
 	while (d->draw_y++ <= HEIGHT)
