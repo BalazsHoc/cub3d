@@ -43,7 +43,7 @@ void	convert_texture(t_data *d, int type, char *texture, int i)
 
 void	draw_textures_u(int *line_height, int *draw_start, int *draw_end)
 {
-	*line_height *= WALL_RESIZE;
+	// *line_height *= WALL_RESIZE;
 	*draw_start = -(*line_height) / 2 + HEIGHT / 2;
 	if (*draw_start < -HEIGHT * WALL_RESIZE)
 		*draw_start = -HEIGHT * WALL_RESIZE;
@@ -79,6 +79,7 @@ void	draw_textures_loop(t_data *d, int cur_col_x, int type)
 void	draw_textures(t_data *d, double distance, int cur_col_x, int type)
 {
 	d->draw_y = 0;
+	distance /= WALL_RESIZE;
 	distance *= cos(d->r_angle - d->player->angle);
 	d->line_height = ((int)(HEIGHT / distance));
 	draw_textures_u(&d->line_height, &d->draw_start, &d->draw_end);
