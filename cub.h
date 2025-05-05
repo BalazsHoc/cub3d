@@ -222,10 +222,10 @@ void		setup_xy(t_data *d);
 void		raycast(t_data *d);
 
 //	srcs/minimap.c
+
+void		delete_mini_map(t_data *d);
 void		draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size);
-void		delete_miniplayer(t_data *d, int pixel_x, int pixel_y, int size);
 void		draw_square(t_data *d, int pixel_x, int pixel_y, int size);
-void		delete_square(t_data *d, int pixel_x, int pixel_y, int size);
 void		draw_mini_map(t_data *d);
 
 //	srcs/displaying.c

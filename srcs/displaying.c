@@ -44,15 +44,12 @@ int	drawing(t_data *d)
 		|| d->player->left == true || d->player->right == true
 		|| d->player->turn_l == true || d->player->turn_r == true)
 	{
-		delete_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
 		move_player_coor(d);
-		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
-			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
+		raycast(d);
+		delete_mini_map(d);
 		draw_mini_map(d);
 		draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 			(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
-		raycast(d);
 		mlx_put_image_to_window(d->mlx_ptr, d->window,
 			d->screen_img[0].img, 0, 0);
 	}
@@ -73,10 +70,11 @@ void	displaying(t_data *d)
 	if (!d->window)
 		return (ft_printe("Error\nmlx_new_window\n"), error_clean(d));
 	screen_img(d);
+	raycast(d);
+	delete_mini_map(d);
+	draw_mini_map(d);
 	draw_miniplayer(d, (d->player->x / WALL) * MINI_WALL,
 		(d->player->y / WALL) * MINI_WALL, MINI_PLAYER);
-	draw_mini_map(d);
-	raycast(d);
 	mlx_put_image_to_window(d->mlx_ptr, d->window, d->screen_img[0].img, 0, 0);
 	mlx_hook(d->window, 17, 0, handle_click_x, d);
 	mlx_hook(d->window, 2, 1L << 0, key_press, d);

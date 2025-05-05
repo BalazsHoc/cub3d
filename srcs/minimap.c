@@ -12,6 +12,31 @@
 
 #include "../cub.h"
 
+void	delete_mini_map(t_data *d)
+{
+	int	x;
+	int	y;
+
+	x = 0;
+	y = 0;
+	while (MINI_MAP && y < d->heigth * MINI_WALL)
+	{
+		while (x <= d->width * MINI_WALL)
+		{
+			if (d->map[y / MINI_WALL][x / MINI_WALL]
+				&& d->map[y / MINI_WALL][x / MINI_WALL] != ' '
+				&& d->map[y / MINI_WALL][x / MINI_WALL] !=  '\n'
+				&& d->map[y / MINI_WALL][x / MINI_WALL] !=  '\t')
+				put_pixel(d, x, y, 0);
+			else if (!d->map[y / MINI_WALL][x / MINI_WALL])
+				break ;
+			x++;
+		}
+		x = 0;
+		y++;
+	}
+}
+
 void	draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size)
 {
 	int	i;
@@ -29,23 +54,6 @@ void	draw_miniplayer(t_data *d, int pixel_x, int pixel_y, int size)
 	}
 }
 
-void	delete_miniplayer(t_data *d, int pixel_x, int pixel_y, int size)
-{
-	int	i;
-	int	j;
-
-	pixel_x -= size / 2;
-	pixel_y -= size / 2;
-	i = -1;
-	j = -1;
-	while (MINI_MAP && ++i < size)
-	{
-		while (++j < size)
-			put_pixel(d, pixel_x + j, pixel_y + i, 0);
-		j = -1;
-	}
-}
-
 void	draw_square(t_data *d, int pixel_x, int pixel_y, int size)
 {
 	int	i;
@@ -57,21 +65,6 @@ void	draw_square(t_data *d, int pixel_x, int pixel_y, int size)
 	{
 		while (++j < size)
 			put_pixel(d, pixel_x + j, pixel_y + i, MINI_WALL_C);
-		j = -1;
-	}
-}
-
-void	delete_square(t_data *d, int pixel_x, int pixel_y, int size)
-{
-	int	i;
-	int	j;
-
-	i = -1;
-	j = -1;
-	while (++i < size)
-	{
-		while (++j < size)
-			put_pixel(d, pixel_x + j, pixel_y + i, 0);
 		j = -1;
 	}
 }
