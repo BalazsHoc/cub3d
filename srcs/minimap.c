@@ -25,8 +25,8 @@ void	delete_mini_map(t_data *d)
 		{
 			if (d->map[y / MINI_WALL][x / MINI_WALL]
 				&& d->map[y / MINI_WALL][x / MINI_WALL] != ' '
-				&& d->map[y / MINI_WALL][x / MINI_WALL] !=  '\n'
-				&& d->map[y / MINI_WALL][x / MINI_WALL] !=  '\t')
+				&& d->map[y / MINI_WALL][x / MINI_WALL] != '\n'
+				&& d->map[y / MINI_WALL][x / MINI_WALL] != '\t')
 				put_pixel(d, x, y, 0);
 			else if (!d->map[y / MINI_WALL][x / MINI_WALL])
 				break ;
